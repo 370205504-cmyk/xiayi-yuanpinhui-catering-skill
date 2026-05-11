@@ -21,6 +21,7 @@ const storeRoutes = require('./routes/store');
 const apiRoutes = require('./routes/api');
 const agentRoutes = require('./routes/agent');
 const adminRoutes = require('./routes/admin');
+const monitorRoutes = require('./routes/monitor');
 
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection } = require('./middleware/security');
 
@@ -70,6 +71,7 @@ app.use('/api/v1/store', storeRoutes);
 app.use('/api/v1', apiLimiter, apiRoutes);
 app.use('/agent', agentRoutes);
 app.use('/admin', adminRoutes);
+app.use('/monitor', monitorRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'web', 'index.html'));
