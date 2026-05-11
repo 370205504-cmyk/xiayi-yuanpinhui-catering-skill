@@ -307,6 +307,35 @@ const MIGRATIONS = [
         INDEX idx_created (created_at)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `
+  },
+  {
+    name: 'create_queues_table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS queues (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        queue_id VARCHAR(50) UNIQUE NOT NULL,
+        store_id INT NOT NULL,
+        user_id INT,
+        table_type ENUM('small', 'medium', 'large', '包间') NOT NULL,
+        people INT NOT NULL,
+        queue_no VARCHAR(20) NOT NULL,
+        status ENUM('waiting', 'called', 'completed', 'cancelled', 'no_show') DEFAULT 'waiting',
+        wait_count INT DEFAULT 1,
+        estimated_time INT DEFAULT 0,
+        note TEXT,
+        called_at TIMESTAMP NULL,
+        completed_at TIMESTAMP NULL,
+        cancelled_at TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+        INDEX idx_queue_id (queue_id),
+        INDEX idx_store_id (store_id),
+        INDEX idx_status (status),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `
   }
 ];
 
