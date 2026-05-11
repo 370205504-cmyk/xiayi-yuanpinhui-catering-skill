@@ -8,6 +8,7 @@
     "dev": "nodemon lambda/server.js",
     "test": "jest --coverage",
     "migrate": "node lambda/database/migrate.js",
+    "import-sample": "node lambda/database/import-sample.js",
     "backup": "node lambda/database/backup.js",
     "lint": "eslint lambda/",
     "security:scan": "npm audit"
