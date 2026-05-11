@@ -1,7 +1,7 @@
 {
   "name": "xiayi-youpinhui-foodie-alexa-skill",
-  "version": "2.0.0",
-  "description": "夏邑缘品荟创味菜 - Alexa Skill for dish recommendation, ordering, and reservation",
+  "version": "2.1.0",
+  "description": "夏邑缘品荟创味菜 - Alexa Skill for dish recommendation, ordering, and reservation - Developed by 石中伟",
   "main": "lambda/index.js",
   "scripts": {
     "test": "jest",
@@ -16,9 +16,17 @@
     "restaurant",
     "ordering",
     "chinese-cuisine",
-    "夏邑缘品荟创味菜"
+    "夏邑缘品荟创味菜",
+    "石中伟"
   ],
-  "author": "夏邑缘品荟创味菜 Team",
+  "author": "石中伟",
+  "contributors": [
+    {
+      "name": "石中伟",
+      "email": "contact@shizhongwei.com",
+      "url": "https://github.com/shizhongwei"
+    }
+  ],
   "license": "Apache-2.0",
   "dependencies": {
     "ask-sdk-core": "^2.14.0",
@@ -32,5 +40,12 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/370205504-cmyk/foodie-chef-alexa-skill"
+  },
+  "bugs": {
+    "url": "https://github.com/370205504-cmyk/foodie-chef-alexa-skill/issues"
   }
 }

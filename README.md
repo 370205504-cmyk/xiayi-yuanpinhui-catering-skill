@@ -1,27 +1,43 @@
 # 🍽️ 夏邑缘品荟创味菜 (Xiayi Youpinhui Foodie) - Alexa Skill
 
-🎙️ **一款开源的智能餐饮 Alexa Skill，提供菜品推荐、菜单生成、菜谱查询、店铺关联、外卖点餐和堂食预约功能。**
+🎙️ **一款开源的智能餐饮 Alexa Skill，提供菜品推荐、菜单生成、菜谱查询、店铺关联、外卖点餐、堂食预约、客人自主下单和智能推荐功能。**
+
+🛠️ **开发者：石中伟**
 
 [English Version](#english-version) | [快速开始](#快速开始) | [功能演示](#-功能演示) | [部署指南](#部署指南)
 
 ---
 
+## 👨‍💻 开发者信息
+
+| 项目 | 信息 |
+|------|------|
+| **开发者** | 石中伟 |
+| **联系邮箱** | contact@shizhongwei.com |
+| **GitHub** | [shizhongwei](https://github.com/shizhongwei) |
+
+---
+
 ## 📖 项目简介
 
-**夏邑缘品荟创味菜** 是一个基于 Amazon Alexa 的智能语音助手技能，专注于中餐烹饪领域和本地餐饮服务。用户可以通过语音交互获取个性化的菜品推荐、完整的菜单规划、详细的菜谱指导，并且可以直接查询附近门店、点外卖或预约堂食。
+**夏邑缘品荟创味菜** 是一个基于 Amazon Alexa 的智能语音助手技能，专注于中餐烹饪领域和本地餐饮服务。用户可以通过语音交互获取个性化的菜品推荐、完整的菜单规划、详细的菜谱指导，并且可以直接查询附近门店、点外卖、预约堂食、查询WiFi密码、连接打印机打印小票，以及进行自主下单。
 
 ### ✨ 核心功能
 
 | 功能 | 说明 | 示例语音指令 |
 |---|---|---|
-| 🎯 **智能推荐** | 根据菜系、食材、口味偏好推荐菜品 | "推荐一道川菜" |
+| 🎯 **智能推荐** | 根据客户喜好推荐菜品和套餐 | "你喜欢什么口味？我推荐这道菜" |
 | 📋 **菜单生成** | 生成早餐/午餐/晚餐/一日三餐菜单 | "帮我安排今天的午餐菜单" |
 | 📖 **菜谱查询** | 提供详细的烹饪步骤和食材清单 | "告诉我宫保鸡丁的做法" |
 | 🏪 **店铺查询** | 查找附近门店、营业时间、地址信息 | "附近有哪些门店" |
+| 📶 **WiFi密码** | 查询店铺WiFi密码 | "WiFi密码是多少" |
 | 🛵 **外卖点餐** | 直接语音下单外卖，支持配送 | "帮我点一份宫保鸡丁外卖" |
+| 📱 **自主下单** | 客人扫描二维码自主点餐 | "我要扫码下单" |
+| 🖨️ **打印机连接** | 连接打印机自动打印订单小票 | "打印订单" |
 | 📅 **堂食预约** | 预约到店用餐座位和时间 | "我想预约明天晚上6点" |
-| 🎲 **随机推荐** | 不知道吃什么？让美食大厨帮您选 | "随机推荐一道菜" |
 | 📤 **社交分享** | 一键分享菜品到小红书/微信 | "分享这道菜到小红书" |
+| 🎲 **随机推荐** | 不知道吃什么？让美食大厨帮您选 | "随机推荐一道菜" |
+| 📜 **菜单显示** | 显示完整菜单供客人选择 | "给我看看菜单" |
 
 ---
 
@@ -58,42 +74,62 @@ ask simulate -l zh-CN -t "推荐一道川菜"
 
 ## 🗣️ 语音指令示例
 
-### 菜品推荐
+### 菜品推荐（智能推荐）
 
 ```
-"Alexa，打开夏邑缘品荟创味菜"
 "推荐一道菜"
-"推荐一道川菜"
-"用鸡肉做什么菜"
-"推荐一道辣的菜"
-"推荐一道川菜，用鸡肉做的，辣一点的"
+"你喜欢什么口味的？"
+"我最近想吃辣的"
+"给我推荐适合小孩的"
+"上次我点了红烧肉，推荐类似的"
+"推荐一个套餐"
 ```
 
-### 菜单生成
+### 菜单显示
 
 ```
-"帮我生成菜单"
-"帮我安排今天的午餐菜单"
-"给3个人做晚餐菜单"
-"安排一日三餐"
+"给我看看菜单"
+"显示今日菜单"
+"有什么招牌菜"
+"素菜有哪些"
+"适合素食者的菜品"
 ```
 
-### 菜谱查询
+### WiFi密码
 
 ```
-"告诉我宫保鸡丁的做法"
-"怎么做麻婆豆腐"
-"告诉我做法"（查询上次推荐的菜）
+"WiFi密码是多少"
+"WiFi怎么连"
+"店里WiFi"
+"无线网络密码"
+```
+
+### 客人自主下单
+
+```
+"我要扫码下单"
+"给我下单二维码"
+"我想自己点餐"
+"我要自己选菜"
+"显示点餐二维码"
+```
+
+### 打印机连接
+
+```
+"打印我的订单"
+"连接打印机"
+"打印小票"
+"打印菜单"
 ```
 
 ### 店铺查询
 
 ```
 "附近有哪些门店"
-"夏邑县城的门店地址"
-"门店营业时间"
-"最近门店是哪家"
-"门店联系电话"
+"门店地址和营业时间"
+"联系电话是多少"
+"门店WiFi密码"
 ```
 
 ### 外卖点餐
@@ -103,7 +139,6 @@ ask simulate -l zh-CN -t "推荐一道川菜"
 "外卖一份红烧肉加一份米饭"
 "下单后多久能送到"
 "查看我的外卖订单"
-"取消我的订单"
 ```
 
 ### 堂食预约
@@ -112,16 +147,7 @@ ask simulate -l zh-CN -t "推荐一道川菜"
 "我想预约明天晚上6点"
 "帮我在门店订位，2个人"
 "查看我的预约"
-"修改预约时间"
 "取消预约"
-```
-
-### 社交分享
-
-```
-"分享这道菜到小红书"
-"分享到微信朋友圈"
-"生成菜品分享卡片"
 ```
 
 ---
@@ -132,44 +158,20 @@ ask simulate -l zh-CN -t "推荐一道川菜"
 
 夏邑缘品荟创味菜目前在以下区域提供服务：
 
-| 区域 | 门店数量 | 配送范围 |
-|------|---------|---------|
-| 夏邑县城 | 3家 | 全城配送 |
-| 城郊区域 | 2家 | 部分区域 |
+| 区域 | 门店数量 | WiFi | 打印机 | 配送范围 |
+|------|---------|------|--------|---------|
+| 夏邑县城 | 3家 | ✅ | ✅ | 全城配送 |
+| 城郊区域 | 2家 | ✅ | ✅ | 部分区域 |
 
-### 支持的服务
+### 门店特色服务
 
-- ✅ 到店自取
-- ✅ 外卖配送
-- ✅ 堂食预约
-- ✅ 会员积分
-- ✅ 优惠券领取
-
----
-
-## 🍜 支持的菜品
-
-### 菜系覆盖
-
-- **川菜** ：宫保鸡丁、麻婆豆腐、水煮鱼、鱼香肉丝、回锅肉、酸菜鱼
-- **粤菜** ：清蒸鲈鱼、皮蛋瘦肉粥
-- **湘菜** ：小炒肉
-- **家常菜** ：番茄炒蛋、红烧肉、糖醋排骨、蛋炒饭等
-- **上海菜** ：葱油拌面
-- **台湾菜** ：三杯鸡
-
-### 菜品详情（20道经典中餐）
-
-| 菜品 | 菜系 | 口味 | 难度 | 时间 | 热量 | 可外卖 |
-|---|---|---|---|---|---|---|
-| 宫保鸡丁 | 川菜 | 香辣 | 中等 | 25分钟 | 320kcal | ✅ |
-| 麻婆豆腐 | 川菜 | 麻辣 | 简单 | 20分钟 | 250kcal | ✅ |
-| 水煮鱼 | 川菜 | 麻辣 | 较难 | 40分钟 | 380kcal | ✅ |
-| 番茄炒蛋 | 家常菜 | 酸甜 | 简单 | 10分钟 | 180kcal | ✅ |
-| 红烧肉 | 家常菜 | 咸鲜 | 中等 | 90分钟 | 520kcal | ✅ |
-| ... | ... | ... | ... | ... | ... | ... |
-
-*查看完整菜品列表请访问 [DISHES.md](DISHES.md)*
+| 服务项目 | 支持门店 | 说明 |
+|---------|---------|------|
+| 📶 WiFi连接 | 全部 | 提供WiFi名称和密码 |
+| 🖨️ 打印机 | 全部 | 支持自动打印订单小票 |
+| 📱 自主下单 | 全部 | 扫码自主点餐 |
+| 🛵 外卖配送 | 全部 | 全城配送服务 |
+| 📅 堂食预约 | 5家 | 支持座位预约 |
 
 ---
 
@@ -181,14 +183,19 @@ foodie-chef/
 │   ├── index.js                   # Skill 主逻辑
 │   ├── package.json               # Node.js 依赖
 │   ├── data/                     # 数据目录
-│   │   ├── dishes.json          # 菜品数据
-│   │   ├── stores.json          # 门店数据
-│   │   └── recipes.json         # 菜谱数据
+│   │   ├── dishes.json          # 菜品数据（含推荐标签）
+│   │   ├── stores.json          # 门店数据（含WiFi、打印机）
+│   │   ├── recipes.json         # 菜谱数据
+│   │   └── customerProfiles.json # 客户偏好数据
 │   └── utils/                   # 工具函数
 │       ├── orderService.js      # 订单服务
 │       ├── reservationService.js # 预约服务
 │       ├── storeService.js      # 门店服务
-│       └── shareService.js      # 分享服务
+│       ├── shareService.js      # 分享服务
+│       ├── wifiService.js       # WiFi服务
+│       ├── printerService.js    # 打印机服务
+│       ├── selfOrderService.js  # 自主下单服务
+│       └── recommendationService.js # 智能推荐服务
 ├── models/                         # 交互模型
 │   ├── zh-CN.json                 # 中文交互模型
 │   └── en-US.json                 # 英文交互模型
@@ -197,52 +204,23 @@ foodie-chef/
 │   └── assets/                    # 图标资源
 ├── infrastructure/                 # 基础设施
 │   └── cfn-deployer.yaml         # CloudFormation 模板
-├── .github/                        # GitHub 配置
-│   ├── ISSUE_TEMPLATE/            # Issue 模板
-│   └── PULL_REQUEST_TEMPLATE.md   # PR 模板
-├── tests/                         # 测试文件
-├── docs/                          # 文档
 ├── README.md                      # 项目说明
 ├── CONTRIBUTING.md                # 贡献指南
 ├── CHANGELOG.md                   # 更新日志
-├── LICENSE                        # 许可证
-└── package.json                   # 项目配置
+└── LICENSE                        # 许可证
 ```
 
 ---
 
 ## 🛠 技术栈
 
+- **开发者** : 石中伟
 - **运行时** : Node.js 18.x (AWS Lambda)
 - **SDK** : [ASK SDK v2 for Node.js](https://developer.amazon.com/docs/alexa/alexa-skills-kit-sdk-for-nodejs/overview.html)
 - **部署** : AWS Lambda + CloudFormation
 - **语言支持** : 中文 (zh-CN)、英文 (en-US)
 - **测试** : Jest
-- **数据库** : DynamoDB (订单/预约) + S3 (静态数据)
-
----
-
-## 🧪 测试
-
-### 本地测试
-
-```bash
-# 安装测试依赖
-npm install --save-dev jest
-
-# 运行测试
-npm test
-```
-
-### 使用 ASK CLI 测试
-
-```bash
-# 模拟中文请求
-ask simulate -l zh-CN -t "推荐一道川菜"
-ask simulate -l zh-CN -t "帮我点一份宫保鸡丁外卖"
-ask simulate -l zh-CN -t "我想预约明天晚上6点"
-ask simulate -l zh-CN -t "分享这道菜到小红书"
-```
+- **打印机支持** : ESC/POS 协议
 
 ---
 
@@ -250,76 +228,60 @@ ask simulate -l zh-CN -t "分享这道菜到小红书"
 
 我们欢迎所有形式的贡献！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何参与项目。
 
-### 快速贡献步骤
-
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
-
-### 菜品贡献
-
-如果您想添加新的菜品，请参考 [DISHES.md](DISHES.md) 的格式，并提交 Pull Request。
-
-### 门店入驻
-
-如果您是餐饮商家，想加入夏邑缘品荟创味菜平台，请提交 [门店入驻申请](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/issues/new?template=store-application.md)。
-
 ---
 
 ## 📋 更新日志
 
 查看 [CHANGELOG.md](CHANGELOG.md) 了解所有版本更新历史。
 
-### 最新版本 v2.0.0
+### 最新版本 v2.1.0
 
-- ✅ 项目更名为"夏邑缘品荟创味菜"
-- ✅ 新增店铺关联功能
-- ✅ 新增外卖点餐功能
-- ✅ 新增堂食预约功能
-- ✅ 新增社交分享功能（小红书/微信）
-- ✅ 完整的O2O餐饮闭环
+- ✅ **开发者更新**：石中伟
+- ✅ **WiFi密码功能**：查询和显示店铺WiFi信息
+- ✅ **菜单显示功能**：展示完整菜单供客人选择
+- ✅ **智能推荐系统**：基于客户喜好和历史记录推荐
+- ✅ **打印机连接**：支持打印订单小票和菜单
+- ✅ **客人自主下单**：扫码自主点餐系统
+- ✅ **地址和营业时间**：完善门店信息
 
 ---
 
 ## 📝 交互模型设计
 
-### 意图 (Intents)
+### 新增意图 (Intents)
 
 | 意图名称 | 类型 | 说明 | 关键槽位 |
 |---|---|---|---|
-| `RecommendDishIntent` | 自定义 | 菜品推荐 | Cuisine, Ingredient, Taste |
-| `GenerateMenuIntent` | 自定义 | 菜单生成 | MealType, PersonCount |
-| `GetRecipeIntent` | 自定义 | 菜谱查询 | DishName |
-| `RandomDishIntent` | 自定义 | 随机推荐 | - |
-| `FindStoreIntent` | 自定义 | 门店查询 | Location, StoreName |
-| `OrderFoodIntent` | 自定义 | 外卖点餐 | DishName, Quantity, Address |
-| `MakeReservationIntent` | 自定义 | 堂食预约 | Date, Time, PersonCount |
-| `ShareDishIntent` | 自定义 | 社交分享 | Platform, DishName |
-| `AMAZON.HelpIntent` | 内置 | 帮助 | - |
-| `AMAZON.CancelIntent` | 内置 | 取消 | - |
-| `AMAZON.StopIntent` | 内置 | 停止 | - |
+| `ShowMenuIntent` | 自定义 | 显示完整菜单 | Category, DishType |
+| `GetWifiPasswordIntent` | 自定义 | 获取WiFi密码 | StoreName |
+| `SelfOrderIntent` | 自定义 | 自主下单 | - |
+| `ConnectPrinterIntent` | 自定义 | 连接打印机 | PrinterAction |
+| `SmartRecommendIntent` | 自定义 | 智能推荐 | Preference, History |
+| `ShowComboIntent` | 自定义 | 显示套餐 | ComboType |
 
-### 自定义槽位类型
+### 新增槽位类型
 
 | 类型 | 描述 | 示例值 |
 |---|---|---|
-| `CUISINE_TYPE` | 菜系 | 川菜、粤菜、湘菜、西餐、日料 |
-| `INGREDIENT_TYPE` | 食材 | 鸡肉、猪肉、豆腐、土豆 |
-| `TASTE_TYPE` | 口味 | 辣、清淡、酸甜、麻辣 |
-| `MEAL_TYPE` | 餐别 | 早餐、午餐、晚餐、宵夜 |
-| `DISH_NAME` | 菜品名 | 宫保鸡丁、麻婆豆腐、红烧肉 |
-| `SHARE_PLATFORM` | 分享平台 | 小红书、微信、朋友圈 |
-| `LOCATION` | 位置 | 夏邑县城、城郊、附近 |
-| `DATE` | 日期 | 明天、后天、周六 |
-| `TIME` | 时间 | 晚上6点、中午12点 |
+| `MENU_CATEGORY` | 菜单分类 | 招牌菜、素菜、儿童餐、套餐 |
+| `DISH_TYPE` | 菜品类型 | 凉菜、热菜、汤、主食 |
+| `PRINTER_ACTION` | 打印操作 | 打印订单、打印小票、打印菜单 |
+| `COMBO_TYPE` | 套餐类型 | 单人餐、双人餐、家庭餐、商务餐 |
 
 ---
 
 ## 📄 许可证
 
 本项目采用 [Apache License 2.0](LICENSE) 开源许可证。
+
+---
+
+## 👨‍💻 开发者
+
+**石中伟** - 项目创始人及主要开发者
+
+- GitHub: [shizhongwei](https://github.com/shizhongwei)
+- Email: contact@shizhongwei.com
 
 ---
 
@@ -333,6 +295,7 @@ ask simulate -l zh-CN -t "分享这道菜到小红书"
 
 ## 📮 联系我们
 
+- **开发者** : 石中伟
 - **GitHub Issues** : [提交问题](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/issues)
 - **Pull Requests** : [贡献代码](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/pulls)
 
@@ -340,30 +303,21 @@ ask simulate -l zh-CN -t "分享这道菜到小红书"
 
 ## 🌐 English Version
 
-**Xiayi Youpinhui Foodie** is an open-source Alexa Skill for intelligent dish recommendation, menu generation, store association, food ordering, and reservation.
+**Xiayi Youpinhui Foodie** is an open-source Alexa Skill developed by **石中伟 (Shi Zhongwei)** for intelligent dish recommendation, menu display, WiFi info, printer connection, self-ordering, and reservation.
 
 ### Features
 
-- 🎯 **Dish Recommendation** : Based on cuisine, ingredients, and taste preferences
-- 📋 **Menu Generation** : Generate breakfast, lunch, dinner, or full-day menus
-- 📖 **Recipe Lookup** : Detailed cooking instructions with ingredients
-- 🏪 **Store Locator** : Find nearby stores and get store information
-- 🛵 **Food Ordering** : Place delivery orders directly via voice
-- 📅 **Reservations** : Book tables for dine-in
-- 📤 **Social Sharing** : Share dishes to Xiaohongshu/WeChat
-- 🎲 **Random Pick** : Let Foodie surprise you with a random dish
+- 🎯 **Smart Recommendation** : Based on customer preferences and history
+- 📜 **Menu Display** : Show complete menu for customers
+- 📶 **WiFi Password** : Get store WiFi information
+- 🖨️ **Printer Connection** : Print order receipts
+- 📱 **Self-Ordering** : QR code self-service ordering
+- 🏪 **Store Locator** : Find nearby stores
+- 🛵 **Food Ordering** : Place delivery orders
+- 📅 **Reservations** : Book tables
 
-### Quick Start
+### Developer
 
-```bash
-git clone https://github.com/370205504-cmyk/foodie-chef-alexa-skill.git
-cd foodie-chef-alexa-skill
-cd lambda && npm install && cd ..
-ask deploy
-```
+**Shi Zhongwei (石中伟)** - Project Founder & Lead Developer
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute.
-
----
-
-Made with ❤️ by 夏邑缘品荟创味菜 Team
+Made with ❤️ by 石中伟
