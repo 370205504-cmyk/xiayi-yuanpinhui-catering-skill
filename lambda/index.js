@@ -469,12 +469,17 @@ const GenerateMenuIntentHandler = {
       speakOutput += `🌙 晚餐：${menu.dinner.map(d => d.name).join('、')}\n\n`;
     }
 
-    speakOutput += `总价格：约${menu.totalPrice}元\n\n`;
-    speakOutput += `请问需要我帮您：\n1. 点外卖\n2. 预约堂食\n3. 查看某个菜的详细做法\n4. 显示菜单`;
+    const totalPrice = [
+      ...(menu.breakfast || []),
+      ...(menu.lunch || []),
+      ...(menu.dinner || [])
+    ].reduce((sum, dish) => sum + dish.price, 0);
+
+    speakOutput += `预计总价：约${totalPrice}元\n\n`;
+    speakOutput += `需要我帮您下单吗？`;
 
     handlerInput.attributesManager.setSessionAttributes({
       generatedMenu: menu,
-      personCount: personCount,
       lastIntent: 'GenerateMenuIntent'
     });
 
@@ -494,52 +499,43 @@ const GetRecipeIntentHandler = {
   handle(handlerInput) {
     const { slots } = handlerInput.requestEnvelope.request.intent;
     const dishName = slots.DishName?.value;
-    
-    let dish;
-    let recipe;
 
     if (!dishName) {
-      const sessionAttr = handlerInput.attributesManager.getSessionAttributes();
-      dish = sessionAttr.recommendedDish;
-    } else {
-      dish = dishes.find(d => 
-        d.name.toLowerCase().includes(dishName.toLowerCase())
-      );
-    }
-
-    if (!dish) {
       return handlerInput.responseBuilder
-        .speak(`抱歉，没有找到您想要的菜品。您可以说「告诉我宫保鸡丁的做法」或者「我想学做川菜」。`)
-        .reprompt('请告诉我您想学做的菜品名称')
+        .speak('请问您想查询哪个菜品的做法？请告诉我菜品名称。')
+        .reprompt('请告诉我您想学的菜品名称')
         .getResponse();
     }
 
-    recipe = recipes.find(r => r.dishId === dish.id);
+    const recipe = recipes.find(r => 
+      r.name.toLowerCase().includes(dishName.toLowerCase())
+    );
+
+    if (!recipe) {
+      return handlerInput.responseBuilder
+        .speak(`抱歉，没有找到「${dishName}」的菜谱。请换一个菜品试试。`)
+        .reprompt('您可以尝试：宫保鸡丁、麻婆豆腐、鱼香肉丝等常见菜品')
+        .getResponse();
+    }
 
     handlerInput.attributesManager.setSessionAttributes({
-      currentDish: dish,
       currentRecipe: recipe,
       lastIntent: 'GetRecipeIntent'
     });
 
-    let speakOutput = `${dish.name}的做法如下：\n\n`;
-    
-    if (recipe) {
-      speakOutput += `📝 主要食材：${dish.ingredients.join('、')}\n\n`;
-      speakOutput += `📖 步骤：\n`;
-      recipe.steps.forEach((step, index) => {
-        speakOutput += `第${index + 1}步：${step}\n`;
-      });
-      
-      if (recipe.tips && recipe.tips.length > 0) {
-        speakOutput += `\n💡 小贴士：${recipe.tips.join('；')}`;
-      }
-    } else {
-      speakOutput += `主要食材：${dish.ingredients.join('、')}\n`;
-      speakOutput += `这是一道${dish.cuisine}，口味${dish.taste}。\n`;
-    }
+    let speakOutput = `「${recipe.name}」的做法：\n\n`;
+    speakOutput += `📝 难度：${recipe.difficulty}\n`;
+    speakOutput += `⏱️ 烹饪时间：${recipe.cookingTime}\n\n`;
+    speakOutput += `📋 所需食材：\n`;
+    recipe.ingredients.forEach((ing, idx) => {
+      speakOutput += `${idx + 1}. ${ing}\n`;
+    });
+    speakOutput += `\n👨‍🍳 烹饪步骤：\n`;
+    recipe.steps.forEach((step, idx) => {
+      speakOutput += `第${idx + 1}步：${step}\n`;
+    });
 
-    speakOutput += `\n\n需要我帮您：\n1. 点这道菜\n2. 显示菜单\n3. 推荐其他菜品`;
+    speakOutput += `\n💡 小贴士：${recipe.tips}`;
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
@@ -559,43 +555,45 @@ const FindStoreIntentHandler = {
     const location = slots.Location?.value;
     const storeName = slots.StoreName?.value;
 
-    let filteredStores = storeService.getAllStores();
+    let targetStores = [...stores];
 
     if (location) {
-      filteredStores = storeService.getStoresByDistrict(location);
-    }
-
-    if (storeName) {
-      filteredStores = filteredStores.filter(s => 
-        s.name.toLowerCase().includes(storeName.toLowerCase())
+      targetStores = targetStores.filter(store => 
+        store.district.toLowerCase().includes(location.toLowerCase()) ||
+        store.address.toLowerCase().includes(location.toLowerCase())
       );
     }
 
-    if (filteredStores.length === 0) {
+    if (storeName) {
+      targetStores = targetStores.filter(store => 
+        store.name.toLowerCase().includes(storeName.toLowerCase())
+      );
+    }
+
+    if (targetStores.length === 0) {
       return handlerInput.responseBuilder
-        .speak(`抱歉，在您指定的区域没有找到门店。`)
-        .reprompt('请问您想查询哪个区域的门店？')
+        .speak(`抱歉，在该区域没有找到我们的门店。请问您想查询哪个区域的门店？`)
+        .reprompt('您可以尝试：夏邑县城、城郊等区域')
         .getResponse();
     }
 
     handlerInput.attributesManager.setSessionAttributes({
-      foundStores: filteredStores,
+      displayedStores: targetStores,
       lastIntent: 'FindStoreIntent'
     });
 
-    let speakOutput = `找到了${filteredStores.length}家门店：\n\n`;
-    
-    filteredStores.forEach((store, index) => {
+    let speakOutput = `找到了${targetStores.length}家门店：\n\n`;
+
+    targetStores.forEach((store, idx) => {
       speakOutput += `🏪 ${store.name}\n`;
       speakOutput += `📍 地址：${store.address}\n`;
       speakOutput += `📞 电话：${store.phone}\n`;
       speakOutput += `🕐 营业时间：${store.businessHours}\n`;
-      speakOutput += `📶 WiFi：${store.hasWifi ? '✅ 支持' : '❌ 不支持'}\n`;
-      speakOutput += `🖨️ 打印机：${store.hasPrinter ? '✅ 支持' : '❌ 不支持'}\n`;
-      speakOutput += `${store.canDeliver ? '✅ 支持外卖' : '❌ 暂不支持外卖'}\n\n`;
+      speakOutput += `${store.canDeliver ? '✅ 支持外卖' : '❌ 暂不支持外卖'} `;
+      speakOutput += `${store.canReserve ? '✅ 支持预约' : '❌ 暂不支持预约'}\n\n`;
     });
 
-    speakOutput += `请问需要我帮您：\n1. 点外卖\n2. 预约座位\n3. 查询WiFi密码`;
+    speakOutput += `请问需要我帮您做什么？`;
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
@@ -604,7 +602,7 @@ const FindStoreIntentHandler = {
   }
 };
 
-// ============ 外卖点餐意图 ============
+// ============ 点餐意图 ============
 const OrderFoodIntentHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput) === 'IntentRequest'
@@ -616,73 +614,68 @@ const OrderFoodIntentHandler = {
     const quantity = parseInt(slots.Quantity?.value) || 1;
     const address = slots.Address?.value;
 
-    let dish;
-    
     if (!dishName) {
-      const sessionAttr = handlerInput.attributesManager.getSessionAttributes();
-      dish = sessionAttr.recommendedDish || sessionAttr.currentDish;
-    } else {
-      dish = dishes.find(d => 
-        d.name.toLowerCase().includes(dishName.toLowerCase())
-      );
+      return handlerInput.responseBuilder
+        .speak('请问您想点什么菜品？')
+        .reprompt('您可以说：点一份宫保鸡丁')
+        .getResponse();
     }
+
+    // 查找菜品
+    const dish = dishes.find(d => 
+      d.name.toLowerCase().includes(dishName.toLowerCase())
+    );
 
     if (!dish) {
       return handlerInput.responseBuilder
-        .speak(`抱歉，没有找到您想要的菜品。请先告诉我您想点什么菜。`)
-        .reprompt('请告诉我您想点的菜品名称')
+        .speak(`抱歉，菜单中没有找到「${dishName}」。请问您想点什么？`)
+        .reprompt('您可以尝试：宫保鸡丁、红烧肉、鱼香肉丝等')
         .getResponse();
     }
 
-    if (!dish.canDeliver) {
-      return handlerInput.responseBuilder
-        .speak(`抱歉，${dish.name}暂不支持外卖配送。您可以到店品尝，或者选择其他支持外卖的菜品。`)
-        .reprompt('请问您想点其他菜品吗？')
-        .getResponse();
-    }
+    const subtotal = dish.price * quantity;
+    const deliveryFee = 5;
+    const totalPrice = subtotal + deliveryFee;
 
-    if (!address) {
-      handlerInput.attributesManager.setSessionAttributes({
-        pendingOrder: {
-          dish: dish,
-          quantity: quantity,
-          status: 'awaiting_address'
-        },
-        lastIntent: 'OrderFoodIntent'
-      });
-
-      return handlerInput.responseBuilder
-        .speak(`${dish.name} ${quantity}份，确认下单！\n\n请问您的配送地址是？`)
-        .reprompt('请告诉我您的配送地址')
-        .getResponse();
-    }
-
-    const order = orderService.createOrder({
-      dish: dish,
+    const order = {
+      orderId: `ORD${Date.now()}`,
+      dishName: dish.name,
       quantity: quantity,
-      address: address,
-      customerPhone: '用户手机号',
-      storeId: storeService.getNearestStore()?.id
-    });
+      price: dish.price,
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
+      totalPrice: totalPrice,
+      address: address || '未提供地址',
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
 
     handlerInput.attributesManager.setSessionAttributes({
       currentOrder: order,
       lastIntent: 'OrderFoodIntent'
     });
 
-    // 自动打印小票
-    printerService.printReceipt(order);
+    let speakOutput = `已为您创建订单：\n\n`;
+    speakOutput += `🍽️ 菜品：${dish.name} x ${quantity}\n`;
+    speakOutput += `💰 小计：${subtotal}元\n`;
+    speakOutput += `🚚 配送费：${deliveryFee}元\n`;
+    speakOutput += `📦 总计：${totalPrice}元\n\n`;
 
-    let speakOutput = `✅ 订单创建成功！\n\n订单号：${order.orderId}\n菜品：${dish.name} x ${quantity}\n金额：¥${order.totalPrice}\n配送地址：${address}\n\n小票已发送至打印机。\n\n请问还需要其他帮助吗？`;
+    if (!address) {
+      speakOutput += `请问您的配送地址是哪里？`;
+    } else {
+      speakOutput += `配送地址：${address}\n\n`;
+      speakOutput += `请确认是否下单？`;
+    }
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
-      .reprompt('请问还需要其他帮助吗？')
+      .reprompt('请问您的配送地址是哪里？')
       .getResponse();
   }
 };
 
-// ============ 堂食预约意图 ============
+// ============ 预约意图 ============
 const MakeReservationIntentHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput) === 'IntentRequest'
@@ -694,57 +687,40 @@ const MakeReservationIntentHandler = {
     const time = slots.Time?.value;
     const personCount = parseInt(slots.PersonCount?.value) || 2;
 
-    if (!date || !time) {
-      handlerInput.attributesManager.setSessionAttributes({
-        pendingReservation: {
-          personCount: personCount,
-          status: 'awaiting_details'
-        },
-        lastIntent: 'MakeReservationIntent'
-      });
+    const store = storeService.getNearestStore();
 
-      let question = '好的，我来帮您预约！';
-      if (!date) question += '请问您想预约哪一天？';
-      else question += `预约日期是${date}，`;
-      
-      if (!time) question += '请问想预约几点？';
-      
-      return handlerInput.responseBuilder
-        .speak(question)
-        .reprompt('请告诉我预约的日期和时间')
-        .getResponse();
-    }
-
-    const reservation = reservationService.createReservation({
-      date: date,
-      time: time,
+    const reservation = {
+      reservationId: `RSV${Date.now()}`,
+      date: date || new Date().toLocaleDateString('zh-CN'),
+      time: time || '18:00',
       personCount: personCount,
-      storeId: storeService.getNearestStore()?.id,
-      customerPhone: '用户手机号'
-    });
-
-    if (!reservation.success) {
-      return handlerInput.responseBuilder
-        .speak(`抱歉，${reservation.message}。请您选择其他时间。`)
-        .reprompt('请问您想选择其他时间吗？')
-        .getResponse();
-    }
+      storeId: store.id,
+      storeName: store.name,
+      status: 'confirmed',
+      createdAt: new Date().toISOString()
+    };
 
     handlerInput.attributesManager.setSessionAttributes({
       currentReservation: reservation,
       lastIntent: 'MakeReservationIntent'
     });
 
-    let speakOutput = `✅ 预约成功！\n\n预约号：${reservation.reservationId}\n日期：${date}\n时间：${time}\n人数：${personCount}人\n门店：${reservation.storeName}\n\n请您按时到店，到店后出示预约号即可。\n\n请问还需要其他帮助吗？`;
+    let speakOutput = `预约成功！\n\n`;
+    speakOutput += `📅 日期：${reservation.date}\n`;
+    speakOutput += `🕐 时间：${reservation.time}\n`;
+    speakOutput += `👥 人数：${personCount}人\n`;
+    speakOutput += `🏪 门店：${store.name}\n`;
+    speakOutput += `📋 预约号：${reservation.reservationId}\n\n`;
+    speakOutput += `请按时到店，祝您用餐愉快！`;
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
-      .reprompt('请问还需要其他帮助吗？')
+      .reprompt('请问还需要什么帮助？')
       .getResponse();
   }
 };
 
-// ============ 社交分享意图 ============
+// ============ 分享菜品意图 ============
 const ShareDishIntentHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput) === 'IntentRequest'
@@ -752,55 +728,44 @@ const ShareDishIntentHandler = {
   },
   handle(handlerInput) {
     const { slots } = handlerInput.requestEnvelope.request.intent;
-    const platform = slots.Platform?.value || 'xiaohongshu';
+    const platform = slots.Platform?.value;
     const dishName = slots.DishName?.value;
 
-    let dish;
-    
-    if (!dishName) {
-      const sessionAttr = handlerInput.attributesManager.getSessionAttributes();
-      dish = sessionAttr.recommendedDish || sessionAttr.currentDish;
-    } else {
-      dish = dishes.find(d => 
-        d.name.toLowerCase().includes(dishName.toLowerCase())
-      );
-    }
+    const sessionAttr = handlerInput.attributesManager.getSessionAttributes();
+    const dish = dishName 
+      ? dishes.find(d => d.name.toLowerCase().includes(dishName.toLowerCase()))
+      : sessionAttr.recommendedDish;
 
     if (!dish) {
       return handlerInput.responseBuilder
-        .speak(`抱歉，没有找到您想要分享的菜品。请先推荐或选择一个菜品。`)
-        .reprompt('请先告诉我您想分享的菜品名称')
+        .speak('抱歉，没有找到要分享的菜品。请先推荐或选择一个菜品。')
+        .reprompt('您可以先说「推荐一道菜」')
         .getResponse();
     }
 
     const shareContent = shareService.generateShareContent(dish, platform);
-    const shareLink = shareService.generateShareLink(platform, dish.id);
+    const shareUrl = shareService.generateShareUrl(dish, platform);
 
     handlerInput.attributesManager.setSessionAttributes({
-      sharedDish: dish,
-      sharePlatform: platform,
+      shareContent: shareContent,
+      shareUrl: shareUrl,
       lastIntent: 'ShareDishIntent'
     });
 
-    let platformName = platform === 'xiaohongshu' ? '小红书' : 
-                       platform === 'wechat' ? '微信' : platform;
-
-    let speakOutput = `📤 已为您生成${platformName}分享内容！\n\n`;
+    let speakOutput = `已为您生成分享内容：\n\n`;
+    speakOutput += `🍽️ ${dish.name}\n`;
+    speakOutput += `📝 ${dish.description || '一道美味的菜品'}\n`;
+    speakOutput += `⭐ 评分：${dish.rating || '4.8'}分\n\n`;
     
-    if (platform === 'xiaohongshu') {
-      speakOutput += `📝 标题：${shareContent.title}\n`;
-      speakOutput += `📖 正文：${shareContent.content}\n\n`;
-    } else if (platform === 'wechat') {
-      speakOutput += `📝 标题：${shareContent.title}\n`;
-      speakOutput += `📖 摘要：${shareContent.summary}\n\n`;
+    if (platform) {
+      speakOutput += `可以分享到${platform}，内容已准备好。`;
+    } else {
+      speakOutput += `请问您想分享到哪个平台？`;
     }
-    
-    speakOutput += `🔗 分享链接：${shareLink}\n\n`;
-    speakOutput += `链接已生成，您可以复制到${platformName}分享给朋友！`;
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
-      .reprompt('请问还需要其他帮助吗？')
+      .reprompt('请问您想分享到哪个平台？')
       .getResponse();
   }
 };
@@ -812,26 +777,43 @@ const HelpIntentHandler = {
       && Alexa.getIntentName(handlerInput) === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    const speakOutput = `夏邑缘品荟创味菜可以帮您：\n\n🍳 智能推荐 - 说「我喜欢辣的」\n📜 显示菜单 - 说「给我看看菜单」\n📶 WiFi密码 - 说「WiFi密码是多少」\n📱 自主下单 - 说「我要扫码下单」\n🖨️ 打印服务 - 说「连接打印机」\n🍽️ 菜品推荐 - 说「推荐一道川菜」\n📋 生成菜单 - 说「帮我安排午餐菜单」\n📖 菜谱查询 - 说「告诉我宫保鸡丁的做法」\n🏪 门店查询 - 说「附近有哪些门店」\n🛵 外卖点餐 - 说「帮我点一份宫保鸡丁」\n📅 堂食预约 - 说「我想预约明天晚上6点」\n📤 社交分享 - 说「分享到小红书」\n🎲 随机推荐 - 说「随机推荐一道菜」\n\n开发者：石中伟\n\n请问有什么可以帮您？`;
+    const speakOutput = `欢迎使用夏邑缘品荟创味菜！我是您的智能餐饮助手。\n\n您可以：\n\n🎯 智能推荐 - 说「给我推荐」\n📜 查看菜单 - 说「显示菜单」\n📶 查询WiFi - 说「WiFi密码」\n🛵 点外卖 - 说「帮我点外卖」\n📱 自主下单 - 说「我要下单」\n🖨️ 打印小票 - 说「打印订单」\n📅 预约座位 - 说「我要预约」\n🏪 查询门店 - 说「附近门店」\n\n请问有什么可以帮您的？`;
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
-      .reprompt(speakOutput)
+      .reprompt('请问有什么可以帮您的？')
       .getResponse();
   }
 };
 
-// ============ Cancel/Stop Intent ============
-const CancelAndStopIntentHandler = {
+// ============ Cancel or Stop Intent ============
+const CancelOrStopIntentHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput) === 'IntentRequest'
       && (Alexa.getIntentName(handlerInput) === 'AMAZON.CancelIntent'
         || Alexa.getIntentName(handlerInput) === 'AMAZON.StopIntent');
   },
   handle(handlerInput) {
-    const speakOutput = '感谢使用夏邑缘品荟创味菜！祝您用餐愉快，再见！\n\n开发者：石中伟';
+    const speakOutput = `感谢使用夏邑缘品荟创味菜！祝您用餐愉快，再见！`;
+
     return handlerInput.responseBuilder
       .speak(speakOutput)
+      .getResponse();
+  }
+};
+
+// ============ Fallback Intent ============
+const FallbackIntentHandler = {
+  canHandle(handlerInput) {
+    return Alexa.getRequestType(handlerInput) === 'IntentRequest'
+      && Alexa.getIntentName(handlerInput) === 'AMAZON.FallbackIntent';
+  },
+  handle(handlerInput) {
+    const speakOutput = `抱歉，我没有理解您的问题。您可以尝试说「帮助」来了解我可以做什么。`;
+
+    return handlerInput.responseBuilder
+      .speak(speakOutput)
+      .reprompt('请问有什么可以帮您的？')
       .getResponse();
   }
 };
@@ -842,6 +824,7 @@ const SessionEndedRequestHandler = {
     return Alexa.getRequestType(handlerInput) === 'SessionEndedRequest';
   },
   handle(handlerInput) {
+    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
     return handlerInput.responseBuilder.getResponse();
   }
 };
@@ -853,8 +836,10 @@ const ErrorHandler = {
   },
   handle(handlerInput, error) {
     console.log(`Error handled: ${error.message}`);
-    const speakOutput = `抱歉，我遇到了一些问题。请您重新说明您的需求。`;
-    
+    console.log(error.stack);
+
+    const speakOutput = `抱歉，遇到了一个问题。请稍后再试。`;
+
     return handlerInput.responseBuilder
       .speak(speakOutput)
       .reprompt(speakOutput)
@@ -862,7 +847,23 @@ const ErrorHandler = {
   }
 };
 
+// ============ Request Interceptor ============
+const LoggingRequestInterceptor = {
+  process(handlerInput) {
+    console.log(`Incoming request: ${handlerInput.requestEnvelope.request.type}`);
+  }
+};
+
+// ============ Response Interceptor ============
+const LoggingResponseInterceptor = {
+  process(handlerInput, response) {
+    console.log(`Outgoing response: ${response}`);
+  }
+};
+
 // ============ Skill Builder ============
+const skillBuilder = Alexa.SkillBuilders.custom();
+
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
@@ -881,8 +882,99 @@ exports.handler = Alexa.SkillBuilders.custom()
     MakeReservationIntentHandler,
     ShareDishIntentHandler,
     HelpIntentHandler,
-    CancelAndStopIntentHandler,
+    CancelOrStopIntentHandler,
+    FallbackIntentHandler,
     SessionEndedRequestHandler
   )
   .addErrorHandlers(ErrorHandler)
+  .addRequestInterceptors(LoggingRequestInterceptor)
+  .addResponseInterceptors(LoggingResponseInterceptor)
   .lambda();
+
+// ============ 文字请求入口（新增） ============
+const skill = Alexa.SkillBuilders.custom()
+  .addRequestHandlers(
+    LaunchRequestHandler,
+    SmartRecommendIntentHandler,
+    ShowMenuIntentHandler,
+    GetWifiPasswordIntentHandler,
+    SelfOrderIntentHandler,
+    ConnectPrinterIntentHandler,
+    ShowComboIntentHandler,
+    RecommendDishIntentHandler,
+    RandomDishIntentHandler,
+    GenerateMenuIntentHandler,
+    GetRecipeIntentHandler,
+    FindStoreIntentHandler,
+    OrderFoodIntentHandler,
+    MakeReservationIntentHandler,
+    ShareDishIntentHandler,
+    HelpIntentHandler,
+    CancelOrStopIntentHandler,
+    FallbackIntentHandler,
+    SessionEndedRequestHandler
+  )
+  .addErrorHandlers(ErrorHandler)
+  .create();
+
+function textToAlexaRequest(text, userId = 'anonymous') {
+  return {
+    version: '1.0',
+    session: {
+      sessionId: `text-session-${Date.now()}`,
+      application: { applicationId: process.env.SKILL_ID || 'foodie-chef-skill' },
+      user: { userId },
+      new: true
+    },
+    context: {
+      System: {
+        application: { applicationId: process.env.SKILL_ID || 'foodie-chef-skill' },
+        user: { userId }
+      }
+    },
+    request: {
+      type: 'IntentRequest',
+      intent: {
+        name: 'TextInputIntent',
+        slots: {
+          TextInput: { name: 'TextInput', value: text }
+        }
+      },
+      timestamp: new Date().toISOString()
+    }
+  };
+}
+
+async function handleTextRequest(text, userId) {
+  const request = textToAlexaRequest(text, userId);
+  try {
+    const response = await skill.invoke(request);
+    if (response && response.response && response.response.outputSpeech) {
+      const ssml = response.response.outputSpeech.ssml || response.response.outputSpeech.text || '';
+      return ssml.replace(/<[^>]+>/g, '');
+    }
+    return '抱歉，暂时无法处理您的请求。';
+  } catch (error) {
+    console.error('Text handler error:', error);
+    return '抱歉，遇到了错误。请稍后再试。';
+  }
+}
+
+exports.textHandler = async (event) => {
+  const { text, userId } = event;
+  if (!text) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: '缺少text参数' })
+    };
+  }
+  const response = await handleTextRequest(text, userId);
+  return {
+    statusCode: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ response })
+  };
+};
+
+exports.handleText = handleTextRequest;
