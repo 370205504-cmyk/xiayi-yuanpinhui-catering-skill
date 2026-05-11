@@ -13,11 +13,14 @@
       "花生米",
       "干辣椒",
       "花椒",
-      "大葱",
-      "姜",
-      "蒜"
+      "大葱"
     ],
     "canDeliver": true,
+    "isSignature": true,
+    "isVegetarian": false,
+    "forKids": false,
+    "popularity": 95,
+    "type": "hot",
     "imageUrl": "https://example.com/images/gongbao-chicken.jpg"
   },
   {
@@ -33,10 +36,14 @@
       "嫩豆腐",
       "牛肉末",
       "豆瓣酱",
-      "花椒粉",
-      "蒜苗"
+      "花椒粉"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": false,
+    "forKids": false,
+    "popularity": 88,
+    "type": "hot",
     "imageUrl": "https://example.com/images/mapou-tofu.jpg"
   },
   {
@@ -51,12 +58,15 @@
     "ingredients": [
       "草鱼",
       "豆芽",
-      "莴笋",
       "干辣椒",
-      "花椒",
-      "豆瓣酱"
+      "花椒"
     ],
     "canDeliver": true,
+    "isSignature": true,
+    "isVegetarian": false,
+    "forKids": false,
+    "popularity": 92,
+    "type": "hot",
     "imageUrl": "https://example.com/images/shuizhu-yu.jpg"
   },
   {
@@ -72,10 +82,14 @@
       "猪里脊",
       "木耳",
       "胡萝卜",
-      "青椒",
       "泡椒"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": false,
+    "forKids": true,
+    "popularity": 85,
+    "type": "hot",
     "imageUrl": "https://example.com/images/yuxiang-pork.jpg"
   },
   {
@@ -90,10 +104,14 @@
     "ingredients": [
       "五花肉",
       "蒜苗",
-      "郫县豆瓣",
-      "甜面酱"
+      "郫县豆瓣"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": false,
+    "forKids": false,
+    "popularity": 82,
+    "type": "hot",
     "imageUrl": "https://example.com/images/huiguo-pork.jpg"
   },
   {
@@ -108,10 +126,14 @@
     "ingredients": [
       "黑鱼",
       "酸菜",
-      "泡椒",
-      "豆芽"
+      "泡椒"
     ],
     "canDeliver": true,
+    "isSignature": true,
+    "isVegetarian": false,
+    "forKids": false,
+    "popularity": 90,
+    "type": "hot",
     "imageUrl": "https://example.com/images/suancaiyu.jpg"
   },
   {
@@ -126,10 +148,14 @@
     "ingredients": [
       "鲈鱼",
       "葱姜",
-      "蒸鱼豉油",
-      "料酒"
+      "蒸鱼豉油"
     ],
     "canDeliver": false,
+    "isSignature": true,
+    "isVegetarian": false,
+    "forKids": true,
+    "popularity": 88,
+    "type": "hot",
     "imageUrl": "https://example.com/images/steam-bass.jpg"
   },
   {
@@ -145,10 +171,14 @@
       "大米",
       "皮蛋",
       "瘦肉",
-      "姜丝",
-      "葱花"
+      "姜丝"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": false,
+    "forKids": true,
+    "popularity": 75,
+    "type": "soup",
     "imageUrl": "https://example.com/images/congee.jpg"
   },
   {
@@ -163,10 +193,14 @@
     "ingredients": [
       "五花肉",
       "青蒜",
-      "小米辣",
-      "豆豉"
+      "小米辣"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": false,
+    "forKids": false,
+    "popularity": 78,
+    "type": "hot",
     "imageUrl": "https://example.com/images/xiaochaorou.jpg"
   },
   {
@@ -181,10 +215,14 @@
     "ingredients": [
       "番茄",
       "鸡蛋",
-      "葱花",
-      "糖"
+      "葱花"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": true,
+    "forKids": true,
+    "popularity": 95,
+    "type": "hot",
     "imageUrl": "https://example.com/images/tomato-egg.jpg"
   },
   {
@@ -200,11 +238,14 @@
       "五花肉",
       "冰糖",
       "生抽",
-      "老抽",
-      "八角",
-      "桂皮"
+      "八角"
     ],
     "canDeliver": true,
+    "isSignature": true,
+    "isVegetarian": false,
+    "forKids": true,
+    "popularity": 92,
+    "type": "hot",
     "imageUrl": "https://example.com/images/hongshao-pork.jpg"
   },
   {
@@ -220,10 +261,14 @@
       "猪排骨",
       "醋",
       "糖",
-      "生抽",
-      "料酒"
+      "生抽"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": false,
+    "forKids": true,
+    "popularity": 85,
+    "type": "hot",
     "imageUrl": "https://example.com/images/tangcu-pork.jpg"
   },
   {
@@ -238,10 +283,14 @@
     "ingredients": [
       "米饭",
       "鸡蛋",
-      "葱花",
-      "盐"
+      "葱花"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": true,
+    "forKids": true,
+    "popularity": 90,
+    "type": "staple",
     "imageUrl": "https://example.com/images/fried-rice.jpg"
   },
   {
@@ -257,10 +306,14 @@
       "细面条",
       "葱花",
       "生抽",
-      "白糖",
       "热油"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": true,
+    "forKids": true,
+    "popularity": 80,
+    "type": "staple",
     "imageUrl": "https://example.com/images/congyou-noodles.jpg"
   },
   {
@@ -276,10 +329,14 @@
       "鸡腿肉",
       "米酒",
       "酱油",
-      "麻油",
-      "九层塔"
+      "麻油"
     ],
     "canDeliver": true,
+    "isSignature": true,
+    "isVegetarian": false,
+    "forKids": false,
+    "popularity": 88,
+    "type": "hot",
     "imageUrl": "https://example.com/images/sanbei-chicken.jpg"
   },
   {
@@ -295,10 +352,14 @@
       "鸡腿肉",
       "花生碎",
       "芝麻",
-      "辣椒油",
-      "花椒粉"
+      "辣椒油"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": false,
+    "forKids": false,
+    "popularity": 82,
+    "type": "cold",
     "imageUrl": "https://example.com/images/koushui-chicken.jpg"
   },
   {
@@ -313,11 +374,14 @@
     "ingredients": [
       "大虾",
       "粉丝",
-      "蒜蓉",
-      "葱花",
-      "蒸鱼豉油"
+      "蒜蓉"
     ],
     "canDeliver": false,
+    "isSignature": false,
+    "isVegetarian": false,
+    "forKids": true,
+    "popularity": 85,
+    "type": "hot",
     "imageUrl": "https://example.com/images/steam-shrimp.jpg"
   },
   {
@@ -332,10 +396,14 @@
     "ingredients": [
       "土猪肉",
       "青红椒",
-      "蒜苗",
-      "豆豉"
+      "蒜苗"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": false,
+    "forKids": false,
+    "popularity": 78,
+    "type": "hot",
     "imageUrl": "https://example.com/images/peasant-stirfry.jpg"
   },
   {
@@ -350,10 +418,14 @@
     "ingredients": [
       "土豆",
       "干辣椒",
-      "醋",
-      "盐"
+      "醋"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": true,
+    "forKids": true,
+    "popularity": 88,
+    "type": "hot",
     "imageUrl": "https://example.com/images/suanla-potato.jpg"
   },
   {
@@ -368,11 +440,14 @@
     "ingredients": [
       "长茄子",
       "蒜末",
-      "生抽",
-      "老抽",
-      "糖"
+      "生抽"
     ],
     "canDeliver": true,
+    "isSignature": false,
+    "isVegetarian": true,
+    "forKids": true,
+    "popularity": 80,
+    "type": "hot",
     "imageUrl": "https://example.com/images/hongshao-eggplant.jpg"
   }
 ]
