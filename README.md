@@ -53,10 +53,22 @@
 ### 环境要求
 - Node.js >= 18.0.0
 - MySQL >= 8.0
-- Redis >= 6.0
+- Redis >= 6.0 (可选，用于缓存)
 - Docker (可选)
 
-### 本地开发
+### 一键启动（推荐）
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill.git
+cd xiayi-youpinhui-foodie-skill
+
+# 2. 使用快速启动脚本
+chmod +x quick-start.sh
+./quick-start.sh
+```
+
+### 手动启动
 
 ```bash
 # 1. 克隆项目
@@ -74,19 +86,38 @@ cp ../.env.example ../.env
 # 4. 初始化数据库
 npm run migrate
 
-# 5. 启动服务
+# 5. 导入示例数据（可选，快速体验）
+npm run import-sample
+
+# 6. 启动服务
 npm start
 ```
 
 ### Docker部署
 
 ```bash
-# 启动所有服务
+# 启动所有服务（包含MySQL + Redis）
 docker-compose up -d
 
 # 查看日志
 docker-compose logs -f
+
+# 停止服务
+docker-compose down
 ```
+
+### 访问地址
+
+启动成功后可以访问：
+- **顾客端**: http://localhost:3000
+- **移动端**: http://localhost:3000/mobile
+- **管理端**: http://localhost:3000/admin
+
+### 测试账号
+
+如果导入了示例数据，可以使用以下账号测试：
+- 手机号: 13800138000
+- 密码: 123456
 
 ## API接口
 
@@ -135,6 +166,40 @@ docker-compose logs -f
 | `/api/v1/stock/:dishId` | GET | 获取库存 |
 | `/api/v1/stock/update` | PUT | 更新库存(管理员) |
 | `/api/v1/stock/warning/low` | GET | 低库存预警(管理员) |
+
+### 配送接口
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/api/v1/delivery/create` | POST | 创建配送单 |
+| `/api/v1/delivery/:deliveryNo` | GET | 获取配送信息 |
+| `/api/v1/delivery/:deliveryNo/assign` | PUT | 分配配送员(管理员) |
+| `/api/v1/delivery/:deliveryNo/status` | PUT | 更新配送状态 |
+| `/api/v1/delivery/driver/:driverId/list` | GET | 配送员订单列表 |
+| `/api/v1/delivery/nearby` | GET | 获取附近订单 |
+
+### 统计接口
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/api/v1/analytics/dashboard` | GET | 仪表盘数据(管理员) |
+| `/api/v1/analytics/revenue` | GET | 营收统计(管理员) |
+| `/api/v1/analytics/dishes` | GET | 菜品统计(管理员) |
+| `/api/v1/analytics/customers` | GET | 客户统计(管理员) |
+| `/api/v1/analytics/hourly` | GET | 时段统计(管理员) |
+| `/api/v1/analytics/categories` | GET | 分类统计(管理员) |
+| `/api/v1/analytics/retention` | GET | 留存分析(管理员) |
+| `/api/v1/analytics/export` | GET | 导出报表(管理员) |
+
+### 门店接口
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/api/v1/store/stores` | GET | 获取门店列表 |
+| `/api/v1/store/stores/:id` | GET | 获取门店详情 |
+| `/api/v1/store/stores/:id/stats` | GET | 门店统计(管理员) |
+| `/api/v1/store/stores/:id/settings` | GET | 门店设置(管理员) |
+| `/api/v1/store/stores/:id/settings` | PUT | 更新门店设置(管理员) |
+| `/api/v1/store/stores` | POST | 创建门店(管理员) |
+| `/api/v1/store/stores/:id` | PUT | 更新门店(管理员) |
+| `/api/v1/store/stores/:id/default` | PUT | 设置默认门店(管理员) |
 
 ## 目录结构
 
@@ -220,11 +285,12 @@ ALIPAY_NOTIFY_URL=https://your-domain.com/api/v1/payment/alipay/callback
 - [x] 微信/支付宝支付对接
 - [x] 会员积分系统
 - [x] 菜品库存管理
-- [ ] 外卖订单和配送跟踪
-- [ ] 订单推送通知
+- [x] 外卖订单和配送跟踪
+- [x] 订单推送通知
+- [x] 多门店连锁管理
+- [x] 数据分析报表
 - [ ] SaaS云端版本
-- [ ] 多门店连锁管理
-- [ ] 数据分析报表
+- [ ] 更多AI功能增强
 
 ## License
 
