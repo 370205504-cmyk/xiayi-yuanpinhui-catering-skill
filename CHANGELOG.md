@@ -1,183 +1,119 @@
-# Changelog
+# 更新日志
 
-All notable changes to the **夏邑缘品荟创味菜 (Xiayi Youpinhui Foodie) Alexa Skill** project will be documented in this file.
+所有重要的更新都会在此记录。
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+## [3.0.0] - 2026-05-11
+
+### 🎉 重大更新：商业化改造 + AI Agent适配
+
+#### 核心功能
+- ✨ **HTTP服务器独立运行** - 新增 `server.js`，可本地运行无需AWS
+- ✨ **RESTful API完整重构** - 新增 `routes/api.js`，完整商业化接口
+- ✨ **AI Agent适配层** - 新增 `routes/agent.js`，支持扣子/龙虾/Dify等平台
+- ✨ **购物车系统** - 新增 `services/cartService.js`，支持加菜、减菜、备注
+- ✨ **订单管理V2** - 新增 `services/orderServiceV2.js`，完整订单生命周期
+- ✨ **智能推荐** - 新增 `services/dishesService.js`，多维度智能推荐
+
+#### 商业化功能
+- ✨ **支付网关预留** - 新增 `integrations/paymentGateway.js`
+- ✨ **收银SaaS对接** - 新增 `integrations/cashierAdapter.js`（银豹/美团/客如云）
+- ✨ **后台管理系统** - 新增 `web/admin.html`，可视化订单管理
+- ✨ **日志系统** - 新增 `utils/logger.js`，完整操作日志
+- ✨ **多轮对话上下文** - 新增 `session/contextManager.js`
+
+#### 部署优化
+- ✨ **一键启动脚本** - `start.sh`，本地运行无需AWS
+- ✨ **Docker容器化** - `Dockerfile` + `docker-compose.yml`
+- ✨ **统一配置中心** - `config.json` 集中管理所有配置
+
+#### 数据更新
+- ✨ **菜品数据扩展** - 从原有菜品扩展到120道完整菜单
+- ✨ **6大菜品分类** - 招牌菜、特色硬菜、宴请首选、餐前开胃、家常炒菜、汤羹主食
+
+### API接口
+
+#### 基础接口
+- `GET /api/v1/menu` - 获取菜单列表
+- `GET /api/v1/dishes` - 查询菜品
+- `GET /api/v1/recommend` - 智能推荐
+- `GET /api/v1/stores` - 门店信息
+- `GET /api/v1/wifi` - WiFi密码
+
+#### 购物车接口
+- `GET /api/v1/cart/:userId` - 获取购物车
+- `POST /api/v1/cart/add` - 添加商品
+- `POST /api/v1/cart/remove` - 移除商品
+- `POST /api/v1/cart/clear` - 清空购物车
+
+#### 订单接口
+- `POST /api/v1/order` - 创建订单
+- `GET /api/v1/order/:orderId` - 查询订单
+- `PUT /api/v1/order/:orderId/status` - 更新状态
+- `GET /api/v1/orders` - 订单列表
+- `POST /api/v1/order/:orderId/print` - 打印小票
+
+#### 管理接口
+- `GET /api/v1/stats` - 经营统计
+- `GET /admin/orders` - 后台订单管理
+- `PUT /admin/order/:orderId/status` - 更新订单状态
+- `POST /admin/order/:orderId/print` - 重打小票
+
+### 技术栈
+- Node.js 18+
+- Express.js
+- Docker
+- AWS Lambda (兼容)
+
+### 文件结构
+```
+lambda/
+├── server.js              # HTTP服务器入口
+├── routes/
+│   ├── api.js            # RESTful API
+│   ├── agent.js          # AI Agent适配
+│   └── admin.js          # 后台管理
+├── services/
+│   ├── cartService.js    # 购物车
+│   ├── orderServiceV2.js # 订单V2
+│   └── dishesService.js  # 菜品服务
+├── integrations/
+│   ├── paymentGateway.js # 支付网关
+│   └── cashierAdapter.js # 收银对接
+├── session/
+│   └── contextManager.js # 对话上下文
+└── utils/
+    └── logger.js        # 日志系统
+```
+
+---
 
 ## [2.1.0] - 2026-05-11
 
-### Added
-
-#### 👨‍💻 开发者信息更新
-
-- **开发者**: 石中伟
-- **联系邮箱**: contact@shizhongwei.com
-- **GitHub**: shizhongwei
-
-#### 📶 WiFi密码连接功能
-
-- **门店WiFi查询**
-  - 支持查询各门店WiFi名称和密码
-  - 支持按门店名称筛选
-  - WiFi连接指南
-
-- **WiFi配置**
-  - 县城中心店: XYYP_001_Guest / 88888888
-  - 城东店: XYYP_002_WiFi / 66666666
-  - 城西店: XYYP_003_Free / 55555555
-  - 城郊店: XYYP_004 / 44444444
-  - 旗舰店: XYYP_005_VIP / 99999999
-
-#### 📜 菜单显示功能
-
-- **分类展示**
-  - 招牌菜展示
-  - 素菜展示
-  - 儿童餐展示
-  - 套餐展示
-  - 按类型分类（凉菜、热菜、汤、主食）
-
-- **菜品详情**
-  - 价格、口味、难度
-  - 食材信息
-  - 推荐标签（招牌、素菜、儿童）
-
-#### 🎯 智能推荐系统
-
-- **基于客户喜好**
-  - 口味偏好学习
-  - 历史订单推荐
-  - 相似菜品推荐
-  - 场景匹配（儿童、老人、商务、聚会等）
-
-- **智能匹配算法**
-  - 计算菜品匹配度
-  - 综合评分排序
-  - 推荐理由生成
-
-- **套餐推荐**
-  - 单人套餐
-  - 双人套餐
-  - 家庭套餐
-  - 儿童营养套餐
-  - 商务宴请套餐
-
-#### 🖨️ 打印机连接功能
-
-- **打印机管理**
-  - 打印机连接/断开
-  - 打印机状态检查
-  - 墨水和纸张状态
-
-- **打印服务**
-  - 订单小票打印（自动）
-  - 菜单打印
-  - 预约单打印
-
-- **小票格式**
-  - 订单信息完整展示
-  - 收银小票样式
-  - 中文支持
-
-#### 📱 客人自主下单
-
-- **二维码生成**
-  - 点餐二维码
-  - 菜单二维码
-  - 桌台二维码
-  - 时效性验证
-
-- **扫码点餐**
-  - 语音引导扫码
-  - 自主选择菜品
-  - 订单状态跟踪
-
-#### 🏪 门店信息完善
-
-- **地址信息**
-  - 完整街道地址
-  - 区域标注
-  - 导航支持
-
-- **营业时间**
-  - 各店营业时间
-  - 差异化营业时间
-
-- **服务标识**
-  - WiFi支持
-  - 打印机支持
-  - 自主下单支持
-  - 外卖/堂食支持
-
-### Changed
-
-- **package.json**: 更新开发者信息
-- **README.md**: 完整重写，包含所有新功能
-- **门店数据**: 所有门店添加WiFi、打印机信息
-- **菜品数据**: 添加推荐标签、分类信息
-
-### Technical Changes
-
-- **新增服务模块**
-  - `wifiService.js` - WiFi密码服务
-  - `printerService.js` - 打印机服务
-  - `selfOrderService.js` - 自主下单服务
-  - `recommendationService.js` - 智能推荐算法
-
-- **新增数据文件**
-  - 门店WiFi配置
-  - 套餐数据
-  - 客户偏好数据
-
-- **新增意图处理器**
-  - `SmartRecommendIntentHandler` - 智能推荐
-  - `ShowMenuIntentHandler` - 菜单显示
-  - `GetWifiPasswordIntentHandler` - WiFi密码
-  - `SelfOrderIntentHandler` - 自主下单
-  - `ConnectPrinterIntentHandler` - 打印机连接
-  - `ShowComboIntentHandler` - 套餐查询
-
-- **新增交互模型**
-  - WiFi密码查询意图
-  - 菜单显示意图
-  - 自主下单意图
-  - 打印机操作意图
-  - 套餐查询意图
-  - 智能推荐意图
+### 功能更新
+- 🔧 开发者改为石中伟
+- 📍 新增地址和营业时间查询
+- 📶 新增WiFi密码连接功能
+- 🍜 新增菜单显示功能
+- ⭐ 新增智能推荐功能
+- 🖨️ 新增打印机连接功能
+- 🛒 新增顾客自主下单功能
 
 ---
 
 ## [2.0.0] - 2026-05-11
 
-### Added
-
-#### 🍽️ O2O 餐饮功能
-
-- 店铺关联系统
-- 外卖点餐系统
-- 堂食预约系统
-- 社交分享系统
-
-#### 🌐 国际化
-
-- 中文交互模型 (zh-CN)
-- 英文交互模型 (en-US)
+### 重大更新
+- 🚀 品牌升级为"夏邑缘品荟创味菜"
+- 📱 支持O2O功能
+- 🔗 支持社交分享
+- 💬 增强多轮对话能力
 
 ---
 
 ## [1.0.0] - 2026-05-11
 
-### Added
-
-- 菜品推荐功能
-- 菜单生成功能
-- 菜谱查询功能
-- 随机推荐功能
-- AWS Lambda 部署支持
-- ASK SDK v2 for Node.js
-- 完整项目文档
-
-### Project Info
-
-- **开发者**: 石中伟
-- **项目名称**: 夏邑缘品荟创味菜
+### 初始版本
+- 🍽️ 基础菜品查询
+- ⭐ 招牌菜推荐
+- 📍 门店查询
+- 🎤 Alexa语音交互
