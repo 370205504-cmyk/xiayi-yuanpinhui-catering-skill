@@ -1,3 +1,5 @@
+const config = require('../config.json');
+
 class WifiService {
   constructor() {
     this.wifiNetworks = new Map();
@@ -5,7 +7,24 @@ class WifiService {
   }
 
   initializeWifiData() {
-    const wifiConfigs = [
+    const defaultWifi = config.wifi?.default;
+    const stores = config.stores || [];
+    
+    if (defaultWifi) {
+      stores.forEach((store, index) => {
+        const storeId = store.id || `store_${String(index + 1).padStart(3, '0')}`;
+        this.wifiNetworks.set(storeId, {
+          storeId: storeId,
+          ssid: defaultWifi.ssid || `XYYP_${String(index + 1).padStart(3, '0')}_Guest`,
+          password: defaultWifi.password || '88888888',
+          securityType: defaultWifi.securityType || 'WPA2',
+          location: store.name || store.address || '未知',
+          floor: defaultWifi.floor || '全店覆盖'
+        });
+      });
+    }
+    
+    const customWifiConfigs = [
       {
         storeId: 'store_001',
         ssid: 'XYYP_001_Guest',
@@ -48,7 +67,7 @@ class WifiService {
       }
     ];
 
-    wifiConfigs.forEach(config => {
+    customWifiConfigs.forEach(config => {
       this.wifiNetworks.set(config.storeId, config);
     });
   }
@@ -69,6 +88,18 @@ class WifiService {
       }
     });
     return results;
+  }
+
+  getDefaultWifi() {
+    const defaultConfig = config.wifi?.default;
+    if (defaultConfig) {
+      return {
+        ssid: defaultConfig.ssid,
+        password: defaultConfig.password,
+        securityType: defaultConfig.securityType || 'WPA2'
+      };
+    }
+    return this.getStoreWifi('store_001');
   }
 
   validateWifiPassword(storeId, password) {
