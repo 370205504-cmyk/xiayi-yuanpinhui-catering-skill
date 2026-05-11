@@ -1,237 +1,236 @@
-# 夏邑缘品荟创味菜 - 智能餐饮服务系统
+# 夏邑缘品荟创味菜 - 智能餐饮服务系统 v3.0.0
 
-[![GitHub stars](https://img.shields.io/github/stars/370205504-cmyk/xiayi-youpinhui-foodie-skill)](https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill/stargazers)
-[![License](https://img.shields.io/github/license/370205504-cmyk/xiayi-youpinhui-foodie-skill)](https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill/blob/main/LICENSE)
+<div align="center">
 
-一款基于Alexa Skill和HTTP API的智能餐饮服务系统，支持语音对话、文字聊天、API接口、购物车点餐和订单管理。
+![Version](https://img.shields.io/badge/version-3.0.0-blue)
+![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
+![License](https://img.shields.io/badge/license-MIT-orange)
 
-## 🍽️ 功能特性
+**夏邑缘品荟创味菜 - 智能餐饮服务 Skill，支持语音点餐、文字聊天、AI Agent 接入（扣子 / 龙虾 / Dify）、购物车管理、完整订单生命周期**
+
+</div>
+
+## 功能特性
 
 ### 核心功能
-- **语音点餐**：Alexa智能语音助手，支持语音查询菜单、推荐菜品、下单
-- **文字聊天**：Web聊天界面，支持文字输入点餐
-- **RESTful API**：标准HTTP接口，支持AI Agent接入（扣子/龙虾/Dify等）
-- **购物车**：支持加菜、减菜、口味备注、多人点餐
-- **订单管理**：完整订单生命周期（待确认→制作中→已出餐）
-- **小票打印**：支持ESC/POS热敏打印机，自动打印订单
+- 🍽️ **多渠道点餐**: 语音点餐(Alexa)、文字聊天、Web/移动端点餐
+- 🤖 **AI Agent适配**: 支持扣子/龙虾/Dify等AI平台接入
+- 🛒 **完整购物车**: 加菜、减菜、口味备注、多人点餐
+- 📦 **订单生命周期**: 待确认→已下单→后厨接单→制作中→已出餐→已取消
+- 💳 **支付集成**: 微信支付、支付宝、余额支付
+- 🎫 **会员系统**: 积分、充值、优惠券、会员等级
 
-### 商业化功能
-- **统一配置**：所有配置集中到config.json，修改方便
-- **智能推荐**：根据口味、价格、场景智能推荐菜品
-- **收银SaaS对接**：预留银豹/美团收银/客如云对接层
-- **支付集成**：微信/支付宝支付回调预留
-- **日志系统**：完整的操作日志、订单日志、错误日志
-- **后台管理**：可视化订单管理、菜品管理、小票重打
+### 数据存储升级
+- 🗄️ **MySQL数据库**: 关系型数据存储，支持复杂查询
+- ⚡ **Redis缓存**: 热门数据缓存，提升系统性能
+- 🔄 **连接池**: 数据库连接池，提高并发处理能力
+- 💾 **备份恢复**: 自动化备份，支持手动恢复
 
-## 🚀 快速开始
+### 安全性增强
+- 🛡️ **Helmet**: HTTP安全头保护
+- 🚫 **CSRF防护**: 跨站请求伪造防护
+- 🧹 **XSS防护**: 跨站脚本攻击防护
+- ⏱️ **API限流**: 防止恶意请求
+- 🔒 **输入验证**: 全面的数据验证和清洗
+- 🌐 **HTTPS强制**: 生产环境强制HTTPS
 
-### 本地运行（无需AWS）
+### 用户体验
+- 📱 **响应式设计**: 完美适配移动端
+- 🖼️ **图片上传**: 支持菜品图片展示
+- 📊 **数据统计**: 经营数据可视化
+- 🖨️ **小票打印**: 支持ESC/POS热敏打印机
+
+## 技术栈
+
+- **后端**: Node.js + Express.js
+- **数据库**: MySQL + Redis
+- **安全**: Helmet + express-validator + bcryptjs
+- **认证**: JWT
+- **部署**: Docker + Docker Compose
+
+## 快速开始
+
+### 环境要求
+- Node.js >= 18.0.0
+- MySQL >= 8.0
+- Redis >= 6.0
+- Docker (可选)
+
+### 本地开发
 
 ```bash
-# 克隆项目
+# 1. 克隆项目
 git clone https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill.git
 cd xiayi-youpinhui-foodie-skill
 
-# 一键启动
-chmod +x start.sh
-./start.sh
-```
+# 2. 安装依赖
+cd lambda
+npm install
 
-服务启动后访问：
-- 顾客端：http://localhost:3000/
-- 管理端：http://localhost:3000/admin
-- API文档：http://localhost:3000/api/v1/docs
+# 3. 配置环境变量
+cp ../.env.example ../.env
+# 编辑 .env 文件，配置数据库等信息
+
+# 4. 初始化数据库
+npm run migrate
+
+# 5. 启动服务
+npm start
+```
 
 ### Docker部署
 
 ```bash
+# 启动所有服务
 docker-compose up -d
+
+# 查看日志
+docker-compose logs -f
 ```
 
-## 📡 API接口
+## API接口
 
-### 基础接口
-
-| 接口 | 方法 | 说明 |
+### 认证接口
+| 接口 | 方法 | 描述 |
 |------|------|------|
-| `/api/v1/menu` | GET | 获取菜单列表 |
-| `/api/v1/dishes` | GET | 查询菜品 |
-| `/api/v1/recommend` | GET | 智能推荐菜品 |
-| `/api/v1/stores` | GET | 查询门店信息 |
-| `/api/v1/wifi` | GET | 获取WiFi密码 |
+| `/api/v1/auth/register` | POST | 用户注册 |
+| `/api/v1/auth/login` | POST | 用户登录 |
+| `/api/v1/auth/wechat` | POST | 微信登录 |
+| `/api/v1/auth/profile` | GET | 获取用户信息 |
 
-### 购物车接口
-
-| 接口 | 方法 | 说明 |
+### 菜品接口
+| 接口 | 方法 | 描述 |
 |------|------|------|
-| `/api/v1/cart/:userId` | GET | 获取购物车 |
-| `/api/v1/cart/add` | POST | 添加商品 |
-| `/api/v1/cart/remove` | POST | 移除商品 |
-| `/api/v1/cart/clear` | POST | 清空购物车 |
+| `/api/v1/dishes/dishes` | GET | 获取菜品列表 |
+| `/api/v1/dishes/dish/:id` | GET | 获取菜品详情 |
+| `/api/v1/dishes/dish` | POST | 添加菜品(管理员) |
+| `/api/v1/dishes/dish/:id` | PUT | 更新菜品(管理员) |
 
 ### 订单接口
-
-| 接口 | 方法 | 说明 |
+| 接口 | 方法 | 描述 |
 |------|------|------|
-| `/api/v1/order` | POST | 创建订单 |
-| `/api/v1/order/:orderId` | GET | 查询订单 |
-| `/api/v1/order/:orderId/status` | PUT | 更新状态 |
-| `/api/v1/orders` | GET | 查询订单列表 |
-| `/api/v1/order/:orderId/print` | POST | 打印订单 |
+| `/api/v1/order/create` | POST | 创建订单 |
+| `/api/v1/order/list` | GET | 获取订单列表 |
+| `/api/v1/order/:orderNo` | GET | 获取订单详情 |
+| `/api/v1/order/:orderNo/cancel` | PUT | 取消订单 |
 
-### AI Agent接口
-
-| 接口 | 方法 | 说明 |
+### 会员接口
+| 接口 | 方法 | 描述 |
 |------|------|------|
-| `/agent/text` | POST | AI Agent文字对话入口 |
+| `/api/v1/member/info` | GET | 获取会员信息 |
+| `/api/v1/member/recharge` | POST | 余额充值 |
+| `/api/v1/member/coupons` | GET | 获取优惠券 |
+| `/api/v1/member/coupons/claim` | POST | 领取优惠券 |
 
-## 🤖 AI Agent接入
+### 支付接口
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/api/v1/payment/create` | POST | 创建支付 |
+| `/api/v1/payment/status/:orderNo` | GET | 查询支付状态 |
+| `/api/v1/payment/refund` | POST | 申请退款 |
 
-支持扣子(Coze)、龙虾(LongBot)、Dify等AI Agent平台接入。
+### 库存接口
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/api/v1/stock/:dishId` | GET | 获取库存 |
+| `/api/v1/stock/update` | PUT | 更新库存(管理员) |
+| `/api/v1/stock/warning/low` | GET | 低库存预警(管理员) |
 
-### 扣子/龙虾接入示例
-
-```json
-POST /agent/text
-{
-  "query": "推荐几道招牌菜",
-  "user_id": "user123",
-  "session_id": "session456"
-}
-```
-
-### 响应格式
-
-```json
-{
-  "success": true,
-  "reply": "为您推荐：\n招牌大鱼头泡饭 - 88元\n招牌烧肉 - 58元\n...",
-  "actions": [{"type": "recommend", "data": [...]}],
-  "sessionId": "session456"
-}
-```
-
-## ⚙️ 配置说明
-
-所有配置集中在 `lambda/config.json`：
-
-```json
-{
-  "restaurant": {
-    "name": "夏邑缘品荟创味菜",
-    "address": "夏邑县孔祖大道南段",
-    "phone": "0370-628-8888"
-  },
-  "wifi": {
-    "default": {
-      "ssid": "缘品荟免费WiFi",
-      "password": "88888888"
-    }
-  },
-  "printer": {
-    "default": {
-      "ip": "192.168.1.100",
-      "port": 9100
-    }
-  }
-}
-```
-
-## 📁 项目结构
+## 目录结构
 
 ```
 xiayi-youpinhui-foodie-skill/
 ├── lambda/
-│   ├── server.js              # HTTP服务器入口
-│   ├── index.js               # Alexa Lambda入口
-│   ├── textHandler.js         # 文字请求处理
-│   ├── config.json            # 统一配置
-│   ├── routes/
-│   │   ├── api.js             # RESTful API
-│   │   ├── agent.js           # AI Agent适配
-│   │   └── admin.js           # 后台管理API
-│   ├── services/
-│   │   ├── cartService.js     # 购物车服务
-│   │   ├── orderServiceV2.js  # 订单服务
-│   │   └── dishesService.js    # 菜品服务
-│   ├── integrations/
-│   │   ├── paymentGateway.js  # 支付网关
-│   │   └── cashierAdapter.js   # 收银SaaS对接
-│   ├── utils/
-│   │   ├── logger.js          # 日志工具
-│   │   ├── printerService.js   # 打印服务
-│   │   └── wifiService.js     # WiFi服务
-│   ├── data/
-│   │   ├── dishes.json        # 菜品数据
-│   │   ├── stores.json        # 门店数据
-│   │   └── orders.json         # 订单数据
-│   └── web/
-│       ├── index.html         # 顾客聊天界面
-│       └── admin.html         # 后台管理界面
-├── models/
-│   └── zh-CN.json             # Alexa交互模型
-├── infrastructure/
-│   └── cfn-deployer.yaml      # CloudFormation模板
-├── start.sh                    # 本地启动脚本
-├── deploy.sh                   # 一键部署脚本
-├── docker-compose.yml          # Docker配置
+│   ├── database/          # 数据库层
+│   │   ├── db.js         # 数据库连接
+│   │   ├── migrate.js    # 数据迁移
+│   │   └── backup.js     # 备份恢复
+│   ├── routes/           # 路由层
+│   │   ├── auth.js       # 认证路由
+│   │   ├── order.js      # 订单路由
+│   │   ├── payment.js    # 支付路由
+│   │   ├── member.js     # 会员路由
+│   │   └── ...
+│   ├── services/         # 业务逻辑层
+│   │   ├── authService.js
+│   │   ├── paymentService.js
+│   │   ├── memberService.js
+│   │   ├── stockService.js
+│   │   └── ...
+│   ├── middleware/       # 中间件
+│   │   ├── security.js  # 安全中间件
+│   │   ├── auth.js      # 认证中间件
+│   │   └── upload.js    # 文件上传
+│   ├── web/              # Web界面
+│   │   ├── mobile.html  # 移动端点餐
+│   │   └── admin.html   # 管理后台
+│   └── server.js        # 服务器入口
+├── .env.example         # 环境变量示例
+├── docker-compose.yml   # Docker编排
 └── README.md
 ```
 
-## 🔧 开发
+## 配置说明
 
-### 安装依赖
-
-```bash
-cd lambda
-npm install
+### 必需配置
+```env
+PORT=3000
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=xiayi_restaurant
+JWT_SECRET=your_jwt_secret
 ```
 
-### 启动开发服务器
-
-```bash
-npm run dev
+### 微信支付配置
+```env
+WECHAT_APPID=your_appid
+WECHAT_MCHID=your_mchid
+WECHAT_APIKEY=your_apikey
+WECHAT_NOTIFY_URL=https://your-domain.com/api/v1/payment/wechat/callback
 ```
 
-### 运行测试
-
-```bash
-npm test
+### 支付宝配置
+```env
+ALIPAY_APPID=your_appid
+ALIPAY_PRIVATE_KEY=your_private_key
+ALIPAY_PUBLIC_KEY=your_public_key
+ALIPAY_NOTIFY_URL=https://your-domain.com/api/v1/payment/alipay/callback
 ```
 
-## 📊 菜品数据
+## 商业价值
 
-当前项目包含 **120道菜品**，分为6大类：
+### 适用场景
+- 🍜 中小餐厅、快餐店、火锅店
+- 🏬 美食广场、食堂
+- 🏨 酒店、民宿餐饮服务
+- 🤖 无人餐厅、智慧餐厅
 
-- 招牌菜：4道
-- 特色硬菜：21道
-- 宴请首选菜：20道
-- 餐前开胃菜：32道
-- 家常炒菜：24道
-- 汤羹/主食/饮品：19道
+### 商业优势
+- 💰 **低成本**: 相比传统收银系统，部署和维护成本更低
+- 🤖 **AI赋能**: AI Agent实现智能推荐和客户服务
+- 🔧 **可定制**: 开源代码允许二次开发
+- 🌐 **生态扩展**: 可对接外卖平台、供应链系统等
 
-菜品数据位于 `lambda/data/dishes.json`。
+## 开发计划
 
-## 🔒 安全说明
+- [x] 数据存储升级 - MySQL + Redis
+- [x] 用户注册登录系统
+- [x] 微信/支付宝支付对接
+- [x] 会员积分系统
+- [x] 菜品库存管理
+- [ ] 外卖订单和配送跟踪
+- [ ] 订单推送通知
+- [ ] SaaS云端版本
+- [ ] 多门店连锁管理
+- [ ] 数据分析报表
 
-- 管理接口需要API密钥验证
-- 生产环境请修改默认配置
-- 支付和收银对接需要商业授权
+## License
 
-## 📄 License
+MIT License - 石中伟
 
-MIT License
+## 联系方式
 
-## 👨‍💻 Developer
-
-**石中伟**
-
-## 🙏 致谢
-
-- [Alexa Skills Kit](https://developer.amazon.com/alexa-skills-kit)
-- [ASK SDK for Node.js](https://github.com/alexa/alexa-skills-kit-sdk-for-nodejs)
-- 感谢所有为本项目贡献代码的朋友
-
----
-
-**夏邑缘品荟创味菜** - 让每一餐都成为美好回忆 🍽️
+- GitHub: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill
+- 开发者: 石中伟
