@@ -307,6 +307,18 @@
           ]
         },
         {
+          "name": "TextInputIntent",
+          "slots": [
+            {
+              "name": "TextInput",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "{TextInput}"
+          ]
+        },
+        {
           "name": "AMAZON.HelpIntent",
           "slots": [],
           "samples": [
