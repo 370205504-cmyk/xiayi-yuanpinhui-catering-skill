@@ -196,6 +196,117 @@ const MIGRATIONS = [
         INDEX idx_created (created_at)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `
+  },
+  {
+    name: 'create_stores_table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS stores (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        name_en VARCHAR(100),
+        address VARCHAR(255) NOT NULL,
+        phone VARCHAR(20),
+        business_hours VARCHAR(100),
+        lat DECIMAL(10, 8),
+        lng DECIMAL(11, 8),
+        image VARCHAR(255),
+        description TEXT,
+        status ENUM('active', 'inactive') DEFAULT 'active',
+        is_default BOOLEAN DEFAULT FALSE,
+        sort_order INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_status (status),
+        INDEX idx_location (lat, lng)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `
+  },
+  {
+    name: 'create_store_settings_table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS store_settings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        store_id INT NOT NULL,
+        setting_key VARCHAR(100) NOT NULL,
+        setting_value TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_store_setting (store_id, setting_key)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `
+  },
+  {
+    name: 'create_delivery_drivers_table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS delivery_drivers (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(50) NOT NULL,
+        phone VARCHAR(20) NOT NULL,
+        wechat_id VARCHAR(100),
+        avatar VARCHAR(255),
+        status ENUM('online', 'offline', 'busy') DEFAULT 'offline',
+        current_lat DECIMAL(10, 8),
+        current_lng DECIMAL(11, 8),
+        total_deliveries INT DEFAULT 0,
+        rating DECIMAL(3, 2) DEFAULT 5.00,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_status (status),
+        INDEX idx_location (current_lat, current_lng)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `
+  },
+  {
+    name: 'create_deliveries_table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS deliveries (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        delivery_no VARCHAR(32) UNIQUE NOT NULL,
+        order_id INT NOT NULL,
+        driver_id INT,
+        address VARCHAR(255) NOT NULL,
+        contact_phone VARCHAR(20) NOT NULL,
+        contact_name VARCHAR(50),
+        status ENUM('pending', 'assigned', 'picking_up', 'delivering', 'completed', 'cancelled') DEFAULT 'pending',
+        current_location JSON,
+        estimated_time INT,
+        actual_time INT,
+        picked_up_at TIMESTAMP NULL,
+        completed_at TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        assigned_at TIMESTAMP NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+        FOREIGN KEY (driver_id) REFERENCES delivery_drivers(id) ON DELETE SET NULL,
+        INDEX idx_delivery_no (delivery_no),
+        INDEX idx_driver_id (driver_id),
+        INDEX idx_status (status)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `
+  },
+  {
+    name: 'create_notifications_table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
+        type ENUM('wechat', 'sms', 'push') NOT NULL,
+        template_code VARCHAR(50),
+        recipient VARCHAR(100) NOT NULL,
+        title VARCHAR(100),
+        content TEXT,
+        data JSON,
+        status ENUM('pending', 'sent', 'failed') DEFAULT 'pending',
+        sent_at TIMESTAMP NULL,
+        error_message TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+        INDEX idx_user_id (user_id),
+        INDEX idx_status (status),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `
   }
 ];
 
