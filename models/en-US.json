@@ -1,206 +1,298 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "foodie chef",
+      "invocationName": "xiayi foodie chef",
       "intents": [
         {
-          "name": "LaunchRequest",
-          "samples": []
-        },
-        {
           "name": "RecommendDishIntent",
-          "samples": [
-            "recommend a dish",
-            "what should I eat today",
-            "give me a food recommendation",
-            "suggest a recipe",
-            "what's for dinner",
-            "I don't know what to eat",
-            "help me choose a dish"
-          ],
           "slots": [
             {
               "name": "Cuisine",
               "type": "CUISINE_TYPE",
-              "samples": [
-                "recommend a {Cuisine} dish",
-                "I want {Cuisine} food",
-                "suggest a {Cuisine} recipe"
-              ]
+              "multipleValues": false
             },
             {
               "name": "Ingredient",
               "type": "INGREDIENT_TYPE",
-              "samples": [
-                "I have {Ingredient}",
-                "what can I make with {Ingredient}",
-                "recommend something with {Ingredient}"
-              ]
+              "multipleValues": false
             },
             {
               "name": "Taste",
               "type": "TASTE_TYPE",
-              "samples": [
-                "I want something {Taste}",
-                "recommend a {Taste} dish",
-                "something {Taste} please"
-              ]
+              "multipleValues": false
             }
+          ],
+          "samples": [
+            "recommend a dish",
+            "recommend a {cuisine}",
+            "what can I make with {ingredient}",
+            "recommend a {taste} dish",
+            "suggest something with {ingredient}",
+            "what is good today"
           ]
         },
         {
           "name": "GenerateMenuIntent",
-          "samples": [
-            "generate a menu",
-            "create a meal plan",
-            "plan my meals for today",
-            "make a menu for today",
-            "what should I eat today",
-            "arrange my meals"
-          ],
           "slots": [
             {
               "name": "MealType",
               "type": "MEAL_TYPE",
-              "samples": [
-                "plan my {MealType}",
-                "what's for {MealType}",
-                "suggest a {MealType} menu"
-              ]
+              "multipleValues": false
             },
             {
               "name": "PersonCount",
               "type": "AMAZON.NUMBER",
-              "samples": [
-                "for {PersonCount} people",
-                "menu for {PersonCount} persons",
-                "{PersonCount} servings"
-              ]
+              "multipleValues": false
             }
+          ],
+          "samples": [
+            "generate a menu",
+            "create a {mealType} menu",
+            "menu for {personCount} people",
+            "what should I cook today"
           ]
         },
         {
           "name": "GetRecipeIntent",
-          "samples": [
-            "tell me the recipe",
-            "how to cook this dish",
-            "give me the cooking steps",
-            "how do I make this",
-            "what's the recipe"
-          ],
           "slots": [
             {
               "name": "DishName",
               "type": "DISH_NAME",
-              "samples": [
-                "how to make {DishName}",
-                "recipe for {DishName}",
-                "tell me how to cook {DishName}"
-              ]
+              "multipleValues": false
             }
+          ],
+          "samples": [
+            "how to make {dishName}",
+            "{dishName} recipe",
+            "tell me how to cook {dishName}",
+            "give me the recipe"
           ]
         },
         {
           "name": "RandomDishIntent",
+          "slots": [],
           "samples": [
-            "surprise me with a dish",
-            "random dish please",
-            "pick a random dish for me",
-            "give me a surprise dish"
+            "surprise me",
+            "random dish",
+            "pick something for me",
+            "I do not know what to eat"
+          ]
+        },
+        {
+          "name": "FindStoreIntent",
+          "slots": [
+            {
+              "name": "Location",
+              "type": "LOCATION",
+              "multipleValues": false
+            },
+            {
+              "name": "StoreName",
+              "type": "STORE_NAME",
+              "multipleValues": false
+            }
+          ],
+          "samples": [
+            "find nearby stores",
+            "store in {location}",
+            "store address",
+            "store hours",
+            "contact store",
+            "nearest store"
+          ]
+        },
+        {
+          "name": "OrderFoodIntent",
+          "slots": [
+            {
+              "name": "DishName",
+              "type": "DISH_NAME",
+              "multipleValues": false
+            },
+            {
+              "name": "Quantity",
+              "type": "AMAZON.NUMBER",
+              "multipleValues": false
+            },
+            {
+              "name": "Address",
+              "type": "AMAZON.FullAddress",
+              "multipleValues": false
+            }
+          ],
+          "samples": [
+            "order {dishName} for delivery",
+            "I want to order {dishName}",
+            "order {quantity} {dishName}",
+            "place an order",
+            "delivery order"
+          ]
+        },
+        {
+          "name": "MakeReservationIntent",
+          "slots": [
+            {
+              "name": "Date",
+              "type": "AMAZON.DATE",
+              "multipleValues": false
+            },
+            {
+              "name": "Time",
+              "type": "TIME",
+              "multipleValues": false
+            },
+            {
+              "name": "PersonCount",
+              "type": "AMAZON.NUMBER",
+              "multipleValues": false
+            }
+          ],
+          "samples": [
+            "I want to make a reservation for {date} at {time}",
+            "book a table for {personCount}",
+            "reserve a table",
+            "dinner reservation",
+            "book for tomorrow"
+          ]
+        },
+        {
+          "name": "ShareDishIntent",
+          "slots": [
+            {
+              "name": "Platform",
+              "type": "SHARE_PLATFORM",
+              "multipleValues": false
+            },
+            {
+              "name": "DishName",
+              "type": "DISH_NAME",
+              "multipleValues": false
+            }
+          ],
+          "samples": [
+            "share {dishName} to {platform}",
+            "share this dish",
+            "post to {platform}",
+            "share on social media"
           ]
         },
         {
           "name": "AMAZON.HelpIntent",
-          "samples": []
+          "slots": [],
+          "samples": [
+            "help",
+            "what can you do",
+            "how to use",
+            "help me"
+          ]
         },
         {
           "name": "AMAZON.CancelIntent",
-          "samples": []
+          "slots": [],
+          "samples": [
+            "cancel",
+            "never mind",
+            "forget it"
+          ]
         },
         {
           "name": "AMAZON.StopIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.NavigateHomeIntent",
-          "samples": []
+          "slots": [],
+          "samples": [
+            "stop",
+            "exit",
+            "goodbye",
+            "quit"
+          ]
         }
       ],
       "types": [
         {
           "name": "CUISINE_TYPE",
           "values": [
-            {"name": {"value": "Chinese"}},
-            {"name": {"value": "Sichuan"}},
-            {"name": {"value": "Cantonese"}},
-            {"name": {"value": "Italian"}},
-            {"name": {"value": "Japanese"}},
-            {"name": {"value": "Korean"}},
-            {"name": {"value": "Mexican"}},
-            {"name": {"value": "Indian"}},
-            {"name": {"value": "Thai"}},
-            {"name": {"value": "French"}},
-            {"name": {"value": "American"}}
+            {"id": {"name": {"value": "Sichuan"}}},
+            {"id": {"name": {"value": "Cantonese"}}},
+            {"id": {"name": {"value": "Hunan"}}},
+            {"id": {"name": {"value": "home style"}}},
+            {"id": {"name": {"value": "Shanghai"}}},
+            {"id": {"name": {"value": "Taiwan"}}}
           ]
         },
         {
           "name": "INGREDIENT_TYPE",
           "values": [
-            {"name": {"value": "chicken"}},
-            {"name": {"value": "beef"}},
-            {"name": {"value": "pork"}},
-            {"name": {"value": "fish"}},
-            {"name": {"value": "shrimp"}},
-            {"name": {"value": "tofu"}},
-            {"name": {"value": "egg"}},
-            {"name": {"value": "potato"}},
-            {"name": {"value": "tomato"}},
-            {"name": {"value": "rice"}},
-            {"name": {"value": "noodle"}},
-            {"name": {"value": "mushroom"}},
-            {"name": {"value": "broccoli"}}
+            {"id": {"name": {"value": "chicken"}}},
+            {"id": {"name": {"value": "pork"}}},
+            {"id": {"name": {"value": "beef"}}},
+            {"id": {"name": {"value": "tofu"}}},
+            {"id": {"name": {"value": "fish"}}},
+            {"id": {"name": {"value": "shrimp"}}}
           ]
         },
         {
           "name": "TASTE_TYPE",
           "values": [
-            {"name": {"value": "spicy"}},
-            {"name": {"value": "sweet"}},
-            {"name": {"value": "sour"}},
-            {"name": {"value": "salty"}},
-            {"name": {"value": "mild"}},
-            {"name": {"value": "sweet and sour"}},
-            {"name": {"value": "savory"}}
+            {"id": {"name": {"value": "spicy"}}},
+            {"id": {"name": {"value": "mild"}}},
+            {"id": {"name": {"value": "sweet and sour"}}},
+            {"id": {"name": {"value": "savory"}}}
           ]
         },
         {
           "name": "MEAL_TYPE",
           "values": [
-            {"name": {"value": "breakfast"}},
-            {"name": {"value": "lunch"}},
-            {"name": {"value": "dinner"}},
-            {"name": {"value": "snack"}},
-            {"name": {"value": "brunch"}}
+            {"id": {"name": {"value": "breakfast"}}},
+            {"id": {"name": {"value": "lunch"}}},
+            {"id": {"name": {"value": "dinner"}}},
+            {"id": {"name": {"value": "all day"}}}
           ]
         },
         {
           "name": "DISH_NAME",
           "values": [
-            {"name": {"value": "Kung Pao Chicken"}},
-            {"name": {"value": "Mapo Tofu"}},
-            {"name": {"value": "Sweet and Sour Pork"}},
-            {"name": {"value": "Fried Rice"}},
-            {"name": {"value": "Tomato Egg Stir Fry"}},
-            {"name": {"value": "Hot Pot"}},
-            {"name": {"value": "Pad Thai"}},
-            {"name": {"value": "Sushi"}},
-            {"name": {"value": "Pasta Carbonara"}},
-            {"name": {"value": "Tacos"}},
-            {"name": {"value": "Butter Chicken"}},
-            {"name": {"value": "Steamed Fish"}},
-            {"name": {"value": "Cola Chicken Wings"}},
-            {"name": {"value": "Garlic Broccoli"}},
-            {"name": {"value": "Beef Stew"}}
+            {"id": {"name": {"value": "kung pao chicken"}}},
+            {"id": {"name": {"value": "mapo tofu"}}},
+            {"id": {"name": {"value": "boiled fish"}}},
+            {"id": {"name": {"value": "fish flavor pork"}}},
+            {"id": {"name": {"value": "twice cooked pork"}}},
+            {"id": {"name": {"value": "tomato egg"}}},
+            {"id": {"name": {"value": "braised pork"}}},
+            {"id": {"name": {"value": "fried rice"}}}
+          ]
+        },
+        {
+          "name": "SHARE_PLATFORM",
+          "values": [
+            {"id": {"name": {"value": "xiaohongshu"}}},
+            {"id": {"name": {"value": "wechat"}}},
+            {"id": {"name": {"value": "weibo"}}},
+            {"id": {"name": {"value": "instagram"}}}
+          ]
+        },
+        {
+          "name": "LOCATION",
+          "values": [
+            {"id": {"name": {"value": "xiayi county"}}},
+            {"id": {"name": {"value": "downtown"}}},
+            {"id": {"name": {"value": "nearby"}}}
+          ]
+        },
+        {
+          "name": "STORE_NAME",
+          "values": [
+            {"id": {"name": {"value": "center store"}}},
+            {"id": {"name": {"value": "east store"}}},
+            {"id": {"name": {"value": "west store"}}},
+            {"id": {"name": {"value": "flagship store"}}}
+          ]
+        },
+        {
+          "name": "TIME",
+          "values": [
+            {"id": {"name": {"value": "6 PM"}}},
+            {"id": {"name": {"value": "7 PM"}}},
+            {"id": {"name": {"value": "12 PM"}}},
+            {"id": {"name": {"value": "noon"}}}
           ]
         }
       ]

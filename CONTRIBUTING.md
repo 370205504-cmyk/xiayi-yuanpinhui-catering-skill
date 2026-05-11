@@ -1,169 +1,83 @@
-# 🤝 贡献指南
+# 贡献指南
 
-感谢您考虑为 **美食大厨 (Foodie Chef)** 做出贡献！
+欢迎来到夏邑缘品荟创味菜项目！🎉
+
+感谢您有兴趣为项目做出贡献。以下指南将帮助您了解如何参与项目开发。
+
+---
 
 ## 📋 目录
 
 - [行为准则](#行为准则)
-- [如何贡献](#如何贡献)
-  - [报告 Bug](#报告-bug)
-  - [建议新功能](#建议新功能)
-  - [提交代码](#提交代码)
-- [开发流程](#开发流程)
+- [快速开始](#快速开始)
+- [开发环境](#开发环境)
 - [代码规范](#代码规范)
-- [提交信息规范](#提交信息规范)
+- [提交规范](#提交规范)
+- [Pull Request 流程](#pull-request-流程)
+- [贡献类型](#贡献类型)
 
 ---
 
 ## 行为准则
 
-本项目遵循 [Contributor Covenant](https://www.contributor-covenant.org/) 行为准则。参与本项目即表示您同意遵守此准则。
-
-### 我们的承诺
-
-- 使用友好和包容的语言
-- 尊重不同的观点和经验
-- 优雅地接受建设性批评
-- 关注对社区最有利的事情
-- 对其他社区成员表示同理心
+参与本项目即表示您同意遵守我们的行为准则。我们致力于营造一个友好、包容的社区环境。
 
 ---
 
-## 如何贡献
-
-### 报告 Bug
-
-如果您发现了 Bug，请通过 [GitHub Issues](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/issues) 报告。
-
-**提交 Bug 报告前，请检查：**
-- [ ] 该 Bug 尚未被报告
-- [ ] 您使用的是最新版本
-
-**Bug 报告应包含：**
-- 问题的清晰描述
-- 复现步骤
-- 期望行为 vs 实际行为
-- 截图（如适用）
-- 环境信息（Node.js 版本、ASK CLI 版本等）
-
-### 建议新功能
-
-我们欢迎新功能建议！请通过 [GitHub Issues](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/issues) 提交，并使用 `enhancement` 标签。
-
-**功能建议应包含：**
-- 功能的清晰描述
-- 使用场景
-- 可能的实现方案（可选）
-
-### 提交代码
-
-#### 快速开始
-
-1. **Fork 仓库**
-   ```bash
-   # 点击 GitHub 页面的 Fork 按钮
-   ```
-
-2. **克隆您的 Fork**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/foodie-chef-alexa-skill.git
-   cd foodie-chef-alexa-skill
-   ```
-
-3. **添加上游仓库**
-   ```bash
-   git remote add upstream https://github.com/370205504-cmyk/foodie-chef-alexa-skill.git
-   ```
-
-4. **创建分支**
-   ```bash
-   git checkout -b feature/your-feature-name
-   # 或
-   git checkout -b fix/bug-description
-   ```
-
-5. **进行更改**
-   - 编写代码
-   - 添加测试
-   - 更新文档
-
-6. **提交更改**
-   ```bash
-   git add .
-   git commit -m "feat: 添加新功能描述"
-   ```
-
-7. **推送到您的 Fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-8. **创建 Pull Request**
-   - 访问原仓库
-   - 点击 "New Pull Request"
-   - 选择您的分支
-   - 填写 PR 描述
-
----
-
-## 开发流程
-
-### 环境设置
+## 快速开始
 
 ```bash
-# 1. 安装依赖
-cd lambda && npm install && cd ..
+# 1. Fork 仓库
+git clone https://github.com/370205504-cmyk/foodie-chef-alexa-skill.git
+cd foodie-chef-alexa-skill
 
-# 2. 配置 ASK CLI
-ask configure
+# 2. 安装依赖
+cd lambda && npm install
 
-# 3. 运行测试
+# 3. 创建特性分支
+git checkout -b feature/your-feature-name
+
+# 4. 进行开发...
+
+# 5. 测试您的更改
 npm test
+
+# 6. 提交并推送
+git add .
+git commit -m 'Add: your feature description'
+git push origin feature/your-feature-name
+
+# 7. 创建 Pull Request
 ```
 
-### 项目结构
+---
 
-```
-foodie-chef/
-├── lambda/           # 后端代码
-│   ├── index.js      # 主逻辑
-│   └── package.json
-├── models/           # 交互模型
-│   ├── zh-CN.json
-│   └── en-US.json
-├── tests/            # 测试文件
-└── docs/             # 文档
-```
+## 开发环境
 
-### 添加新菜品
+### 前置要求
 
-如果您想添加新菜品到数据库，请编辑 `lambda/index.js`：
+- Node.js 18.x 或更高版本
+- npm 9.x 或更高版本
+- ASK CLI 2.x
+- Amazon Developer 账号
+- AWS 账号
 
-```javascript
-const dishDatabase = {
-  // 在现有菜品后添加
-  '新菜品名': {
-    name: '新菜品名',
-    cuisine: '菜系',
-    taste: '口味',
-    ingredients: ['食材1', '食材2'],
-    difficulty: '简单|中等|较难',
-    cookTime: 'XX分钟',
-    calories: XXX,
-    description: '菜品描述',
-    steps: [
-      '步骤1',
-      '步骤2',
-      // ...
-    ]
-  }
-};
+### 安装 ASK CLI
+
+```bash
+npm install -g ask-cli
+ask configure
 ```
 
-同时更新：
-- `cuisineDishMap` - 菜系映射
-- `tasteDishMap` - 口味映射
-- `ingredientDishMap` - 食材映射
+### 本地测试
+
+```bash
+# 运行单元测试
+npm test
+
+# 使用 ASK CLI 模拟测试
+ask simulate -l zh-CN -t "推荐一道川菜"
+```
 
 ---
 
@@ -172,63 +86,64 @@ const dishDatabase = {
 ### JavaScript 规范
 
 - 使用 ES6+ 语法
-- 使用单引号 `'string'`
-- 缩进使用 2 个空格
-- 行尾不使用分号（可选）
-- 最大行长度 100 字符
+- 使用 2 空格缩进
+- 使用单引号字符串
+- 始终使用严格相等 (`===`)
+- 使用有意义的变量和函数命名
 
 ### 示例
 
 ```javascript
-// ✅ 好的代码
-const recommendDish = (cuisine, ingredient, taste) => {
-  let candidates = getAllDishNames()
-  
-  if (cuisine) {
-    const cuisineDishes = cuisineDishMap[cuisine] || []
-    candidates = candidates.filter(d => cuisineDishes.includes(d))
-  }
-  
-  return getRandomItem(candidates)
-}
+// ✅ 好的写法
+const getRecommendedDishes = (cuisine, taste) => {
+  return dishes.filter(dish => 
+    dish.cuisine === cuisine && dish.taste === taste
+  );
+};
 
-// ❌ 避免
-const recommendDish=function(cuisine,ingredient,taste){
-var candidates=getAllDishNames();
-if(cuisine){
-var cuisineDishes=cuisineDishMap[cuisine]||[];
-candidates=candidates.filter(function(d){return cuisineDishes.includes(d)});
-}
-return getRandomItem(candidates);
+// ❌ 避免的写法
+function getDishes(c, t) {
+  let result = [];
+  for (let i = 0; i < dishes.length; i++) {
+    if (dishes[i].c === c && dishes[i].t === t) {
+      result.push(dishes[i]);
+    }
+  }
+  return result;
 }
 ```
 
-### 注释规范
+### Alexa Skill 代码规范
 
-- 使用 JSDoc 注释函数
-- 复杂逻辑添加行内注释
-- 使用中文注释（本项目主要面向中文用户）
+- 每个意图使用单独的 Handler
+- Handler 必须包含 `canHandle` 和 `handle` 方法
+- 使用 `handlerInput.attributesManager` 管理会话属性
+- 始终提供 `reprompt` 提示用户
+
+### 示例
 
 ```javascript
-/**
- * 根据条件推荐菜品
- * @param {string} cuisine - 菜系
- * @param {string} ingredient - 食材
- * @param {string} taste - 口味
- * @returns {string} 推荐的菜品名称
- */
-function recommendDish(cuisine, ingredient, taste) {
-  // 实现代码
-}
+const MyIntentHandler = {
+  canHandle(handlerInput) {
+    return Alexa.getRequestType(handlerInput) === 'IntentRequest'
+      && Alexa.getIntentName(handlerInput) === 'MyIntent';
+  },
+  handle(handlerInput) {
+    const speakOutput = '这是我的响应';
+    
+    return handlerInput.responseBuilder
+      .speak(speakOutput)
+      .reprompt('您还需要其他帮助吗？')
+      .getResponse();
+  }
+};
 ```
 
 ---
 
-## 提交信息规范
+## 提交规范
 
-我们使用 [Conventional Commits](https://www.conventionalcommits.org/) 规范。
-
-### 格式
+我们使用语义化提交信息格式：
 
 ```
 <type>(<scope>): <subject>
@@ -240,59 +155,159 @@ function recommendDish(cuisine, ingredient, taste) {
 
 ### 类型 (Type)
 
-| 类型 | 说明 |
-|------|------|
-| `feat` | 新功能 |
-| `fix` | Bug 修复 |
-| `docs` | 文档更新 |
-| `style` | 代码格式（不影响功能） |
-| `refactor` | 代码重构 |
-| `perf` | 性能优化 |
-| `test` | 测试相关 |
-| `chore` | 构建/工具相关 |
+- `feat`: 新功能
+- `fix`: Bug 修复
+- `docs`: 文档更改
+- `style`: 代码格式（不影响功能）
+- `refactor`: 代码重构
+- `perf`: 性能改进
+- `test`: 测试相关
+- `chore`: 构建/工具相关
 
 ### 示例
 
 ```bash
-# 新功能
-feat: 添加随机推荐功能
-
-# Bug 修复
-fix: 修复菜单生成时重复菜品的问题
-
-# 文档
-docs: 更新 README 添加部署说明
-
-# 代码重构
-refactor(dish): 优化推荐算法
-
-# 添加菜品
-data: 添加 5 道新川菜
+git commit -m 'feat(store): 添加门店查询功能'
+git commit -m 'fix(order): 修复订单状态更新问题'
+git commit -m 'docs(readme): 更新安装说明'
+git commit -m 'refactor(service): 重构订单服务模块'
 ```
 
 ---
 
-## 审核流程
+## Pull Request 流程
 
-1. 提交 PR 后，维护者会进行审核
-2. 可能需要根据反馈进行修改
-3. 通过审核后会被合并到 main 分支
-4. 合并后您的贡献将出现在下一个版本中
+1. **Fork 仓库** - 点击 GitHub 上的 Fork 按钮
+
+2. **克隆您的 Fork**
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/foodie-chef-alexa-skill.git
+   ```
+
+3. **创建特性分支**
+   ```bash
+   git checkout -b feature/amazing-feature
+   # 或者
+   git checkout -b fix/bug-description
+   ```
+
+4. **进行更改** - 按照代码规范进行开发
+
+5. **测试** - 确保所有测试通过
+   ```bash
+   npm test
+   ```
+
+6. **提交更改**
+   ```bash
+   git add .
+   git commit -m '您的提交信息'
+   ```
+
+7. **推送到您的 Fork**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+
+8. **创建 Pull Request** - 在 GitHub 上创建 PR
+
+9. **等待审核** - 项目维护者会审核您的 PR
+
+10. **合并** - 审核通过后，PR 将被合并
 
 ---
 
-## 问题与支持
+## 贡献类型
 
-- 💬 一般讨论：[GitHub Discussions](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/discussions)
-- 🐛 Bug 报告：[GitHub Issues](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/issues)
-- 📧 其他问题：通过 GitHub 联系
+### 🐛 报告 Bug
+
+- 使用 GitHub Issues 提交 Bug 报告
+- 包含详细的复现步骤
+- 提供您的环境信息（Node.js 版本、操作系统等）
+
+### 💡 提出新功能
+
+- 在 GitHub Issues 中讨论新功能
+- 详细描述功能需求和使用场景
+- 提供可能的实现建议
+
+### 🔧 代码贡献
+
+我们欢迎以下类型的代码贡献：
+
+#### 添加新菜品
+
+1. 在 `lambda/data/dishes.json` 中添加新菜品
+2. 在 `lambda/data/recipes.json` 中添加菜谱
+3. 在 `models/zh-CN.json` 和 `models/en-US.json` 中添加菜品名称
+
+**菜品数据格式：**
+
+```json
+{
+  "id": "dish_xxx",
+  "name": "菜品名称",
+  "cuisine": "菜系",
+  "taste": "口味",
+  "difficulty": "难度",
+  "cookingTime": "烹饪时间",
+  "calories": 卡路里,
+  "price": 价格,
+  "ingredients": ["食材1", "食材2"],
+  "canDeliver": true/false,
+  "imageUrl": "图片URL"
+}
+```
+
+#### 添加新门店
+
+1. 在 `lambda/data/stores.json` 中添加新门店
+
+**门店数据格式：**
+
+```json
+{
+  "id": "store_xxx",
+  "name": "门店名称",
+  "district": "区域",
+  "address": "地址",
+  "phone": "电话",
+  "businessHours": "营业时间",
+  "location": {"lat": 纬度, "lng": 经度},
+  "canDeliver": true/false,
+  "canReserve": true/false
+}
+```
+
+#### 添加新功能
+
+- 创建新的 Handler
+- 添加对应的 Intent
+- 更新交互模型
+
+### 📚 文档贡献
+
+- 改进现有文档
+- 添加使用示例
+- 翻译文档
+
+### 🧪 测试贡献
+
+- 添加单元测试
+- 添加集成测试
+- 改进测试覆盖率
 
 ---
 
-## 致谢
+## 🙏 感谢
 
-感谢所有为美食大厨做出贡献的开发者！
+感谢所有为夏邑缘品荟创味菜项目做出贡献的开发者！
 
-<a href="https://github.com/370205504-cmyk/foodie-chef-alexa-skill/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=370205504-cmyk/foodie-chef-alexa-skill" />
-</a>
+您的每一份贡献都让项目变得更好！
+
+---
+
+## 📞 联系我们
+
+- GitHub Issues: [提交问题](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/issues)
+- Pull Requests: [贡献代码](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/pulls)
