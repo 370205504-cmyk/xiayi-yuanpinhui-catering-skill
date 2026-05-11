@@ -47,10 +47,14 @@ const helmetConfig = helmet({
   crossOriginEmbedderPolicy: false
 });
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const corsConfig = cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: isProduction 
+    ? (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',')
+    : '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Request-ID'],
   credentials: true,
   maxAge: 86400
 });

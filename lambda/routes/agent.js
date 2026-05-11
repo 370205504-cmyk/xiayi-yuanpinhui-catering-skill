@@ -5,6 +5,32 @@ const orderService = require('../services/orderServiceV2');
 const inputValidator = require('../services/inputValidator');
 const logger = require('../utils/logger');
 
+const PROMPT_INJECTION_PATTERNS = [
+  /ignore\s+(previous|all|your)/i,
+  /forget\s+(everything|instructions)/i,
+  /disregard\s+(your|previous)/i,
+  /you\s+are\s+now/i,
+  /you\s+are\s+a/i,
+  /sql\s+(select|insert|update|delete|drop)/i,
+  /select\s+\*\s+from/i,
+  /delete\s+from/i,
+  /drop\s+(table|database)/i,
+  /\bexec\b|\beval\b|\beval\s*\(/i,
+  /\{\{.*\}\}/,
+  /<script/i,
+  /javascript:/i,
+  /on\w+\s*=/i
+];
+
+function detectPromptInjection(query) {
+  for (const pattern of PROMPT_INJECTION_PATTERNS) {
+    if (pattern.test(query)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 async function agentAdapter(req, res, next) {
   try {
     const { query, user_id, session_id, context = {} } = req.body;
@@ -14,6 +40,15 @@ async function agentAdapter(req, res, next) {
         success: false,
         code: 'INVALID_QUERY',
         message: '缺少必要参数：query'
+      });
+    }
+
+    if (detectPromptInjection(query)) {
+      logger.warn('Prompt注入攻击检测', { query: query.substring(0, 100) });
+      return res.status(400).json({
+        success: false,
+        code: 'INVALID_INPUT',
+        message: '输入内容包含无效指令'
       });
     }
 

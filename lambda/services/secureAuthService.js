@@ -12,7 +12,7 @@ class SecureAuthService {
   constructor() {
     this.secretKey = process.env.JWT_SECRET || 'change-this-in-production';
     this.adminApiKey = process.env.ADMIN_API_KEY || '';
-    this.tokenExpiry = '7d';
+    this.tokenExpiry = process.env.JWT_EXPIRES_IN || '2h';
   }
 
   generateToken(userId, phone, role = 'user') {

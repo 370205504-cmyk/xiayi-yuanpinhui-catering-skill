@@ -21,7 +21,7 @@ router.post('/create',
   validate,
   async (req, res) => {
     try {
-      const { items, type, tableNo, guestCount, remarks, address, contactPhone } = req.body;
+      const { items, type, tableNo, guestCount, remarks, address, contactPhone, requestId } = req.body;
       const userId = req.userId || null;
 
       if (!items || items.length === 0) {
@@ -32,7 +32,24 @@ router.post('/create',
         return res.status(400).json({ success: false, message: '非法请求参数' });
       }
 
+      if (requestId) {
+        const existingOrders = await db.query(
+          'SELECT * FROM orders WHERE request_id = ? LIMIT 1',
+          [inputValidator.sanitizeString(requestId)]
+        );
+        if (existingOrders.length > 0) {
+          logger.info(`订单幂等返回: requestId=${requestId}`);
+          return res.json({
+            success: true,
+            idempotent: true,
+            message: '订单已创建',
+            order: { orderNo: existingOrders[0].order_no, totalAmount: existingOrders[0].total_amount }
+          });
+        }
+      }
+
       const orderNo = `ORD${Date.now()}${uuidv4().slice(0, 6).toUpperCase()}`;
+      const safeRequestId = requestId ? inputValidator.sanitizeString(requestId) : null;
 
       let totalAmount = 0;
       const orderItems = [];
@@ -93,10 +110,10 @@ router.post('/create',
 
       await db.transaction(async (connection) => {
         const [orderResult] = await connection.query(
-          `INSERT INTO orders (order_no, user_id, type, total_amount, discount_amount, final_amount,
+          `INSERT INTO orders (order_no, user_id, request_id, type, total_amount, discount_amount, final_amount,
             points_earned, coupon_id, table_no, guest_count, remarks, address, contact_phone)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [orderNo, userId, type, totalAmount, discountAmount, finalAmount, pointsEarned,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [orderNo, userId, safeRequestId, type, totalAmount, discountAmount, finalAmount, pointsEarned,
            couponId, tableNo, guestCount || 1, remarks, address, contactPhone]
         );
 

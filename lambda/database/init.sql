@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS dishes (
 CREATE TABLE IF NOT EXISTS orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   order_no VARCHAR(64) UNIQUE NOT NULL COMMENT '订单号',
+  request_id VARCHAR(64) UNIQUE COMMENT '幂等请求ID',
   user_id INT COMMENT '用户ID',
   type ENUM('dine_in', 'takeout', 'delivery') DEFAULT 'dine_in' COMMENT '订单类型',
   status ENUM('pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled') DEFAULT 'pending' COMMENT '订单状态',
@@ -95,6 +96,7 @@ CREATE TABLE IF NOT EXISTS orders (
   INDEX idx_user (user_id),
   INDEX idx_status (status),
   INDEX idx_order_no (order_no),
+  INDEX idx_request_id (request_id),
   INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -231,4 +233,17 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_user (user_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 管理员操作日志表
+CREATE TABLE IF NOT EXISTS operation_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  admin_id VARCHAR(64) NOT NULL COMMENT '管理员ID',
+  operation VARCHAR(100) NOT NULL COMMENT '操作类型',
+  detail TEXT COMMENT '操作详情',
+  ip VARCHAR(45) NOT NULL COMMENT 'IP地址',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_admin (admin_id),
+  INDEX idx_operation (operation),
+  INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

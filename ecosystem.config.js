@@ -23,6 +23,8 @@ module.exports = {
       NODE_ENV: 'development'
     },
     kill_timeout: 5000,
-    listen_timeout: 3000
+    listen_timeout: 3000,
+    pmx: false,
+    instance_var: 'INSTANCE_ID'
   }]
 };
