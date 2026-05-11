@@ -1,7 +1,13 @@
+const config = require('../config.json');
+
 class PrinterService {
   constructor() {
+    const printerConfig = config.printer?.default || {};
+    
     this.connected = false;
-    this.printerModel = '爱普生 TM-T82X';
+    this.printerModel = printerConfig.model || '爱普生 TM-T82X';
+    this.printerIp = printerConfig.ip || '192.168.1.100';
+    this.printerPort = printerConfig.port || 9100;
     this.printerStatus = 'ready';
     this.printQueue = [];
     this.inkLevel = '100%';
@@ -16,6 +22,8 @@ class PrinterService {
         resolve({
           connected: true,
           printerModel: this.printerModel,
+          printerIp: this.printerIp,
+          printerPort: this.printerPort,
           status: this.printerStatus,
           message: '打印机连接成功'
         });
@@ -36,6 +44,8 @@ class PrinterService {
     return {
       connected: this.connected,
       printerModel: this.printerModel,
+      printerIp: this.printerIp,
+      printerPort: this.printerPort,
       status: this.printerStatus,
       inkLevel: this.inkLevel,
       paperLevel: this.paperLevel,
@@ -130,9 +140,10 @@ class PrinterService {
 
   generateReceiptContent(order) {
     const now = new Date();
+    const restaurantName = config.restaurant?.name || '夏邑缘品荟创味菜';
     const receipt = `
 ================================
-     夏邑缘品荟创味菜
+     ${restaurantName}
 ================================
 订单号：${order.orderId}
 日期：${now.toLocaleDateString('zh-CN')}
@@ -157,9 +168,10 @@ ${order.dishName}        x${order.quantity}    ¥${order.subtotal}
   }
 
   generateMenuContent(dishes) {
+    const restaurantName = config.restaurant?.name || '夏邑缘品荟创味菜';
     let menu = `
 ================================
-     夏邑缘品荟创味菜 菜单
+     ${restaurantName} 菜单
 ================================
 `;
 
@@ -178,9 +190,10 @@ ${order.dishName}        x${order.quantity}    ¥${order.subtotal}
   }
 
   generateReservationContent(reservation) {
+    const restaurantName = config.restaurant?.name || '夏邑缘品荟创味菜';
     const receipt = `
 ================================
-     夏邑缘品荟创味菜
+     ${restaurantName}
 ================================
 预约号：${reservation.reservationId}
 日期：${reservation.date}
@@ -205,6 +218,21 @@ ${order.dishName}        x${order.quantity}    ¥${order.subtotal}
 
   getPrintHistory() {
     return this.printQueue;
+  }
+
+  updatePrinterConfig(newConfig) {
+    if (newConfig.model) this.printerModel = newConfig.model;
+    if (newConfig.ip) this.printerIp = newConfig.ip;
+    if (newConfig.port) this.printerPort = newConfig.port;
+    return {
+      success: true,
+      message: '打印机配置已更新',
+      config: {
+        model: this.printerModel,
+        ip: this.printerIp,
+        port: this.printerPort
+      }
+    };
   }
 }
 
