@@ -1,0 +1,378 @@
+[
+  {
+    "id": "dish_001",
+    "name": "宫保鸡丁",
+    "cuisine": "川菜",
+    "taste": "香辣",
+    "difficulty": "中等",
+    "cookingTime": "25分钟",
+    "calories": 320,
+    "price": 38,
+    "ingredients": [
+      "鸡胸肉",
+      "花生米",
+      "干辣椒",
+      "花椒",
+      "大葱",
+      "姜",
+      "蒜"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/gongbao-chicken.jpg"
+  },
+  {
+    "id": "dish_002",
+    "name": "麻婆豆腐",
+    "cuisine": "川菜",
+    "taste": "麻辣",
+    "difficulty": "简单",
+    "cookingTime": "20分钟",
+    "calories": 250,
+    "price": 28,
+    "ingredients": [
+      "嫩豆腐",
+      "牛肉末",
+      "豆瓣酱",
+      "花椒粉",
+      "蒜苗"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/mapou-tofu.jpg"
+  },
+  {
+    "id": "dish_003",
+    "name": "水煮鱼",
+    "cuisine": "川菜",
+    "taste": "麻辣",
+    "difficulty": "较难",
+    "cookingTime": "40分钟",
+    "calories": 380,
+    "price": 68,
+    "ingredients": [
+      "草鱼",
+      "豆芽",
+      "莴笋",
+      "干辣椒",
+      "花椒",
+      "豆瓣酱"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/shuizhu-yu.jpg"
+  },
+  {
+    "id": "dish_004",
+    "name": "鱼香肉丝",
+    "cuisine": "川菜",
+    "taste": "酸甜",
+    "difficulty": "中等",
+    "cookingTime": "25分钟",
+    "calories": 290,
+    "price": 35,
+    "ingredients": [
+      "猪里脊",
+      "木耳",
+      "胡萝卜",
+      "青椒",
+      "泡椒"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/yuxiang-pork.jpg"
+  },
+  {
+    "id": "dish_005",
+    "name": "回锅肉",
+    "cuisine": "川菜",
+    "taste": "香辣",
+    "difficulty": "中等",
+    "cookingTime": "30分钟",
+    "calories": 350,
+    "price": 36,
+    "ingredients": [
+      "五花肉",
+      "蒜苗",
+      "郫县豆瓣",
+      "甜面酱"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/huiguo-pork.jpg"
+  },
+  {
+    "id": "dish_006",
+    "name": "酸菜鱼",
+    "cuisine": "川菜",
+    "taste": "酸辣",
+    "difficulty": "中等",
+    "cookingTime": "35分钟",
+    "calories": 320,
+    "price": 58,
+    "ingredients": [
+      "黑鱼",
+      "酸菜",
+      "泡椒",
+      "豆芽"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/suancaiyu.jpg"
+  },
+  {
+    "id": "dish_007",
+    "name": "清蒸鲈鱼",
+    "cuisine": "粤菜",
+    "taste": "清淡",
+    "difficulty": "中等",
+    "cookingTime": "30分钟",
+    "calories": 180,
+    "price": 58,
+    "ingredients": [
+      "鲈鱼",
+      "葱姜",
+      "蒸鱼豉油",
+      "料酒"
+    ],
+    "canDeliver": false,
+    "imageUrl": "https://example.com/images/steam-bass.jpg"
+  },
+  {
+    "id": "dish_008",
+    "name": "皮蛋瘦肉粥",
+    "cuisine": "粤菜",
+    "taste": "咸鲜",
+    "difficulty": "简单",
+    "cookingTime": "45分钟",
+    "calories": 220,
+    "price": 18,
+    "ingredients": [
+      "大米",
+      "皮蛋",
+      "瘦肉",
+      "姜丝",
+      "葱花"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/congee.jpg"
+  },
+  {
+    "id": "dish_009",
+    "name": "小炒肉",
+    "cuisine": "湘菜",
+    "taste": "香辣",
+    "difficulty": "简单",
+    "cookingTime": "15分钟",
+    "calories": 280,
+    "price": 32,
+    "ingredients": [
+      "五花肉",
+      "青蒜",
+      "小米辣",
+      "豆豉"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/xiaochaorou.jpg"
+  },
+  {
+    "id": "dish_010",
+    "name": "番茄炒蛋",
+    "cuisine": "家常菜",
+    "taste": "酸甜",
+    "difficulty": "简单",
+    "cookingTime": "10分钟",
+    "calories": 180,
+    "price": 16,
+    "ingredients": [
+      "番茄",
+      "鸡蛋",
+      "葱花",
+      "糖"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/tomato-egg.jpg"
+  },
+  {
+    "id": "dish_011",
+    "name": "红烧肉",
+    "cuisine": "家常菜",
+    "taste": "咸鲜",
+    "difficulty": "中等",
+    "cookingTime": "90分钟",
+    "calories": 520,
+    "price": 48,
+    "ingredients": [
+      "五花肉",
+      "冰糖",
+      "生抽",
+      "老抽",
+      "八角",
+      "桂皮"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/hongshao-pork.jpg"
+  },
+  {
+    "id": "dish_012",
+    "name": "糖醋排骨",
+    "cuisine": "家常菜",
+    "taste": "酸甜",
+    "difficulty": "中等",
+    "cookingTime": "40分钟",
+    "calories": 380,
+    "price": 42,
+    "ingredients": [
+      "猪排骨",
+      "醋",
+      "糖",
+      "生抽",
+      "料酒"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/tangcu-pork.jpg"
+  },
+  {
+    "id": "dish_013",
+    "name": "蛋炒饭",
+    "cuisine": "家常菜",
+    "taste": "咸鲜",
+    "difficulty": "简单",
+    "cookingTime": "10分钟",
+    "calories": 320,
+    "price": 15,
+    "ingredients": [
+      "米饭",
+      "鸡蛋",
+      "葱花",
+      "盐"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/fried-rice.jpg"
+  },
+  {
+    "id": "dish_014",
+    "name": "葱油拌面",
+    "cuisine": "上海菜",
+    "taste": "咸鲜",
+    "difficulty": "简单",
+    "cookingTime": "15分钟",
+    "calories": 280,
+    "price": 18,
+    "ingredients": [
+      "细面条",
+      "葱花",
+      "生抽",
+      "白糖",
+      "热油"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/congyou-noodles.jpg"
+  },
+  {
+    "id": "dish_015",
+    "name": "三杯鸡",
+    "cuisine": "台湾菜",
+    "taste": "香甜",
+    "difficulty": "中等",
+    "cookingTime": "35分钟",
+    "calories": 340,
+    "price": 45,
+    "ingredients": [
+      "鸡腿肉",
+      "米酒",
+      "酱油",
+      "麻油",
+      "九层塔"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/sanbei-chicken.jpg"
+  },
+  {
+    "id": "dish_016",
+    "name": "口水鸡",
+    "cuisine": "川菜",
+    "taste": "麻辣",
+    "difficulty": "中等",
+    "cookingTime": "30分钟",
+    "calories": 290,
+    "price": 38,
+    "ingredients": [
+      "鸡腿肉",
+      "花生碎",
+      "芝麻",
+      "辣椒油",
+      "花椒粉"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/koushui-chicken.jpg"
+  },
+  {
+    "id": "dish_017",
+    "name": "蒜蓉粉丝蒸虾",
+    "cuisine": "粤菜",
+    "taste": "清淡",
+    "difficulty": "中等",
+    "cookingTime": "20分钟",
+    "calories": 220,
+    "price": 52,
+    "ingredients": [
+      "大虾",
+      "粉丝",
+      "蒜蓉",
+      "葱花",
+      "蒸鱼豉油"
+    ],
+    "canDeliver": false,
+    "imageUrl": "https://example.com/images/steam-shrimp.jpg"
+  },
+  {
+    "id": "dish_018",
+    "name": "农家小炒肉",
+    "cuisine": "湘菜",
+    "taste": "香辣",
+    "difficulty": "简单",
+    "cookingTime": "15分钟",
+    "calories": 270,
+    "price": 32,
+    "ingredients": [
+      "土猪肉",
+      "青红椒",
+      "蒜苗",
+      "豆豉"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/peasant-stirfry.jpg"
+  },
+  {
+    "id": "dish_019",
+    "name": "酸辣土豆丝",
+    "cuisine": "家常菜",
+    "taste": "酸辣",
+    "difficulty": "简单",
+    "cookingTime": "10分钟",
+    "calories": 150,
+    "price": 16,
+    "ingredients": [
+      "土豆",
+      "干辣椒",
+      "醋",
+      "盐"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/suanla-potato.jpg"
+  },
+  {
+    "id": "dish_020",
+    "name": "红烧茄子",
+    "cuisine": "家常菜",
+    "taste": "咸鲜",
+    "difficulty": "简单",
+    "cookingTime": "20分钟",
+    "calories": 180,
+    "price": 18,
+    "ingredients": [
+      "长茄子",
+      "蒜末",
+      "生抽",
+      "老抽",
+      "糖"
+    ],
+    "canDeliver": true,
+    "imageUrl": "https://example.com/images/hongshao-eggplant.jpg"
+  }
+]
