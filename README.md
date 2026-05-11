@@ -1,7 +1,7 @@
 # 夏邑缘品荟创味菜 - 智能餐饮服务系统
 
-[![GitHub stars](https://img.shields.io/github/stars/370205504-cmyk/foodie-chef-alexa-skill)](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/stargazers)
-[![License](https://img.shields.io/github/license/370205504-cmyk/foodie-chef-alexa-skill)](https://github.com/370205504-cmyk/foodie-chef-alexa-skill/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/370205504-cmyk/xiayi-youpinhui-foodie-skill)](https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill/stargazers)
+[![License](https://img.shields.io/github/license/370205504-cmyk/xiayi-youpinhui-foodie-skill)](https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill/blob/main/LICENSE)
 
 一款基于Alexa Skill和HTTP API的智能餐饮服务系统，支持语音对话、文字聊天、API接口、购物车点餐和订单管理。
 
@@ -29,8 +29,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/370205504-cmyk/foodie-chef-alexa-skill.git
-cd foodie-chef-alexa-skill
+git clone https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill.git
+cd xiayi-youpinhui-foodie-skill
 
 # 一键启动
 chmod +x start.sh
@@ -140,7 +140,7 @@ POST /agent/text
 ## 📁 项目结构
 
 ```
-foodie-chef-alexa-skill/
+xiayi-youpinhui-foodie-skill/
 ├── lambda/
 │   ├── server.js              # HTTP服务器入口
 │   ├── index.js               # Alexa Lambda入口
@@ -153,10 +153,10 @@ foodie-chef-alexa-skill/
 │   ├── services/
 │   │   ├── cartService.js     # 购物车服务
 │   │   ├── orderServiceV2.js  # 订单服务
-│   │   └── dishesService.js   # 菜品服务
+│   │   └── dishesService.js    # 菜品服务
 │   ├── integrations/
 │   │   ├── paymentGateway.js  # 支付网关
-│   │   └── cashierAdapter.js  # 收银SaaS对接
+│   │   └── cashierAdapter.js   # 收银SaaS对接
 │   ├── utils/
 │   │   ├── logger.js          # 日志工具
 │   │   ├── printerService.js   # 打印服务
@@ -164,17 +164,17 @@ foodie-chef-alexa-skill/
 │   ├── data/
 │   │   ├── dishes.json        # 菜品数据
 │   │   ├── stores.json        # 门店数据
-│   │   └── orders.json        # 订单数据
+│   │   └── orders.json         # 订单数据
 │   └── web/
 │       ├── index.html         # 顾客聊天界面
 │       └── admin.html         # 后台管理界面
 ├── models/
 │   └── zh-CN.json             # Alexa交互模型
 ├── infrastructure/
-│   └── cfn-deployer.yaml     # CloudFormation模板
-├── start.sh                   # 本地启动脚本
-├── deploy.sh                  # 一键部署脚本
-├── docker-compose.yml         # Docker配置
+│   └── cfn-deployer.yaml      # CloudFormation模板
+├── start.sh                    # 本地启动脚本
+├── deploy.sh                   # 一键部署脚本
+├── docker-compose.yml          # Docker配置
 └── README.md
 ```
 
