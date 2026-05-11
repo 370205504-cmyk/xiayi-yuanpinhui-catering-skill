@@ -1,6 +1,26 @@
+const config = require('../config.json');
+
 class StoreService {
   constructor(stores) {
+    this.restaurantName = config.restaurant?.name || '夏邑缘品荟创味菜';
+    this.restaurantPhone = config.restaurant?.phone || '0370-628-8888';
+    this.restaurantAddress = config.restaurant?.address || '夏邑县孔祖大道南段';
     this.stores = stores || [];
+    
+    if (this.stores.length === 0 && config.stores) {
+      this.stores = config.stores.map((store, index) => ({
+        id: store.id || `store_${String(index + 1).padStart(3, '0')}`,
+        name: store.name || `门店${index + 1}`,
+        address: store.address || this.restaurantAddress,
+        phone: store.phone || this.restaurantPhone,
+        businessHours: store.hours || store.businessHours || '10:00-22:00',
+        district: store.district || '夏邑县',
+        features: store.features || ['WiFi', '打印机'],
+        canDeliver: store.canDeliver !== false,
+        canReserve: store.canReserve !== false,
+        location: store.location || { lat: 34.2313, lng: 116.1327 }
+      }));
+    }
   }
 
   /**
@@ -48,17 +68,26 @@ class StoreService {
   }
 
   /**
+   * 根据名称获取门店
+   * @param {string} name - 门店名称
+   * @returns {Object|null} 门店对象
+   */
+  getStoreByName(name) {
+    return this.stores.find(store => 
+      store.name.toLowerCase().includes(name.toLowerCase())
+    ) || null;
+  }
+
+  /**
    * 获取最近的门店
    * @param {Object} userLocation - 用户位置 {lat, lng}
    * @returns {Object|null} 最近的门店
    */
   getNearestStore(userLocation = null) {
     if (!userLocation) {
-      // 默认返回县城中心店
       return this.stores.find(store => store.id === 'store_001') || this.stores[0];
     }
 
-    // 计算距离并排序
     const storesWithDistance = this.stores.map(store => {
       const distance = this.calculateDistance(
         userLocation.lat, userLocation.lng,
@@ -80,8 +109,7 @@ class StoreService {
    * @returns {number} 距离（公里）
    */
   calculateDistance(lat1, lng1, lat2, lng2) {
-    // 使用简化的平面距离公式，适用于小范围区域
-    const R = 6371; // 地球半径（公里）
+    const R = 6371;
     const dLat = this.toRad(lat2 - lat1);
     const dLng = this.toRad(lng2 - lng1);
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -146,6 +174,18 @@ class StoreService {
       message: isOpen 
         ? `${store.name}正在营业中`
         : `${store.name}已打烊，营业时间为 ${store.businessHours}`
+    };
+  }
+
+  /**
+   * 获取餐厅信息
+   * @returns {Object} 餐厅基础信息
+   */
+  getRestaurantInfo() {
+    return {
+      name: this.restaurantName,
+      phone: this.restaurantPhone,
+      address: this.restaurantAddress
     };
   }
 }
