@@ -27,10 +27,134 @@
             "推荐一道{cuisine}",
             "用{ingredient}做什么菜",
             "推荐一道{taste}的菜",
-            "推荐一道{cuisine}，用{ingredient}做的",
-            "推荐一道{ingredient}做的{taste}的菜",
             "有什么好吃的",
             "今天推荐什么"
+          ]
+        },
+        {
+          "name": "SmartRecommendIntent",
+          "slots": [
+            {
+              "name": "Preference",
+              "type": "PREFERENCE_TYPE",
+              "multipleValues": false
+            },
+            {
+              "name": "History",
+              "type": "DISH_NAME",
+              "multipleValues": false
+            },
+            {
+              "name": "CustomerId",
+              "type": "AMAZON.Text",
+              "multipleValues": false
+            }
+          ],
+          "samples": [
+            "我喜欢{taste}",
+            "我想要{Preference}",
+            "给我推荐",
+            "你推荐什么",
+            "上次我吃了{History}",
+            "类似{History}的还有吗",
+            "我最近想吃辣",
+            "适合小孩吃的",
+            "素菜有哪些"
+          ]
+        },
+        {
+          "name": "ShowMenuIntent",
+          "slots": [
+            {
+              "name": "Category",
+              "type": "MENU_CATEGORY",
+              "multipleValues": false
+            },
+            {
+              "name": "DishType",
+              "type": "DISH_TYPE",
+              "multipleValues": false
+            }
+          ],
+          "samples": [
+            "给我看看菜单",
+            "显示菜单",
+            "今日菜单",
+            "有什么菜",
+            "展示{Category}",
+            "显示{DishType}",
+            "招牌菜有哪些",
+            "素菜有哪些",
+            "套餐有哪些"
+          ]
+        },
+        {
+          "name": "ShowComboIntent",
+          "slots": [
+            {
+              "name": "ComboType",
+              "type": "COMBO_TYPE",
+              "multipleValues": false
+            }
+          ],
+          "samples": [
+            "有哪些套餐",
+            "单人套餐",
+            "双人套餐",
+            "家庭套餐",
+            "儿童套餐",
+            "商务套餐",
+            "显示套餐"
+          ]
+        },
+        {
+          "name": "GetWifiPasswordIntent",
+          "slots": [
+            {
+              "name": "StoreName",
+              "type": "STORE_NAME",
+              "multipleValues": false
+            }
+          ],
+          "samples": [
+            "WiFi密码",
+            "WiFi密码是多少",
+            "WiFi怎么连",
+            "无线网络密码",
+            "店里WiFi",
+            "查询WiFi"
+          ]
+        },
+        {
+          "name": "SelfOrderIntent",
+          "slots": [],
+          "samples": [
+            "我要扫码下单",
+            "给我下单二维码",
+            "我想自己点餐",
+            "自主下单",
+            "扫码点餐",
+            "我要自己选菜",
+            "显示点餐二维码"
+          ]
+        },
+        {
+          "name": "ConnectPrinterIntent",
+          "slots": [
+            {
+              "name": "PrinterAction",
+              "type": "PRINTER_ACTION",
+              "multipleValues": false
+            }
+          ],
+          "samples": [
+            "连接打印机",
+            "打印订单",
+            "打印小票",
+            "打印菜单",
+            "打印机状态",
+            "检查打印机",
+            "断开打印机"
           ]
         },
         {
@@ -52,8 +176,7 @@
             "帮我安排{mealType}菜单",
             "给{personCount}个人做菜单",
             "安排一日三餐",
-            "今天吃什么好",
-            "推荐今天的菜单"
+            "今天吃什么好"
           ]
         },
         {
@@ -103,9 +226,7 @@
             "门店地址",
             "门店营业时间",
             "最近门店是哪家",
-            "门店联系电话",
-            "帮我找{storeName}",
-            "查询{location}的门店"
+            "门店联系电话"
           ]
         },
         {
@@ -160,8 +281,7 @@
             "帮我在门店订位",
             "预定{personCount}个人的位置",
             "预约明天晚上{time}",
-            "我想订座",
-            "有位置吗"
+            "我想订座"
           ]
         },
         {
@@ -226,9 +346,7 @@
             {"id": {"name": {"value": "湘菜"}}},
             {"id": {"name": {"value": "家常菜"}}},
             {"id": {"name": {"value": "上海菜"}}},
-            {"id": {"name": {"value": "台湾菜"}}},
-            {"id": {"name": {"value": "鲁菜"}}},
-            {"id": {"name": {"value": "浙菜"}}}
+            {"id": {"name": {"value": "台湾菜"}}}
           ]
         },
         {
@@ -239,10 +357,7 @@
             {"id": {"name": {"value": "牛肉"}}},
             {"id": {"name": {"value": "豆腐"}}},
             {"id": {"name": {"value": "鱼"}}},
-            {"id": {"name": {"value": "虾"}}},
-            {"id": {"name": {"value": "土豆"}}},
-            {"id": {"name": {"value": "番茄"}}},
-            {"id": {"name": {"value": "鸡蛋"}}}
+            {"id": {"name": {"value": "虾"}}}
           ]
         },
         {
@@ -253,8 +368,65 @@
             {"id": {"name": {"value": "清淡"}}},
             {"id": {"name": {"value": "酸甜"}}},
             {"id": {"name": {"value": "咸鲜"}}},
-            {"id": {"name": {"value": "香辣"}}},
+            {"id": {"name": {"value": "香甜"}}},
             {"id": {"name": {"value": "微辣"}}}
+          ]
+        },
+        {
+          "name": "PREFERENCE_TYPE",
+          "values": [
+            {"id": {"name": {"value": "辣"}}},
+            {"id": {"name": {"value": "清淡"}}},
+            {"id": {"name": {"value": "素菜"}}},
+            {"id": {"name": {"value": "儿童"}}},
+            {"id": {"name": {"value": "家常"}}},
+            {"id": {"name": {"value": "健康"}}},
+            {"id": {"name": {"value": "低热量"}}},
+            {"id": {"name": {"value": "招牌"}}}
+          ]
+        },
+        {
+          "name": "MENU_CATEGORY",
+          "values": [
+            {"id": {"name": {"value": "招牌菜"}}},
+            {"id": {"name": {"value": "素菜"}}},
+            {"id": {"name": {"value": "儿童餐"}}},
+            {"id": {"name": {"value": "套餐"}}},
+            {"id": {"name": {"value": "川菜"}}},
+            {"id": {"name": {"value": "粤菜"}}},
+            {"id": {"name": {"value": "湘菜"}}},
+            {"id": {"name": {"value": "家常菜"}}}
+          ]
+        },
+        {
+          "name": "DISH_TYPE",
+          "values": [
+            {"id": {"name": {"value": "凉菜"}}},
+            {"id": {"name": {"value": "热菜"}}},
+            {"id": {"name": {"value": "汤"}}},
+            {"id": {"name": {"value": "主食"}}},
+            {"id": {"name": {"value": "甜点"}}}
+          ]
+        },
+        {
+          "name": "COMBO_TYPE",
+          "values": [
+            {"id": {"name": {"value": "单人套餐"}}},
+            {"id": {"name": {"value": "双人套餐"}}},
+            {"id": {"name": {"value": "家庭套餐"}}},
+            {"id": {"name": {"value": "儿童套餐"}}},
+            {"id": {"name": {"value": "商务套餐"}}}
+          ]
+        },
+        {
+          "name": "PRINTER_ACTION",
+          "values": [
+            {"id": {"name": {"value": "连接"}}},
+            {"id": {"name": {"value": "断开"}}},
+            {"id": {"name": {"value": "打印订单"}}},
+            {"id": {"name": {"value": "打印小票"}}},
+            {"id": {"name": {"value": "打印菜单"}}},
+            {"id": {"name": {"value": "状态"}}}
           ]
         },
         {
@@ -311,7 +483,8 @@
             {"id": {"name": {"value": "县城中心店"}}},
             {"id": {"name": {"value": "城东店"}}},
             {"id": {"name": {"value": "城西店"}}},
-            {"id": {"name": {"value": "旗舰店"}}}
+            {"id": {"name": {"value": "旗舰店"}}},
+            {"id": {"name": {"value": "城郊店"}}}
           ]
         },
         {
