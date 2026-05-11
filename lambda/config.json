@@ -1,0 +1,41 @@
+{
+  "skill": {
+    "name": "夏邑缘品荟创味菜",
+    "invocationName": "夏邑缘品荟创味菜",
+    "version": "2.1.0"
+  },
+  "restaurant": {
+    "name": "夏邑缘品荟创味菜",
+    "brand": "缘品荟",
+    "address": "夏邑县孔祖大道南段",
+    "phone": "0370-628-8888",
+    "description": "专业的智能餐饮服务，提供菜品推荐、外卖点餐、堂食预约等服务",
+    "businessHours": "09:00-21:00",
+    "deliveryHours": "10:00-20:30"
+  },
+  "wifi": {
+    "default": {
+      "ssid": "缘品荟免费WiFi",
+      "password": "88888888",
+      "securityType": "WPA2"
+    }
+  },
+  "printer": {
+    "default": {
+      "ip": "192.168.1.100",
+      "port": 9100,
+      "model": "爱普生 TM-T82X",
+      "protocol": "ESC/POS"
+    }
+  },
+  "stores": [
+    {
+      "id": "store_001",
+      "name": "总店",
+      "shortName": "中心店",
+      "address": "夏邑县孔祖大道南段123号",
+      "phone": "0370-628-8888",
+      "hours": "09:00-21:00"
+    }
+  ]
+}
