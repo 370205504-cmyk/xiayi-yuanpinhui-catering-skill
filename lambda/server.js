@@ -83,6 +83,41 @@ app.get('/mobile', (req, res) => {
   res.sendFile(path.join(__dirname, 'web', 'mobile.html'));
 });
 
+app.get('/api/v1/health', async (req, res) => {
+  const health = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '3.0.0',
+    services: {
+      database: 'unknown',
+      redis: 'unknown'
+    }
+  };
+
+  try {
+    if (db.pool) {
+      await db.pool.query('SELECT 1');
+      health.services.database = 'connected';
+    }
+  } catch (e) {
+    health.services.database = 'disconnected';
+    health.status = 'degraded';
+  }
+
+  try {
+    if (db.redis && db.redis.isOpen) {
+      await db.redis.ping();
+      health.services.redis = 'connected';
+    }
+  } catch (e) {
+    health.services.redis = 'disconnected';
+  }
+
+  const statusCode = health.status === 'ok' ? 200 : 503;
+  res.status(statusCode).json(health);
+});
+
 app.post('/api/v1/backup', async (req, res) => {
   try {
     const result = await backupService.backupDatabase();
