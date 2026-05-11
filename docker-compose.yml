@@ -1,0 +1,234 @@
+# 夏邑缘品荟创味菜 - Alexa Skill
+
+一款基于Alexa Skill和HTTP API的智能餐饮服务系统，支持语音对话、文字聊天、API接口、购物车点餐和订单管理。
+
+## 🍽️ 功能特性
+
+### 核心功能
+- **语音点餐**：Alexa智能语音助手，支持语音查询菜单、推荐菜品、下单
+- **文字聊天**：Web聊天界面，支持文字输入点餐
+- **RESTful API**：标准HTTP接口，支持AI Agent接入（扣子/龙虾/Dify等）
+- **购物车**：支持加菜、减菜、口味备注、多人点餐
+- **订单管理**：完整订单生命周期（待确认→制作中→已出餐）
+- **小票打印**：支持ESC/POS热敏打印机，自动打印订单
+
+### 商业化功能
+- **统一配置**：所有配置集中到config.json，修改方便
+- **智能推荐**：根据口味、价格、场景智能推荐菜品
+- **收银SaaS对接**：预留银豹/美团收银/客如云对接层
+- **支付集成**：微信/支付宝支付回调预留
+- **日志系统**：完整的操作日志、订单日志、错误日志
+- **后台管理**：可视化订单管理、菜品管理、小票重打
+
+## 🚀 快速开始
+
+### 本地运行（无需AWS）
+
+```bash
+# 克隆项目
+git clone https://github.com/370205504-cmyk/foodie-chef-alexa-skill.git
+cd foodie-chef-alexa-skill
+
+# 一键启动
+chmod +x start.sh
+./start.sh
+```
+
+服务启动后访问：
+- 顾客端：http://localhost:3000/
+- 管理端：http://localhost:3000/admin
+- API文档：http://localhost:3000/api/v1/docs
+
+### Docker部署
+
+```bash
+docker-compose up -d
+```
+
+## 📡 API接口
+
+### 基础接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/v1/menu` | GET | 获取菜单列表 |
+| `/api/v1/dishes` | GET | 查询菜品 |
+| `/api/v1/recommend` | GET | 智能推荐菜品 |
+| `/api/v1/stores` | GET | 查询门店信息 |
+| `/api/v1/wifi` | GET | 获取WiFi密码 |
+
+### 购物车接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/v1/cart/:userId` | GET | 获取购物车 |
+| `/api/v1/cart/add` | POST | 添加商品 |
+| `/api/v1/cart/remove` | POST | 移除商品 |
+| `/api/v1/cart/clear` | POST | 清空购物车 |
+
+### 订单接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/v1/order` | POST | 创建订单 |
+| `/api/v1/order/:orderId` | GET | 查询订单 |
+| `/api/v1/order/:orderId/status` | PUT | 更新状态 |
+| `/api/v1/orders` | GET | 查询订单列表 |
+| `/api/v1/order/:orderId/print` | POST | 打印订单 |
+
+### AI Agent接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/agent/text` | POST | AI Agent文字对话入口 |
+
+## 🤖 AI Agent接入
+
+支持扣子(Coze)、龙虾(LongBot)、Dify等AI Agent平台接入。
+
+### 扣子/龙虾接入示例
+
+```json
+POST /agent/text
+{
+  "query": "推荐几道招牌菜",
+  "user_id": "user123",
+  "session_id": "session456"
+}
+```
+
+### 响应格式
+
+```json
+{
+  "success": true,
+  "reply": "为您推荐：\n招牌大鱼头泡饭 - 88元\n招牌烧肉 - 58元\n...",
+  "actions": [{"type": "recommend", "data": [...]}],
+  "sessionId": "session456"
+}
+```
+
+## ⚙️ 配置说明
+
+所有配置集中在 `lambda/config.json`：
+
+```json
+{
+  "restaurant": {
+    "name": "夏邑缘品荟创味菜",
+    "address": "夏邑县孔祖大道南段",
+    "phone": "0370-628-8888"
+  },
+  "wifi": {
+    "default": {
+      "ssid": "缘品荟免费WiFi",
+      "password": "88888888"
+    }
+  },
+  "printer": {
+    "default": {
+      "ip": "192.168.1.100",
+      "port": 9100
+    }
+  }
+}
+```
+
+## 📁 项目结构
+
+```
+foodie-chef-alexa-skill/
+├── lambda/
+│   ├── server.js              # HTTP服务器入口
+│   ├── index.js               # Alexa Lambda入口
+│   ├── textHandler.js         # 文字请求处理
+│   ├── config.json            # 统一配置
+│   ├── routes/
+│   │   ├── api.js             # RESTful API
+│   │   ├── agent.js           # AI Agent适配
+│   │   └── admin.js           # 后台管理API
+│   ├── services/
+│   │   ├── cartService.js     # 购物车服务
+│   │   ├── orderServiceV2.js  # 订单服务
+│   │   └── dishesService.js   # 菜品服务
+│   ├── integrations/
+│   │   ├── paymentGateway.js  # 支付网关
+│   │   └── cashierAdapter.js  # 收银SaaS对接
+│   ├── utils/
+│   │   ├── logger.js          # 日志工具
+│   │   ├── printerService.js   # 打印服务
+│   │   └── wifiService.js     # WiFi服务
+│   ├── data/
+│   │   ├── dishes.json        # 菜品数据
+│   │   ├── stores.json        # 门店数据
+│   │   └── orders.json        # 订单数据
+│   └── web/
+│       ├── index.html         # 顾客聊天界面
+│       └── admin.html         # 后台管理界面
+├── models/
+│   └── zh-CN.json             # Alexa交互模型
+├── infrastructure/
+│   └── cfn-deployer.yaml     # CloudFormation模板
+├── start.sh                   # 本地启动脚本
+├── deploy.sh                  # 一键部署脚本
+├── docker-compose.yml         # Docker配置
+└── README.md
+```
+
+## 🔧 开发
+
+### 安装依赖
+
+```bash
+cd lambda
+npm install
+```
+
+### 启动开发服务器
+
+```bash
+npm run dev
+```
+
+### 运行测试
+
+```bash
+npm test
+```
+
+## 📊 菜品数据
+
+当前项目包含 **120道菜品**，分为6大类：
+
+- 招牌菜：4道
+- 特色硬菜：21道
+- 宴请首选菜：20道
+- 餐前开胃菜：32道
+- 家常炒菜：24道
+- 汤羹/主食/饮品：19道
+
+菜品数据位于 `lambda/data/dishes.json`。
+
+## 🔒 安全说明
+
+- 管理接口需要API密钥验证
+- 生产环境请修改默认配置
+- 支付和收银对接需要商业授权
+
+## 📄 License
+
+MIT License
+
+## 👨‍💻 Developer
+
+**石中伟**
+
+## 🙏 致谢
+
+- [Alexa Skills Kit](https://developer.amazon.com/alexa-skills-kit)
+- [ASK SDK for Node.js](https://github.com/alexa/alexa-skills-kit-sdk-for-nodejs)
+- 感谢所有为本项目贡献代码的朋友
+
+---
+
+**夏邑缘品荟创味菜** - 让每一餐都成为美好回忆 🍽️
