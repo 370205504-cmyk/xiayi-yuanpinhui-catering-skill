@@ -4,51 +4,56 @@
     "publishingInformation": {
       "locales": {
         "zh-CN": {
-          "summary": "美食大厨 - 智能菜品推荐与菜单生成助手",
+          "summary": "夏邑缘品荟创味菜 - 智能餐饮服务与菜品推荐助手",
           "examplePhrases": [
-            "Alexa，打开美食大厨",
-            "推荐一道川菜",
-            "帮我生成今天的午餐菜单",
-            "告诉我宫保鸡丁的做法",
-            "随机推荐一道菜"
+            "Alexa，打开夏邑缘品荟",
+            "推荐一道招牌菜",
+            "帮我查查有什么好吃的",
+            "我要点一份香辣酥排骨",
+            "告诉我WiFi密码",
+            "查询门店地址"
           ],
           "keywords": [
+            "夏邑缘品荟",
+            "餐饮",
             "美食",
-            "菜谱",
             "推荐",
-            "菜单",
-            "烹饪",
-            "food",
-            "recipe",
-            "menu"
+            "点餐",
+            "菜品",
+            "餐厅",
+            "foodie",
+            "restaurant",
+            "ordering"
           ],
-          "name": "美食大厨",
-          "description": "美食大厨是一款智能餐饮助手，可以帮您：\n\n🍽 菜品推荐：根据菜系、食材、口味偏好智能推荐菜品\n📋 菜单生成：为您生成早餐、午餐、晚餐的一日菜单\n📖 菜谱查询：提供详细的烹饪步骤和食材清单\n🎲 随机推荐：不知道吃什么？让美食大厨为您随机选一道菜\n\n支持川菜、粤菜、湘菜、家常菜等多种菜系，涵盖20道经典菜品。"
+          "name": "夏邑缘品荟创味菜",
+          "description": "夏邑缘品荟创味菜是一款智能餐饮服务助手，可以帮您：\n\n🍽 菜品推荐：根据您的口味、预算智能推荐招牌菜、特色硬菜\n📋 查看菜单：浏览完整菜单，支持按分类查询\n🛒 自助点餐：语音或文字点餐，轻松下单\n📍 门店查询：获取门店地址、营业时间\n📶 WiFi连接：快速获取WiFi密码\n🖨️ 小票打印：自动打印订单到后厨\n\n支持6大菜品分类：招牌菜、特色硬菜、宴请首选、餐前开胃、家常炒菜、汤羹主食，共120道精选菜品。\n\n开发者：石中伟"
         },
         "en-US": {
-          "summary": "Foodie Chef - Smart dish recommendation and menu generation assistant",
+          "summary": "Xiayi Youpinhui - Smart restaurant service and dish recommendation assistant",
           "examplePhrases": [
-            "Alexa, open foodie chef",
-            "recommend a Chinese dish",
-            "generate a lunch menu for today",
-            "tell me how to make Kung Pao Chicken",
-            "surprise me with a random dish"
+            "Alexa, open Xiayi Youpinhui",
+            "recommend a signature dish",
+            "what's good to eat here",
+            "I want to order spicy ribs",
+            "tell me the WiFi password",
+            "find the store address"
           ],
           "keywords": [
-            "food",
-            "recipe",
+            "restaurant",
+            "foodie",
+            "ordering",
             "menu",
-            "cooking",
-            "chef",
             "recommendation",
-            "meal"
+            "dishes",
+            "xiayi",
+            "youpinhui"
           ],
-          "name": "Foodie Chef",
-          "description": "Foodie Chef is a smart culinary assistant that helps you:\n\n🍽 Dish Recommendation: Recommends dishes based on cuisine, ingredients, and taste preferences\n📋 Menu Generation: Creates breakfast, lunch, and dinner menus for your day\n📖 Recipe Lookup: Provides detailed cooking steps and ingredient lists\n🎲 Random Pick: Can't decide what to eat? Let Foodie Chef pick a dish for you\n\nSupports Sichuan, Cantonese, Hunan cuisine and more, with 20 classic dishes."
+          "name": "Xiayi Youpinhui Foodie",
+          "description": "Xiayi Youpinhui Foodie is a smart restaurant service assistant that helps you:\n\n🍽 Dish Recommendation: Recommends signature dishes based on your taste and budget\n📋 Browse Menu: View complete menu with category filtering\n🛒 Self-Ordering: Order by voice or text with ease\n📍 Store Information: Get store address and business hours\n📶 WiFi Access: Quick WiFi password retrieval\n🖨️ Receipt Printing: Auto-print orders to kitchen\n\nSupports 6 dish categories: Signature Dishes, Specialty Mains, Banquet Favorites, Appetizers, Home-style Dishes, Soups & Beverages, with 120 carefully selected dishes.\n\nDeveloper: 石中伟 (Shi Zhongwei)"
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Sample testing instructions:\n1. Say 'Alexa, open 美食大厨' to launch the skill\n2. Say '推荐一道川菜' to get a Sichuan dish recommendation\n3. Say '帮我生成午餐菜单' to generate a lunch menu\n4. Say '告诉我宫保鸡丁的做法' to get a recipe\n5. Say '随机推荐一道菜' for a random dish"
+      "testingInstructions": "Sample testing instructions:\n1. Say 'Alexa, open 夏邑缘品荟' to launch the skill\n2. Say '推荐一道招牌菜' to get a signature dish recommendation\n3. Say '我要点香辣酥排骨' to place an order\n4. Say '告诉我WiFi密码' to get WiFi info\n5. Say '查询门店地址' to find store location"
     },
     "apis": {
       "custom": {
