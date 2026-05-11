@@ -8,6 +8,7 @@ const db = require('./database/db');
 const backupService = require('./database/backup');
 
 const authRoutes = require('./routes/auth');
+const wechatRoutes = require('./routes/wechat');
 const paymentRoutes = require('./routes/payment');
 const memberRoutes = require('./routes/member');
 const stockRoutes = require('./routes/stock');
@@ -56,6 +57,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth/wechat', wechatRoutes);
 app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/member', memberRoutes);
 app.use('/api/v1/stock', stockRoutes);
