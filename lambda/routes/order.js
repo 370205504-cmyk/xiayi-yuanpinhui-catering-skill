@@ -6,6 +6,7 @@ const memberService = require('../services/memberService');
 const { requireAuth, optionalAuth } = require('../middleware/auth');
 const { body } = require('express-validator');
 const { validate } = require('../middleware/security');
+const inputValidator = require('../services/inputValidator');
 
 const router = express.Router();
 
@@ -23,25 +24,45 @@ router.post('/create',
       const { items, type, tableNo, guestCount, remarks, address, contactPhone } = req.body;
       const userId = req.userId || null;
 
+      if (!items || items.length === 0) {
+        return res.status(400).json({ success: false, message: '购物车不能为空' });
+      }
+
+      if (req.body.totalAmount !== undefined || req.body.finalAmount !== undefined) {
+        return res.status(400).json({ success: false, message: '非法请求参数' });
+      }
+
       const orderNo = `ORD${Date.now()}${uuidv4().slice(0, 6).toUpperCase()}`;
 
       let totalAmount = 0;
       const orderItems = [];
 
       for (const item of items) {
+        if (!item.dishId || !item.quantity) {
+          return res.status(400).json({ success: false, message: '无效的菜品数据' });
+        }
+        if (item.price !== undefined) {
+          return res.status(400).json({ success: false, message: '非法请求参数' });
+        }
+
         const dishes = await db.query('SELECT * FROM dishes WHERE id = ? AND is_available = 1', [item.dishId]);
         if (dishes.length === 0) {
           return res.status(400).json({ success: false, message: `菜品不存在: ${item.dishId}` });
         }
         const dish = dishes[0];
-        const subtotal = dish.price * item.quantity;
+        const quantity = parseInt(item.quantity);
+        if (quantity <= 0 || quantity > 99) {
+          return res.status(400).json({ success: false, message: '无效的数量' });
+        }
+        const subtotal = dish.price * quantity;
         totalAmount += subtotal;
         orderItems.push({
           dishId: dish.id,
           dishName: dish.name,
-          quantity: item.quantity,
+          quantity: quantity,
           unitPrice: dish.price,
-          subtotal
+          subtotal: subtotal,
+          remarks: inputValidator ? inputValidator.validateOrderRemarks(item.remarks) : ''
         });
       }
 

@@ -171,8 +171,19 @@ process.on('SIGTERM', async () => {
 });
 
 process.on('uncaughtException', (error) => {
-  logger.error('未捕获的异常', { error: error.message, stack: error.stack });
-  process.exit(1);
+  logger.error('未捕获的异常', { error: error.message, stack: error.stack, name: error.name });
+  if (error.message && error.message.includes('printer')) {
+    logger.warn('打印机异常，但服务继续运行');
+    return;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    console.error('发生严重错误，服务将在重启后恢复');
+    process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('未处理的Promise拒绝', { reason: String(reason) });
 });
 
 startServer();
