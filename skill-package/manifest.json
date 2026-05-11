@@ -1,0 +1,81 @@
+{
+  "manifest": {
+    "manifestVersion": "1.0",
+    "publishingInformation": {
+      "locales": {
+        "zh-CN": {
+          "summary": "美食大厨 - 智能菜品推荐与菜单生成助手",
+          "examplePhrases": [
+            "Alexa，打开美食大厨",
+            "推荐一道川菜",
+            "帮我生成今天的午餐菜单",
+            "告诉我宫保鸡丁的做法",
+            "随机推荐一道菜"
+          ],
+          "keywords": [
+            "美食",
+            "菜谱",
+            "推荐",
+            "菜单",
+            "烹饪",
+            "food",
+            "recipe",
+            "menu"
+          ],
+          "name": "美食大厨",
+          "description": "美食大厨是一款智能餐饮助手，可以帮您：\n\n🍽 菜品推荐：根据菜系、食材、口味偏好智能推荐菜品\n📋 菜单生成：为您生成早餐、午餐、晚餐的一日菜单\n📖 菜谱查询：提供详细的烹饪步骤和食材清单\n🎲 随机推荐：不知道吃什么？让美食大厨为您随机选一道菜\n\n支持川菜、粤菜、湘菜、家常菜等多种菜系，涵盖20道经典菜品。"
+        },
+        "en-US": {
+          "summary": "Foodie Chef - Smart dish recommendation and menu generation assistant",
+          "examplePhrases": [
+            "Alexa, open foodie chef",
+            "recommend a Chinese dish",
+            "generate a lunch menu for today",
+            "tell me how to make Kung Pao Chicken",
+            "surprise me with a random dish"
+          ],
+          "keywords": [
+            "food",
+            "recipe",
+            "menu",
+            "cooking",
+            "chef",
+            "recommendation",
+            "meal"
+          ],
+          "name": "Foodie Chef",
+          "description": "Foodie Chef is a smart culinary assistant that helps you:\n\n🍽 Dish Recommendation: Recommends dishes based on cuisine, ingredients, and taste preferences\n📋 Menu Generation: Creates breakfast, lunch, and dinner menus for your day\n📖 Recipe Lookup: Provides detailed cooking steps and ingredient lists\n🎲 Random Pick: Can't decide what to eat? Let Foodie Chef pick a dish for you\n\nSupports Sichuan, Cantonese, Hunan cuisine and more, with 20 classic dishes."
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Sample testing instructions:\n1. Say 'Alexa, open 美食大厨' to launch the skill\n2. Say '推荐一道川菜' to get a Sichuan dish recommendation\n3. Say '帮我生成午餐菜单' to generate a lunch menu\n4. Say '告诉我宫保鸡丁的做法' to get a recipe\n5. Say '随机推荐一道菜' for a random dish"
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda",
+          "regions": {
+            "NA_EAST_1": {
+              "uri": "ASK-CUSTOM-SKILL-ENDPOINT"
+            }
+          }
+        }
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [],
+    "privacyAndCompliance": {
+      "locales": {
+        "zh-CN": {
+          "privacyPolicyUrl": "",
+          "termsOfUseUrl": "",
+          "locales": {}
+        },
+        "en-US": {
+          "privacyPolicyUrl": "",
+          "termsOfUseUrl": ""
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "description": "Foodie Chef Alexa Skill - CloudFormation infrastructure template",
+  "Resources": {
+    "FoodieChefLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "FoodieChefSkill",
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": ["LambdaExecutionRole", "Arn"]
+        },
+        "Code": {
+          "S3Bucket": "ask-custom-skill-deployment-bucket",
+          "S3Key": "foodie-chef/lambda.zip"
+        },
+        "Runtime": "nodejs18.x",
+        "Timeout": 15,
+        "MemorySize": 256,
+        "Environment": {
+          "Variables": {
+            "SKILL_NAME": "FoodieChef"
+          }
+        }
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "FoodieChefLambdaRole",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+          "Principal": {
+            "Service": "lambda.amazonaws.com"
+          },
+          "Action": "sts:AssumeRole"
+        }
+      ]
+    },
+    "ManagedPolicyArns": [
+      {
+        "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      }
+    ]
+  }
+  },
+  "Outputs": {
+    "LambdaArn": {
+      "Description": "ARN of the Foodie Chef Lambda function",
+      "Value": {
+        "Fn::GetAtt": ["FoodieChefLambdaFunction", "Arn"]
+      }
+    }
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "foodie chef",
+      "intents": [
+        {
+          "name": "LaunchRequest",
+          "samples": []
+        },
+        {
+          "name": "RecommendDishIntent",
+          "samples": [
+            "recommend a dish",
+            "what should I eat today",
+            "give me a food recommendation",
+            "suggest a recipe",
+            "what's for dinner",
+            "I don't know what to eat",
+            "help me choose a dish"
+          ],
+          "slots": [
+            {
+              "name": "Cuisine",
+              "type": "CUISINE_TYPE",
+              "samples": [
+                "recommend a {Cuisine} dish",
+                "I want {Cuisine} food",
+                "suggest a {Cuisine} recipe"
+              ]
+            },
+            {
+              "name": "Ingredient",
+              "type": "INGREDIENT_TYPE",
+              "samples": [
+                "I have {Ingredient}",
+                "what can I make with {Ingredient}",
+                "recommend something with {Ingredient}"
+              ]
+            },
+            {
+              "name": "Taste",
+              "type": "TASTE_TYPE",
+              "samples": [
+                "I want something {Taste}",
+                "recommend a {Taste} dish",
+                "something {Taste} please"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "GenerateMenuIntent",
+          "samples": [
+            "generate a menu",
+            "create a meal plan",
+            "plan my meals for today",
+            "make a menu for today",
+            "what should I eat today",
+            "arrange my meals"
+          ],
+          "slots": [
+            {
+              "name": "MealType",
+              "type": "MEAL_TYPE",
+              "samples": [
+                "plan my {MealType}",
+                "what's for {MealType}",
+                "suggest a {MealType} menu"
+              ]
+            },
+            {
+              "name": "PersonCount",
+              "type": "AMAZON.NUMBER",
+              "samples": [
+                "for {PersonCount} people",
+                "menu for {PersonCount} persons",
+                "{PersonCount} servings"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "GetRecipeIntent",
+          "samples": [
+            "tell me the recipe",
+            "how to cook this dish",
+            "give me the cooking steps",
+            "how do I make this",
+            "what's the recipe"
+          ],
+          "slots": [
+            {
+              "name": "DishName",
+              "type": "DISH_NAME",
+              "samples": [
+                "how to make {DishName}",
+                "recipe for {DishName}",
+                "tell me how to cook {DishName}"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "RandomDishIntent",
+          "samples": [
+            "surprise me with a dish",
+            "random dish please",
+            "pick a random dish for me",
+            "give me a surprise dish"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        }
+      ],
+      "types": [
+        {
+          "name": "CUISINE_TYPE",
+          "values": [
+            {"name": {"value": "Chinese"}},
+            {"name": {"value": "Sichuan"}},
+            {"name": {"value": "Cantonese"}},
+            {"name": {"value": "Italian"}},
+            {"name": {"value": "Japanese"}},
+            {"name": {"value": "Korean"}},
+            {"name": {"value": "Mexican"}},
+            {"name": {"value": "Indian"}},
+            {"name": {"value": "Thai"}},
+            {"name": {"value": "French"}},
+            {"name": {"value": "American"}}
+          ]
+        },
+        {
+          "name": "INGREDIENT_TYPE",
+          "values": [
+            {"name": {"value": "chicken"}},
+            {"name": {"value": "beef"}},
+            {"name": {"value": "pork"}},
+            {"name": {"value": "fish"}},
+            {"name": {"value": "shrimp"}},
+            {"name": {"value": "tofu"}},
+            {"name": {"value": "egg"}},
+            {"name": {"value": "potato"}},
+            {"name": {"value": "tomato"}},
+            {"name": {"value": "rice"}},
+            {"name": {"value": "noodle"}},
+            {"name": {"value": "mushroom"}},
+            {"name": {"value": "broccoli"}}
+          ]
+        },
+        {
+          "name": "TASTE_TYPE",
+          "values": [
+            {"name": {"value": "spicy"}},
+            {"name": {"value": "sweet"}},
+            {"name": {"value": "sour"}},
+            {"name": {"value": "salty"}},
+            {"name": {"value": "mild"}},
+            {"name": {"value": "sweet and sour"}},
+            {"name": {"value": "savory"}}
+          ]
+        },
+        {
+          "name": "MEAL_TYPE",
+          "values": [
+            {"name": {"value": "breakfast"}},
+            {"name": {"value": "lunch"}},
+            {"name": {"value": "dinner"}},
+            {"name": {"value": "snack"}},
+            {"name": {"value": "brunch"}}
+          ]
+        },
+        {
+          "name": "DISH_NAME",
+          "values": [
+            {"name": {"value": "Kung Pao Chicken"}},
+            {"name": {"value": "Mapo Tofu"}},
+            {"name": {"value": "Sweet and Sour Pork"}},
+            {"name": {"value": "Fried Rice"}},
+            {"name": {"value": "Tomato Egg Stir Fry"}},
+            {"name": {"value": "Hot Pot"}},
+            {"name": {"value": "Pad Thai"}},
+            {"name": {"value": "Sushi"}},
+            {"name": {"value": "Pasta Carbonara"}},
+            {"name": {"value": "Tacos"}},
+            {"name": {"value": "Butter Chicken"}},
+            {"name": {"value": "Steamed Fish"}},
+            {"name": {"value": "Cola Chicken Wings"}},
+            {"name": {"value": "Garlic Broccoli"}},
+            {"name": {"value": "Beef Stew"}}
+          ]
+        }
+      ]
+    }
+  }
+}

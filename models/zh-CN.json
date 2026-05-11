@@ -1,0 +1,292 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "美食大厨",
+      "intents": [
+        {
+          "name": "LaunchRequest",
+          "samples": []
+        },
+        {
+          "name": "RecommendDishIntent",
+          "samples": [
+            "推荐一道菜",
+            "给我推荐一道菜",
+            "今天吃什么",
+            "不知道吃什么",
+            "帮我选一道菜",
+            "有什么好吃的推荐",
+            "推荐美食",
+            "推荐一个菜谱"
+          ],
+          "slots": [
+            {
+              "name": "Cuisine",
+              "type": "CUISINE_TYPE",
+              "samples": [
+                "推荐一道{Cuisine}菜",
+                "我想吃{Cuisine}菜",
+                "来一个{Cuisine}风味的菜",
+                "{Cuisine}菜推荐"
+              ]
+            },
+            {
+              "name": "Ingredient",
+              "type": "INGREDIENT_TYPE",
+              "samples": [
+                "我有{Ingredient}",
+                "用{Ingredient}做什么菜",
+                "有{Ingredient}能做什么",
+                "推荐用{Ingredient}做的菜"
+              ]
+            },
+            {
+              "name": "Taste",
+              "type": "TASTE_TYPE",
+              "samples": [
+                "我想吃{Taste}的",
+                "来点{Taste}的菜",
+                "推荐{Taste}口味的菜"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "GenerateMenuIntent",
+          "samples": [
+            "帮我生成菜单",
+            "生成一份菜单",
+            "制定今天的菜单",
+            "帮我安排一日三餐",
+            "推荐今天的菜单",
+            "做一份菜单",
+            "安排今天的菜谱"
+          ],
+          "slots": [
+            {
+              "name": "MealType",
+              "type": "MEAL_TYPE",
+              "samples": [
+                "帮我安排{MealType}菜单",
+                "推荐{MealType}吃什么",
+                "{MealType}菜单"
+              ]
+            },
+            {
+              "name": "PersonCount",
+              "type": "AMAZON.NUMBER",
+              "samples": [
+                "{PersonCount}个人的菜单",
+                "给{PersonCount}个人做菜单",
+                "{PersonCount}人份的菜单"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "GetRecipeIntent",
+          "samples": [
+            "告诉我做法",
+            "怎么做这道菜",
+            "这道菜的做法",
+            "给我菜谱",
+            "详细做法",
+            "怎么烹饪"
+          ],
+          "slots": [
+            {
+              "name": "DishName",
+              "type": "DISH_NAME",
+              "samples": [
+                "{DishName}怎么做",
+                "告诉我{DishName}的做法",
+                "{DishName}的菜谱",
+                "怎么做{DishName}"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "RandomDishIntent",
+          "samples": [
+            "随机推荐一道菜",
+            "帮我随机选一道菜",
+            "随便来一道菜",
+            "给我来个惊喜菜",
+            "随机选菜"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": [
+            "帮助",
+            "怎么用",
+            "你能做什么",
+            "帮我",
+            "帮助我"
+          ]
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        }
+      ],
+      "types": [
+        {
+          "name": "CUISINE_TYPE",
+          "values": [
+            {"name": {"value": "中餐"}},
+            {"name": {"value": "川菜"}},
+            {"name": {"value": "粤菜"}},
+            {"name": {"value": "湘菜"}},
+            {"name": {"value": "鲁菜"}},
+            {"name": {"value": "江浙菜"}},
+            {"name": {"value": "东北菜"}},
+            {"name": {"value": "西餐"}},
+            {"name": {"value": "日料"}},
+            {"name": {"value": "韩餐"}},
+            {"name": {"value": "东南亚菜"}},
+            {"name": {"value": "意大利菜"}},
+            {"name": {"value": "法国菜"}},
+            {"name": {"value": "墨西哥菜"}},
+            {"name": {"value": "印度菜"}}
+          ]
+        },
+        {
+          "name": "INGREDIENT_TYPE",
+          "values": [
+            {"name": {"value": "鸡肉"}},
+            {"name": {"value": "猪肉"}},
+            {"name": {"value": "牛肉"}},
+            {"name": {"value": "鱼肉"}},
+            {"name": {"value": "虾"}},
+            {"name": {"value": "豆腐"}},
+            {"name": {"value": "鸡蛋"}},
+            {"name": {"value": "土豆"}},
+            {"name": {"value": "西红柿"}},
+            {"name": {"value": "白菜"}},
+            {"name": {"value": "青椒"}},
+            {"name": {"value": "蘑菇"}},
+            {"name": {"value": "米饭"}},
+            {"name": {"value": "面条"}},
+            {"name": {"value": "排骨"}},
+            {"name": {"value": "茄子"}}
+          ]
+        },
+        {
+          "name": "TASTE_TYPE",
+          "values": [
+            {"name": {"value": "辣"}},
+            {"name": {"value": "酸辣"}},
+            {"name": {"value": "清淡"}},
+            {"name": {"value": "甜"}},
+            {"name": {"value": "咸鲜"}},
+            {"name": {"value": "麻辣"}},
+            {"name": {"value": "酸甜"}},
+            {"name": {"value": "香辣"}}
+          ]
+        },
+        {
+          "name": "MEAL_TYPE",
+          "values": [
+            {"name": {"value": "早餐"}},
+            {"name": {"value": "午餐"}},
+            {"name": {"value": "晚餐"}},
+            {"name": {"value": "宵夜"}},
+            {"name": {"value": "下午茶"}}
+          ]
+        },
+        {
+          "name": "DISH_NAME",
+          "values": [
+            {"name": {"value": "宫保鸡丁"}},
+            {"name": {"value": "麻婆豆腐"}},
+            {"name": {"value": "红烧肉"}},
+            {"name": {"value": "糖醋排骨"}},
+            {"name": {"value": "鱼香肉丝"}},
+            {"name": {"value": "番茄炒蛋"}},
+            {"name": {"value": "回锅肉"}},
+            {"name": {"value": "水煮鱼"}},
+            {"name": {"value": "蛋炒饭"}},
+            {"name": {"value": "酸辣土豆丝"}},
+            {"name": {"value": "清蒸鲈鱼"}},
+            {"name": {"value": "小炒肉"}},
+            {"name": {"value": "可乐鸡翅"}},
+            {"name": {"value": "蒜蓉西兰花"}},
+            {"name": {"value": "酸菜鱼"}},
+            {"name": {"value": "干锅花菜"}},
+            {"name": {"value": "红烧茄子"}},
+            {"name": {"value": "葱油拌面"}},
+            {"name": {"value": "皮蛋瘦肉粥"}},
+            {"name": {"value": "三杯鸡"}}
+          ]
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "RecommendDishIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "Cuisine",
+              "type": "CUISINE_TYPE",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.649597894420.1473669462838"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GenerateMenuIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "MealType",
+              "type": "MEAL_TYPE",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.123456789.987654321"
+              }
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.649597894420.1473669462838",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "您想吃什么菜系呢？比如川菜、粤菜、湘菜、西餐、日料等。"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.123456789.987654321",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "您想安排哪一餐的菜单呢？早餐、午餐还是晚餐？"
+          }
+        ]
+      }
+    ]
+  }
+}

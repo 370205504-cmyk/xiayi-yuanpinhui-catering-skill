@@ -1,0 +1,25 @@
+{
+  "name": "foodie-chef",
+  "version": "1.0.0",
+  "description": "Alexa Skill for dish recommendation and menu generation - 美食大厨",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "alexa",
+    "skill",
+    "food",
+    "recipe",
+    "menu",
+    "recommendation"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "ask-sdk-core": "^2.14.0",
+    "ask-sdk-model": "^1.44.0",
+    "ask-sdk-s3-persistence-adapter": "^2.14.0"
+  }
+}

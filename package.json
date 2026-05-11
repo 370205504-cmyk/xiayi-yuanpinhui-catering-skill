@@ -1,0 +1,15 @@
+{
+  "name": "foodie-chef-skill",
+  "version": "1.0.0",
+  "description": "Foodie Chef - Alexa Skill for dish recommendation and menu generation",
+  "scripts": {
+    "deploy": "ask deploy",
+    "simulate": "ask simulate",
+    "validate": "ask validate"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "ask-cli": "^2.8.0"
+  }
+}
