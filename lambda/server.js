@@ -49,8 +49,17 @@ app.use(inputSanitize);
 app.use(xssProtection);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'web')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use(express.static(path.join(__dirname, 'web'), {
+  maxAge: '1d',
+  etag: true,
+  lastModified: true,
+  index: false
+}));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  maxAge: '7d',
+  index: false
+}));
 
 app.use((req, res, next) => {
   logger.info('请求', { method: req.method, path: req.path, ip: req.ip });
@@ -147,12 +156,29 @@ app.post('/api/v1/restore', async (req, res) => {
   }
 });
 
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    res.status(404).json({ success: false, message: '接口不存在' });
+  } else {
+    res.status(404).sendFile(path.join(__dirname, 'web', '404.html'));
+  }
+});
+
 app.use((err, req, res, next) => {
+  const DataSanitizer = require('./services/dataSanitizer');
   logger.error('错误', { error: err.message, stack: err.stack });
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ success: false, message: '无效的JSON数据' });
   }
-  res.status(500).json({ success: false, message: '服务器内部错误' });
+  if (process.env.NODE_ENV === 'production') {
+    if (req.path.startsWith('/api/')) {
+      res.status(500).json({ success: false, message: '服务器内部错误' });
+    } else {
+      res.status(500).sendFile(path.join(__dirname, 'web', '500.html'));
+    }
+  } else {
+    res.status(500).json({ success: false, message: err.message, stack: err.stack });
+  }
 });
 
 cron.schedule('0 3 * * *', async () => {

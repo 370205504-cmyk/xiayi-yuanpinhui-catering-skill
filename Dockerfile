@@ -1,13 +1,16 @@
 FROM node:18-alpine
 
+RUN addgroup -g 1001 nodejs && adduser -u 1001 -G nodejs -s /bin/sh -D node
+
 WORKDIR /app
+RUN chown -R node:nodejs /app
 
-COPY lambda/package*.json ./
+USER node
 
+COPY --chown=node:nodejs package*.json ./
 RUN npm install --production
-
-COPY lambda/ ./
+COPY --chown=node:nodejs . .
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["node", "lambda/server.js"]
