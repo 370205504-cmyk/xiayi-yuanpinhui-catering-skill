@@ -1,5 +1,19 @@
 const logger = require('../utils/logger');
 
+/**
+ * 带指数退避的通用重试函数
+ * 用于处理第三方接口调用失败时的重试逻辑
+ * 
+ * @param {Function} fn - 需要重试的异步函数
+ * @param {Object} options - 重试配置选项
+ * @param {number} [options.retries=3] - 最大重试次数
+ * @param {number} [options.initialDelay=1000] - 初始延迟(ms)
+ * @param {number} [options.maxDelay=10000] - 最大延迟(ms)
+ * @param {number} [options.factor=2] - 退避因子
+ * @param {boolean} [options.jitter=true] - 是否添加抖动
+ * @param {Function} [options.onRetry=null] - 重试回调函数
+ * @returns {Promise<any>} 函数执行结果
+ */
 async function retryWithBackoff(fn, options = {}) {
   const {
     retries = 3,
@@ -25,7 +39,7 @@ async function retryWithBackoff(fn, options = {}) {
         onRetry(attempt, error);
       }
 
-      logger.warn(`第${attempt}次调用失败，等待${delay}ms后重试: ${error.message}`);
+      logger.warn(`第${attempt}次调用失败，等待${Math.round(delay)}ms后重试: ${error.message}`);
 
       await new Promise(resolve => setTimeout(resolve, delay));
 
@@ -38,6 +52,14 @@ async function retryWithBackoff(fn, options = {}) {
   }
 }
 
+/**
+ * 指数退避重试（默认配置）
+ * 重试3次，延迟依次为: 1s, 2s, 4s
+ * 
+ * @param {Function} fn - 需要重试的异步函数
+ * @param {number} [retries=3] - 最大重试次数
+ * @returns {Promise<any>} 函数执行结果
+ */
 async function retryWithExponentialBackoff(fn, retries = 3) {
   return retryWithBackoff(fn, {
     retries,

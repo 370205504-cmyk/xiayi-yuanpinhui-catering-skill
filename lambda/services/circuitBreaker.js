@@ -3,6 +3,10 @@ const CircuitBreaker = require('opossum');
 const db = require('../database/db');
 const logger = require('../utils/logger');
 
+/**
+ * 熔断器降级处理函数
+ * 当熔断器打开时，返回降级响应，避免服务雪崩
+ */
 const dbFallback = () => {
   logger.error('数据库熔断器已触发');
   return { success: false, message: '系统繁忙，请稍后再试' };
@@ -18,6 +22,12 @@ const externalApiFallback = (error) => {
   return { success: false, message: '外部服务暂时不可用，请稍后再试' };
 };
 
+/**
+ * 数据库查询熔断器配置
+ * - timeout: 3秒超时
+ * - errorThresholdPercentage: 50%错误率触发熔断
+ * - resetTimeout: 10秒后尝试半开状态
+ */
 const dbBreaker = new CircuitBreaker(db.query, {
   timeout: 3000,
   errorThresholdPercentage: 50,
@@ -26,6 +36,12 @@ const dbBreaker = new CircuitBreaker(db.query, {
   name: 'database'
 });
 
+/**
+ * 微信支付接口熔断器配置
+ * - timeout: 5秒超时（支付接口较慢）
+ * - errorThresholdPercentage: 50%错误率触发熔断
+ * - resetTimeout: 10秒后尝试半开状态
+ */
 const payBreaker = new CircuitBreaker(async (params) => {
   const wechatPay = require('../integrations/wechatPay');
   return await wechatPay.createOrder(params);
@@ -37,6 +53,12 @@ const payBreaker = new CircuitBreaker(async (params) => {
   name: 'payment'
 });
 
+/**
+ * 外部API通用熔断器配置
+ * - timeout: 10秒超时（第三方接口可能较慢）
+ * - errorThresholdPercentage: 50%错误率触发熔断
+ * - resetTimeout: 15秒后尝试半开状态
+ */
 const externalApiBreaker = new CircuitBreaker(async (fn) => {
   return await fn();
 }, {
@@ -47,6 +69,9 @@ const externalApiBreaker = new CircuitBreaker(async (fn) => {
   name: 'external-api'
 });
 
+/**
+ * 数据库熔断器事件监听
+ */
 dbBreaker.on('open', () => {
   logger.error('数据库熔断器已打开');
 });
@@ -59,6 +84,9 @@ dbBreaker.on('halfOpen', () => {
   logger.info('数据库熔断器进入半开状态');
 });
 
+/**
+ * 支付熔断器事件监听
+ */
 payBreaker.on('open', () => {
   logger.error('支付熔断器已打开');
 });
