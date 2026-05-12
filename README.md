@@ -1,8 +1,8 @@
-# 夏邑缘品荟智能餐饮系统 v4.0.1
+# 夏邑缘品荟智能餐饮系统 v4.1.0
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-4.0.1-blue)
+![Version](https://img.shields.io/badge/version-4.1.0-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D16.0.0-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
@@ -21,7 +21,8 @@
 | 功能 | 说明 |
 |------|------|
 | **多渠道点餐** | 语音点餐、文字聊天、Web/移动端点餐、AI Agent对话 |
-| **AI Agent适配** | 支持扣子/龙虾/Dify等AI平台接入，21个MCP标准工具 |
+| **AI Agent适配** | 支持扣子/龙虾/Dify等AI平台接入，26个MCP标准工具 |
+| **商业服务查询** | 20+种自然语言查询（WiFi、停车、营业时间等） |
 | **智能排队** | 排队叫号、实时进度查询、取消排队 |
 | **完整购物车** | 加菜、减菜、口味备注、多人点餐 |
 | **订单生命周期** | 待确认→已接单→制作中→已出餐→已完成/已取消 |
@@ -115,6 +116,7 @@ docker-compose down
 
 ## 详细文档
 
+- [快速开始](./QUICKSTART.md) - 新手必读，快速上手指南 ⭐
 - [部署指南](./docs/DEPLOYMENT.md) - 完整部署文档
 - [API文档](./docs/API.md) - API接口文档
 - [Windows使用指南](./WINDOWS使用指南.md) - Windows用户专享
