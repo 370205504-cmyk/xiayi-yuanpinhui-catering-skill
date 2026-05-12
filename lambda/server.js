@@ -29,6 +29,7 @@ const servicesRoutes = require('./routes/services');
 
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection } = require('./middleware/security');
 const { requireSignature, sqlInjectionProtection } = require('./middleware/signature');
+const { IdempotencyService, CSRFProtection } = require('./middleware/securityEnhancements');
 
 const app = express();
 
@@ -65,6 +66,8 @@ app.use((req, res, next) => {
 });
 
 app.use(requireSignature);
+app.use(IdempotencyService.processRequest.bind(IdempotencyService));
+app.use(CSRFProtection.setToken.bind(CSRFProtection));
 
 app.use(express.static(path.join(__dirname, 'web'), {
   maxAge: '1d',
@@ -79,6 +82,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
 
 app.use((req, res, next) => {
   logger.info('请求', { method: req.method, path: req.path, ip: req.ip });
+  
+  const originalJson = res.json;
+  res.json = function(data) {
+    res.locals.responseBody = data;
+    return originalJson.call(this, data);
+  };
+  
   next();
 });
 

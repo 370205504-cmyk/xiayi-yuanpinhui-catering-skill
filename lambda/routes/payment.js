@@ -37,7 +37,8 @@ router.post('/create',
 router.post('/wechat/callback',
   async (req, res) => {
     try {
-      const result = await paymentService.handleWechatCallback(req.body);
+      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
+      const result = await paymentService.handleWechatCallback(req, ip);
       if (result.success) {
         res.status(200).json({ code: 'SUCCESS', message: '成功' });
       } else {
@@ -45,6 +46,21 @@ router.post('/wechat/callback',
       }
     } catch (error) {
       res.status(500).json({ code: 'FAIL', message: '处理失败' });
+    }
+  }
+);
+
+router.post('/alipay/callback',
+  async (req, res) => {
+    try {
+      const result = await paymentService.handleAlipayCallback(req);
+      if (result.success) {
+        res.status(200).send('success');
+      } else {
+        res.status(400).send('fail');
+      }
+    } catch (error) {
+      res.status(500).send('fail');
     }
   }
 );

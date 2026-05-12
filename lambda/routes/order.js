@@ -212,6 +212,11 @@ router.get('/:orderNo',
       }
 
       const order = orders[0];
+
+      if (order.user_id && req.userId !== order.user_id && !req.isAdmin) {
+        return res.status(403).json({ success: false, message: '无权查看该订单' });
+      }
+
       const items = await db.query('SELECT * FROM order_items WHERE order_id = ?', [order.id]);
       order.items = items;
 
@@ -234,7 +239,7 @@ router.put('/:orderNo/cancel',
 
       const orders = await db.query('SELECT * FROM orders WHERE order_no = ? AND user_id = ?', [req.params.orderNo, req.userId]);
       if (orders.length === 0) {
-        return res.status(404).json({ success: false, message: '订单不存在' });
+        return res.status(404).json({ success: false, message: '订单不存在或无权操作' });
       }
 
       const order = orders[0];
@@ -273,13 +278,11 @@ router.put('/:orderNo/cancel',
 );
 
 router.post('/:orderNo/confirm',
-  optionalAuth,
+  requireAuth,
   async (req, res) => {
     try {
-      const { adminKey } = req.body;
-
-      if (adminKey !== process.env.ADMIN_API_KEY) {
-        return res.status(403).json({ success: false, message: '权限不足' });
+      if (!req.isAdmin) {
+        return res.status(403).json({ success: false, message: '需要管理员权限' });
       }
 
       const orders = await db.query('SELECT * FROM orders WHERE order_no = ?', [req.params.orderNo]);
