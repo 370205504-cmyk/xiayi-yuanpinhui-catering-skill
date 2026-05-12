@@ -1,7 +1,11 @@
+const crypto = require('crypto');
+const { verifyWechatPaySign, parseWechatPayNotifyXml, buildWechatPayXml } = require('../utils/wechatSign');
+
 class PaymentGateway {
   constructor() {
     this.config = require('../config.json');
     this.pendingPayments = new Map();
+    this.wechatPayKey = process.env.WECHAT_PAY_KEY || '';
   }
 
   async createPayment(order) {
@@ -71,6 +75,53 @@ class PaymentGateway {
     payment.refundReason = reason;
 
     return payment;
+  }
+
+  async processWechatPayCallback(xmlData) {
+    const params = parseWechatPayNotifyXml(xmlData);
+
+    if (!verifyWechatPaySign(params)) {
+      throw new Error('支付回调签名验证失败');
+    }
+
+    const { return_code, transaction_id, out_trade_no, total_fee } = params;
+
+    if (return_code !== 'SUCCESS') {
+      return {
+        success: false,
+        message: '微信支付返回失败'
+      };
+    }
+
+    const payment = this.pendingPayments.get(out_trade_no);
+    if (!payment) {
+      return {
+        success: false,
+        message: '订单不存在'
+      };
+    }
+
+    const expectedAmount = this.convertYuanToFen(payment.amount);
+    if (parseInt(total_fee) !== expectedAmount) {
+      throw new Error(`支付金额不匹配: 预期${expectedAmount}, 实际${total_fee}`);
+    }
+
+    payment.status = 'paid';
+    payment.transactionId = transaction_id;
+    payment.paidAt = new Date().toISOString();
+
+    return {
+      success: true,
+      payment,
+      message: '支付成功'
+    };
+  }
+
+  buildWechatPayResponse(returnCode, returnMsg = 'OK') {
+    return buildWechatPayXml({
+      return_code: returnCode,
+      return_msg: returnMsg
+    });
   }
 
   convertYuanToFen(yuanAmount) {
