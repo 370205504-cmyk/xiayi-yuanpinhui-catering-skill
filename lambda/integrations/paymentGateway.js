@@ -6,7 +6,7 @@ class PaymentGateway {
 
   async createPayment(order) {
     const paymentId = `PAY${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const payment = {
       paymentId,
       orderId: order.orderId,
@@ -38,7 +38,7 @@ class PaymentGateway {
 
   async confirmPayment(paymentId, transactionId) {
     const payment = this.pendingPayments.get(paymentId);
-    
+
     if (!payment) {
       throw new Error('支付不存在');
     }
@@ -57,7 +57,7 @@ class PaymentGateway {
 
   async refundPayment(paymentId, reason) {
     const payment = this.pendingPayments.get(paymentId);
-    
+
     if (!payment) {
       throw new Error('支付不存在');
     }
@@ -71,6 +71,28 @@ class PaymentGateway {
     payment.refundReason = reason;
 
     return payment;
+  }
+
+  convertYuanToFen(yuanAmount) {
+    if (typeof yuanAmount === 'number') {
+      return Math.round(yuanAmount * 100);
+    }
+    const parsed = parseFloat(yuanAmount);
+    if (isNaN(parsed)) {
+      throw new Error('无效的金额格式');
+    }
+    return Math.round(parsed * 100);
+  }
+
+  convertFenToYuan(fenAmount) {
+    if (typeof fenAmount === 'number') {
+      return (fenAmount / 100).toFixed(2);
+    }
+    const parsed = parseInt(fenAmount);
+    if (isNaN(parsed)) {
+      throw new Error('无效的金额格式');
+    }
+    return (parsed / 100).toFixed(2);
   }
 }
 

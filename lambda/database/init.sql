@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS dishes (
   original_price DECIMAL(10,2) COMMENT '原价',
   description TEXT COMMENT '描述',
   image VARCHAR(255) COMMENT '图片URL',
-  stock INT DEFAULT -1 COMMENT '库存(-1表示不限)',
+  stock INT DEFAULT -1 COMMENT '库存(-1表示不限库存)',
   stock_warning INT DEFAULT 10 COMMENT '库存预警值',
   ingredients TEXT COMMENT '食材',
   allergens TEXT COMMENT '过敏原',
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS orders (
   request_id VARCHAR(64) UNIQUE COMMENT '幂等请求ID',
   user_id INT COMMENT '用户ID',
   type ENUM('dine_in', 'takeout', 'delivery') DEFAULT 'dine_in' COMMENT '订单类型',
-  status ENUM('pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled') DEFAULT 'pending' COMMENT '订单状态',
+  status ENUM('pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled', 'expired') DEFAULT 'pending' COMMENT '订单状态',
   payment_status ENUM('unpaid', 'paid', 'refunded') DEFAULT 'unpaid' COMMENT '支付状态',
   total_amount DECIMAL(10,2) NOT NULL COMMENT '商品总价',
   discount_amount DECIMAL(10,2) DEFAULT 0.00 COMMENT '优惠金额',
@@ -88,16 +88,19 @@ CREATE TABLE IF NOT EXISTS orders (
   coupon_id INT COMMENT '使用的优惠券ID',
   table_no VARCHAR(20) COMMENT '桌号',
   guest_count INT DEFAULT 1 COMMENT '用餐人数',
-  remarks TEXT COMMENT '备注',
+  remarks TEXT COMMENT '备注(限200字)',
   address TEXT COMMENT '配送地址',
   contact_phone VARCHAR(20) COMMENT '联系电话',
+  pay_expire_at DATETIME NOT NULL DEFAULT (DATE_ADD(NOW(), INTERVAL 15 MINUTE)) COMMENT '支付过期时间',
+  paid_at DATETIME NULL COMMENT '支付时间',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_user (user_id),
   INDEX idx_status (status),
   INDEX idx_order_no (order_no),
   INDEX idx_request_id (request_id),
-  INDEX idx_created (created_at)
+  INDEX idx_created (created_at),
+  INDEX idx_pay_expire (pay_expire_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 订单明细表
@@ -126,7 +129,8 @@ CREATE TABLE IF NOT EXISTS carts (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY uk_user_dish (user_id, dish_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (dish_id) REFERENCES dishes(id) ON DELETE CASCADE
+  FOREIGN KEY (dish_id) REFERENCES dishes(id) ON DELETE CASCADE,
+  INDEX idx_updated (updated_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 优惠券表
@@ -210,7 +214,7 @@ CREATE TABLE IF NOT EXISTS system_settings (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 库存变动记录
+-- 库存变动记录表
 CREATE TABLE IF NOT EXISTS stock_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
   dish_id INT NOT NULL,
@@ -218,7 +222,8 @@ CREATE TABLE IF NOT EXISTS stock_history (
   reason VARCHAR(100) COMMENT '变动原因',
   operator_id INT COMMENT '操作人',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (dish_id) REFERENCES dishes(id) ON DELETE CASCADE
+  FOREIGN KEY (dish_id) REFERENCES dishes(id) ON DELETE CASCADE,
+  INDEX idx_dish (dish_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 通知记录表
@@ -239,11 +244,63 @@ CREATE TABLE IF NOT EXISTS notifications (
 CREATE TABLE IF NOT EXISTS operation_logs (
   id INT AUTO_INCREMENT PRIMARY KEY,
   admin_id VARCHAR(64) NOT NULL COMMENT '管理员ID',
+  admin_name VARCHAR(50) COMMENT '管理员名称',
   operation VARCHAR(100) NOT NULL COMMENT '操作类型',
   detail TEXT COMMENT '操作详情',
   ip VARCHAR(45) NOT NULL COMMENT 'IP地址',
+  user_agent TEXT COMMENT '浏览器信息',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_admin (admin_id),
   INDEX idx_operation (operation),
   INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 管理员角色表
+CREATE TABLE IF NOT EXISTS admin_roles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(64) NOT NULL COMMENT '用户ID',
+  role ENUM('super_admin', 'manager', 'cashier') NOT NULL DEFAULT 'cashier' COMMENT '角色',
+  permissions JSON COMMENT '额外权限(超出角色默认权限)',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 插入默认超级管理员角色
+INSERT INTO admin_roles (user_id, role) VALUES ('admin001', 'super_admin');
+
+-- 历史订单归档表(用于数据归档)
+CREATE TABLE IF NOT EXISTS orders_archive (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  original_id INT NOT NULL COMMENT '原订单ID',
+  order_no VARCHAR(64) NOT NULL COMMENT '订单号',
+  request_id VARCHAR(64) COMMENT '幂等请求ID',
+  user_id INT COMMENT '用户ID',
+  type ENUM('dine_in', 'takeout', 'delivery') DEFAULT 'dine_in' COMMENT '订单类型',
+  status ENUM('pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled', 'expired') COMMENT '订单状态',
+  payment_status ENUM('unpaid', 'paid', 'refunded') COMMENT '支付状态',
+  total_amount DECIMAL(10,2) NOT NULL COMMENT '商品总价',
+  discount_amount DECIMAL(10,2) DEFAULT 0.00 COMMENT '优惠金额',
+  final_amount DECIMAL(10,2) NOT NULL COMMENT '实付金额',
+  points_earned INT DEFAULT 0 COMMENT '获得积分',
+  table_no VARCHAR(20) COMMENT '桌号',
+  guest_count INT DEFAULT 1 COMMENT '用餐人数',
+  remarks TEXT COMMENT '备注',
+  address TEXT COMMENT '配送地址',
+  contact_phone VARCHAR(20) COMMENT '联系电话',
+  pay_expire_at DATETIME COMMENT '支付过期时间',
+  paid_at DATETIME NULL COMMENT '支付时间',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  archived_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '归档时间',
+  INDEX idx_order_no (order_no),
+  INDEX idx_user (user_id),
+  INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 如果是已存在的数据库，执行以下ALTER语句添加新字段
+-- ALTER TABLE orders ADD COLUMN pay_expire_at DATETIME NOT NULL DEFAULT (DATE_ADD(NOW(), INTERVAL 15 MINUTE)) COMMENT '支付过期时间' AFTER remarks;
+-- ALTER TABLE orders ADD COLUMN paid_at DATETIME NULL COMMENT '支付时间' AFTER pay_expire_at;
+-- ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled', 'expired') DEFAULT 'pending';
+-- ALTER TABLE orders ADD INDEX idx_pay_expire (pay_expire_at);
+-- ALTER TABLE carts ADD INDEX idx_updated (updated_at);

@@ -7,6 +7,8 @@ const { requireAuth, optionalAuth } = require('../middleware/auth');
 const { body } = require('express-validator');
 const { validate } = require('../middleware/security');
 const inputValidator = require('../services/inputValidator');
+const logger = require('../utils/logger');
+const { logOperation, OPERATION_TYPES } = require('../services/operationLogService');
 
 const router = express.Router();
 
@@ -32,24 +34,13 @@ router.post('/create',
         return res.status(400).json({ success: false, message: '非法请求参数' });
       }
 
-      if (requestId) {
-        const existingOrders = await db.query(
-          'SELECT * FROM orders WHERE request_id = ? LIMIT 1',
-          [inputValidator.sanitizeString(requestId)]
-        );
-        if (existingOrders.length > 0) {
-          logger.info(`订单幂等返回: requestId=${requestId}`);
-          return res.json({
-            success: true,
-            idempotent: true,
-            message: '订单已创建',
-            order: { orderNo: existingOrders[0].order_no, totalAmount: existingOrders[0].total_amount }
-          });
-        }
+      if (remarks && remarks.length > 200) {
+        return res.status(400).json({ success: false, message: '备注不能超过200字' });
       }
 
-      const orderNo = `ORD${Date.now()}${uuidv4().slice(0, 6).toUpperCase()}`;
       const safeRequestId = requestId ? inputValidator.sanitizeString(requestId) : null;
+
+      const orderNo = `ORD${Date.now()}${uuidv4().slice(0, 6).toUpperCase()}`;
 
       let totalAmount = 0;
       const orderItems = [];
@@ -109,10 +100,45 @@ router.post('/create',
       const pointsEarned = Math.floor(finalAmount);
 
       await db.transaction(async (connection) => {
+        if (safeRequestId) {
+          const [existing] = await connection.query(
+            'SELECT id, order_no, total_amount FROM orders WHERE request_id = ? FOR UPDATE',
+            [safeRequestId]
+          );
+          if (existing.length > 0) {
+            logger.info(`订单幂等返回(事务): requestId=${safeRequestId}`);
+            return res.json({
+              success: true,
+              idempotent: true,
+              message: '订单已创建',
+              order: { orderNo: existing[0].order_no, totalAmount: existing[0].total_amount }
+            });
+          }
+        }
+
+        for (const item of orderItems) {
+          const [dishStock] = await connection.query(
+            'SELECT stock FROM dishes WHERE id = ? FOR UPDATE',
+            [item.dishId]
+          );
+          if (dishStock.length > 0) {
+            const currentStock = dishStock[0].stock || 999;
+            if (currentStock !== 999 && currentStock < item.quantity) {
+              throw new Error(`菜品《${item.dishName}》库存不足，仅剩${currentStock}份`);
+            }
+            if (currentStock !== 999) {
+              await connection.query(
+                'UPDATE dishes SET stock = stock - ? WHERE id = ?',
+                [item.quantity, item.dishId]
+              );
+            }
+          }
+        }
+
         const [orderResult] = await connection.query(
           `INSERT INTO orders (order_no, user_id, request_id, type, total_amount, discount_amount, final_amount,
-            points_earned, coupon_id, table_no, guest_count, remarks, address, contact_phone)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            points_earned, coupon_id, table_no, guest_count, remarks, address, contact_phone, pay_expire_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE))`,
           [orderNo, userId, safeRequestId, type, totalAmount, discountAmount, finalAmount, pointsEarned,
            couponId, tableNo, guestCount || 1, remarks, address, contactPhone]
         );
@@ -128,6 +154,8 @@ router.post('/create',
         if (couponId) {
           await connection.query('UPDATE user_coupons SET status = ? WHERE id = ?', ['used', couponId]);
         }
+
+        await connection.query('DELETE FROM carts WHERE user_id = ?', [userId]);
       });
 
       logger.info(`订单创建: ${orderNo}, 金额: ${finalAmount}`);
@@ -137,7 +165,7 @@ router.post('/create',
       });
     } catch (error) {
       logger.error('订单创建失败:', error);
-      res.status(500).json({ success: false, message: '订单创建失败' });
+      res.status(500).json({ success: false, message: error.message || '订单创建失败' });
     }
   }
 );
@@ -198,6 +226,12 @@ router.put('/:orderNo/cancel',
   requireAuth,
   async (req, res) => {
     try {
+      const { confirmPassword } = req.body;
+
+      if (!confirmPassword) {
+        return res.status(400).json({ success: false, message: '需要验证密码才能取消订单' });
+      }
+
       const orders = await db.query('SELECT * FROM orders WHERE order_no = ? AND user_id = ?', [req.params.orderNo, req.userId]);
       if (orders.length === 0) {
         return res.status(404).json({ success: false, message: '订单不存在' });
@@ -209,15 +243,61 @@ router.put('/:orderNo/cancel',
       }
 
       await db.transaction(async (connection) => {
-        await connection.query('UPDATE orders SET status = ? WHERE order_no = ?', ['cancelled', req.params.orderNo]);
+        const [orderLock] = await connection.query(
+          'SELECT * FROM orders WHERE order_no = ? FOR UPDATE',
+          [req.params.orderNo]
+        );
+
+        await connection.query('UPDATE orders SET status = ?, updated_at = NOW() WHERE order_no = ?', ['cancelled', req.params.orderNo]);
 
         const items = await connection.query('SELECT * FROM order_items WHERE order_id = ?', [order.id]);
         for (const item of items) {
           await connection.query('UPDATE dishes SET stock = stock + ? WHERE id = ?', [item.quantity, item.dish_id]);
         }
+
+        if (order.payment_status === 'paid') {
+          const paymentService = require('../services/paymentService');
+          try {
+            await paymentService.refund(req.params.orderNo, order.final_amount, '用户取消订单');
+          } catch (refundError) {
+            logger.error('自动退款失败:', refundError);
+          }
+        }
       });
 
       res.json({ success: true, message: '订单已取消' });
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.post('/:orderNo/confirm',
+  optionalAuth,
+  async (req, res) => {
+    try {
+      const { adminKey } = req.body;
+
+      if (adminKey !== process.env.ADMIN_API_KEY) {
+        return res.status(403).json({ success: false, message: '权限不足' });
+      }
+
+      const orders = await db.query('SELECT * FROM orders WHERE order_no = ?', [req.params.orderNo]);
+      if (orders.length === 0) {
+        return res.status(404).json({ success: false, message: '订单不存在' });
+      }
+
+      const order = orders[0];
+      if (order.status !== 'pending') {
+        return res.status(400).json({ success: false, message: '订单状态无法确认' });
+      }
+
+      await db.query('UPDATE orders SET status = ?, updated_at = NOW() WHERE order_no = ?', ['confirmed', req.params.orderNo]);
+
+      await logOperation('system', OPERATION_TYPES.ORDER_STATUS_CHANGE, { orderNo: req.params.orderNo, from: 'pending', to: 'confirmed' }, req.ip);
+
+      logger.info(`订单确认: ${req.params.orderNo}`);
+      res.json({ success: true, message: '订单已确认' });
     } catch (error) {
       res.status(500).json({ success: false, message: '服务器错误' });
     }
