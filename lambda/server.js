@@ -25,8 +25,10 @@ const adminRoutes = require('./routes/admin');
 const monitorRoutes = require('./routes/monitor');
 const exportRoutes = require('./routes/export');
 const userDataRoutes = require('./routes/userData');
+const servicesRoutes = require('./routes/services');
 
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection } = require('./middleware/security');
+const { requireSignature, sqlInjectionProtection } = require('./middleware/signature');
 
 const app = express();
 
@@ -49,6 +51,7 @@ app.use(compression());
 app.use(helmetConfig);
 app.use(corsConfig);
 app.use(ipProtection);
+app.use(sqlInjectionProtection);
 app.use(inputSanitize);
 app.use(xssProtection);
 app.use(express.json({ limit: '10mb' }));
@@ -60,6 +63,8 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+app.use(requireSignature);
 
 app.use(express.static(path.join(__dirname, 'web'), {
   maxAge: '1d',
@@ -89,6 +94,7 @@ app.use('/api/v1/queue', queueRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/store', storeRoutes);
 app.use('/api/v1', apiLimiter, apiRoutes);
+app.use('/api/v1/services', servicesRoutes);
 app.use('/agent', agentRoutes);
 app.use('/admin', adminRoutes);
 app.use('/monitor', monitorRoutes);
@@ -245,8 +251,23 @@ async function startServer() {
     if (process.env.DB_HOST) {
       await db.initialize();
       logger.info('数据库连接成功');
+
+      if (process.env.DB_READ_HOST) {
+        const dbReadWrite = require('./database/dbReadWrite');
+        await dbReadWrite.initialize();
+        logger.info('数据库读写分离已启用');
+      }
     } else {
       logger.warn('未配置数据库，将以离线模式运行');
+    }
+
+    try {
+      const cacheWarmup = require('./services/cacheWarmup');
+      const warmupResult = await cacheWarmup.warmup();
+      await cacheWarmup.schedulePeriodicWarmup();
+      logger.info(`缓存预热完成，成功${warmupResult.successCount}项`);
+    } catch (error) {
+      logger.warn('缓存预热失败:', error.message);
     }
 
     try {
@@ -275,7 +296,7 @@ async function startServer() {
 
     app.listen(PORT, HOST, () => {
       console.log('═══════════════════════════════════════════════════════════');
-      console.log('🍽️  夏邑缘品荟创味菜 - 智能餐饮服务系统 v3.4.0');
+      console.log('🍽️  夏邑缘品荟创味菜 - 智能餐饮服务系统 v3.5.2');
       console.log('═══════════════════════════════════════════════════════════');
       console.log(`🚀 服务已启动: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
       console.log(`📱 顾客端: http://localhost:${PORT}/`);

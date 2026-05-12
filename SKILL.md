@@ -234,5 +234,5 @@ AI: 门店地址：夏邑县孔祖大道南段188号
 ## 联系方式
 
 - **开发者**: 石中伟
-- **GitHub**: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill
-- **问题反馈**: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill/issues
+- **GitHub**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-foodie-skill
+- **问题反馈**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-foodie-skill/issues

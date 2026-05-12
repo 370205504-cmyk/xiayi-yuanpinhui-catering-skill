@@ -6,7 +6,7 @@ const SAMPLE_DATA = {
     {
       id: 1,
       name: '夏邑缘品荟创味菜(孔祖店)',
-      name_en: 'Xiayi Youpinhui Restaurant',
+      name_en: 'Xiayi yuanpinhui Restaurant',
       address: '夏邑县孔祖大道南段188号',
       phone: '0370-6288888',
       business_hours: '10:00-22:00',
@@ -19,7 +19,7 @@ const SAMPLE_DATA = {
     {
       id: 2,
       name: '夏邑缘品荟创味菜(雪枫路店)',
-      name_en: 'Xiayi Youpinhui Restaurant',
+      name_en: 'Xiayi yuanpinhui Restaurant',
       address: '夏邑县雪枫路中段66号',
       phone: '0370-6286666',
       business_hours: '10:00-22:00',
@@ -175,9 +175,9 @@ async function importSampleData() {
     for (const user of SAMPLE_DATA.users) {
       await connection.query(
         'INSERT IGNORE INTO users (id, phone, nickname, password_hash, ' +
-        'points, balance, level, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'points, balance, level, status, must_change_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [user.id, user.phone, user.nickname, passwordHash, user.points,
-          user.balance, user.level, user.status]
+          user.balance, user.level, user.status, 1]
       );
     }
     logger.log('   ✅ 测试用户导入完成');
@@ -191,6 +191,7 @@ async function importSampleData() {
     logger.log('  密码: 123456');
     logger.log('  积分: 100');
     logger.log('  余额: ¥50.00');
+    logger.log('  ⚠️  首次登录必须修改密码');
     logger.log('');
     logger.log('优惠券兑换码：');
     logger.log('  WELCOME10 - 新用户专享券');

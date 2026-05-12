@@ -14,7 +14,7 @@
   ],
   "mcp": {
     "protocol_version": "2024-11-05",
-    "endpoint": "https://mcp.xiayi-youpinhui.com",
+    "endpoint": "https://mcp.xiayi-yuanpinhui.com",
     "transport": "http",
     "authentication": {
       "type": "bearer",
@@ -372,6 +372,91 @@
             }
           }
         }
+      },
+      {
+        "name": "issue_invoice",
+        "description": "开具发票",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "tax_number": {
+              "type": "string",
+              "description": "税号"
+            },
+            "company_name": {
+              "type": "string",
+              "description": "公司名称"
+            },
+            "email": {
+              "type": "string",
+              "description": "接收邮箱（可选）"
+            }
+          },
+          "required": ["order_no", "tax_number", "company_name"]
+        },
+        "examples": [
+          {"order_no": "ORD20260115001", "tax_number": "91110105XXXXXXXX", "company_name": "XX科技有限公司"}
+        ]
+      },
+      {
+        "name": "reserve_room",
+        "description": "包间预订",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "room_id": {
+              "type": "string",
+              "description": "包间ID"
+            },
+            "date": {
+              "type": "string",
+              "description": "预订日期（格式：YYYY-MM-DD）"
+            },
+            "time_slot": {
+              "type": "string",
+              "description": "时间段：11:00, 12:00, 13:00, 17:00, 18:00, 19:00, 20:00",
+              "enum": ["11:00", "12:00", "13:00", "17:00", "18:00", "19:00", "20:00"]
+            },
+            "people": {
+              "type": "number",
+              "description": "用餐人数"
+            },
+            "phone": {
+              "type": "string",
+              "description": "联系电话"
+            },
+            "remarks": {
+              "type": "string",
+              "description": "备注（可选）"
+            }
+          },
+          "required": ["room_id", "date", "time_slot", "people", "phone"]
+        },
+        "examples": [
+          {"room_id": "room001", "date": "2026-01-20", "time_slot": "18:00", "people": 8, "phone": "13800138000"}
+        ]
+      },
+      {
+        "name": "get_events",
+        "description": "查询活动信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "活动类型：promotion(促销), holiday(节日), member(会员专享), all(全部)",
+              "enum": ["promotion", "holiday", "member", "all"]
+            }
+          }
+        },
+        "examples": [
+          {"type": "promotion"},
+          {"type": "all"}
+        ]
       }
     ],
     "resources": [
@@ -384,17 +469,27 @@
         "name": "store_info",
         "description": "门店基本信息",
         "uri": "restaurant://store/{store_id}"
+      },
+      {
+        "name": "events",
+        "description": "餐厅活动信息",
+        "uri": "restaurant://events"
+      },
+      {
+        "name": "rooms",
+        "description": "包间信息",
+        "uri": "restaurant://rooms"
       }
     ]
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill.git"
+    "url": "https://github.com/370205504-cmyk/xiayi-yuanpinhui-foodie-skill.git"
   },
   "endpoints": {
-    "api": "https://mcp.xiayi-youpinhui.com/api/v1",
-    "admin": "https://mcp.xiayi-youpinhui.com/admin",
-    "customer": "https://mcp.xiayi-youpinhui.com/mobile"
+    "api": "https://mcp.xiayi-yuanpinhui.com/api/v1",
+    "admin": "https://mcp.xiayi-yuanpinhui.com/admin",
+    "customer": "https://mcp.xiayi-yuanpinhui.com/mobile"
   },
   "deployment": {
     "platform": "tencent-cloud-scf",

@@ -15,7 +15,7 @@ class WechatService {
     this.appSecret = process.env.WECHAT_SECRET;
     this.mchId = process.env.WECHAT_MCHID;
     this.apiKey = process.env.WECHAT_APIKEY;
-    this.redirectUri = process.env.WECHAT_REDIRECT_URI || 'https://mcp.xiayi-youpinhui.com/api/v1/auth/wechat/callback';
+    this.redirectUri = process.env.WECHAT_REDIRECT_URI || 'https://mcp.xiayi-yuanpinhui.com/api/v1/auth/wechat/callback';
     this.unifiedOrderUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
     this.accessTokenUrl = 'https://api.weixin.qq.com/cgi-bin/token';
     this.userInfoUrl = 'https://api.weixin.qq.com/cgi-bin/user/info';

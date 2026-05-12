@@ -236,7 +236,7 @@ AI: 🎫 取号成功！排队号：A025，预计等待30分钟
 ## 目录结构
 
 ```
-xiayi-youpinhui-foodie-skill/
+xiayi-yuanpinhui-foodie-skill/
 ├── lambda/
 │   ├── database/          # 数据库层
 │   │   ├── db.js         # 数据库连接

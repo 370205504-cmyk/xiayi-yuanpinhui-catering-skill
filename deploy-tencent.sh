@@ -88,14 +88,14 @@ deploy_serverless() {
     source .env 2>/dev/null || true
 
     cloudbase functions:deploy xiayi-foodie-skill \
-        --service-name xiayi-youpinhui \
+        --service-name xiayi-yuanpinhui \
         --dir lambda \
         --runtime Nodejs16.13 \
         --memory 512 \
         --timeout 30 \
         --env-vars "NODE_ENV=production,DB_HOST=${DB_HOST:-localhost},DB_PORT=${DB_PORT:-3306},DB_NAME=${DB_NAME:-xiayi_restaurant}" || \
     tcb fn deploy xiayi-foodie-skill \
-        --service-name xiayi-youpinhui \
+        --service-name xiayi-yuanpinhui \
         --dir lambda \
         --runtime Nodejs16.13 \
         --memory 512 \
@@ -115,7 +115,7 @@ deploy_api_gateway() {
       "apiName": "xiayi-foodie-api",
       "apiDesc": "夏邑缘品荟餐饮API",
       "serviceType": "SCF",
-      "serviceName": "xiayi-youpinhui",
+      "serviceName": "xiayi-yuanpinhui",
       "serviceScfFunctionName": "xiayi-foodie-skill",
       "authType": "NONE",
       "methods": ["ANY"],
@@ -145,13 +145,13 @@ setup_domain() {
     echo ""
     echo "🔗 配置自定义域名..."
 
-    echo "1. 在腾讯云域名服务中添加域名: mcp.xiayi-youpinhui.com"
+    echo "1. 在腾讯云域名服务中添加域名: mcp.xiayi-yuanpinhui.com"
     echo "2. 申请SSL证书"
     echo "3. 在API网关中配置自定义域名绑定"
     echo "4. 将域名CNAME解析到API网关地址"
     echo ""
     echo "域名配置示例:"
-    echo "  域名: mcp.xiayi-youpinhui.com"
+    echo "  域名: mcp.xiayi-yuanpinhui.com"
     echo "  类型: CNAME"
     echo "  值: xxx.apigw.tencentcs.com"
 }
@@ -175,9 +175,9 @@ show_info() {
     echo "=========================================="
     echo ""
     echo "访问地址:"
-    echo "  API: https://mcp.xiayi-youpinhui.com/api/v1"
-    echo "  管理后台: https://mcp.xiayi-youpinhui.com/admin"
-    echo "  顾客端: https://mcp.xiayi-youpinhui.com/mobile"
+    echo "  API: https://mcp.xiayi-yuanpinhui.com/api/v1"
+    echo "  管理后台: https://mcp.xiayi-yuanpinhui.com/admin"
+    echo "  顾客端: https://mcp.xiayi-yuanpinhui.com/mobile"
     echo ""
     echo "下一步:"
     echo "  1. 配置微信公众号授权回调"
@@ -185,7 +185,7 @@ show_info() {
     echo "  3. 测试API接口"
     echo "  4. 配置美团排队API"
     echo ""
-    echo "详细文档: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill"
+    echo "详细文档: https://github.com/370205504-cmyk/xiayi-yuanpinhui-foodie-skill"
     echo "=========================================="
 }
 
@@ -274,13 +274,13 @@ chmod +x deploy-tencent.sh
 七、配置微信公众号
 -----------------
 在微信公众号后台配置:
-- 授权回调域: mcp.xiayi-youpinhui.com
-- JS安全域名: mcp.xiayi-youpinhui.com
+- 授权回调域: mcp.xiayi-yuanpinhui.com
+- JS安全域名: mcp.xiayi-yuanpinhui.com
 
 八、配置微信支付
 ----------------
 在微信商户平台配置:
-- 支付回调地址: https://mcp.xiayi-youpinhui.com/api/v1/payment/wechat/callback
+- 支付回调地址: https://mcp.xiayi-yuanpinhui.com/api/v1/payment/wechat/callback
 
 ==========================================
 
