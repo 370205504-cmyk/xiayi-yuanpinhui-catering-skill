@@ -67,7 +67,9 @@ create_zip() {
         -x ".git/*" \
         -x "uploads/*" \
         -x "backups/*" \
-        -x "coverage/*"
+        -x "coverage/*" \
+        -x ".env*" \
+        -x "*.env"
 
     cd "$PROJECT_DIR"
 
