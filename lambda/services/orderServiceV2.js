@@ -48,7 +48,7 @@ class OrderServiceV2 {
   async createOrder({ userId, storeId, tableNo, remarks, contactPhone }) {
     const cartService = require('./cartService');
     const cart = await cartService.getCart(userId);
-    
+
     if (!cart.items || cart.items.length === 0) {
       throw new Error('购物车为空，无法创建订单');
     }
@@ -97,7 +97,7 @@ class OrderServiceV2 {
 
   async updateOrderStatus(orderId, status, note = '') {
     const order = this.orders.get(orderId);
-    
+
     if (!order) {
       throw new Error('订单不存在');
     }

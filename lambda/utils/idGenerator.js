@@ -35,7 +35,7 @@ function Snowflake() {
   this.customEpoch = snowflakeState.customEpoch;
 }
 
-Snowflake.prototype.getUniqueID = function() {
+Snowflake.prototype.getUniqueID = function () {
   let timestamp = Date.now();
 
   if (timestamp === this.lastTimestamp) {
@@ -58,7 +58,7 @@ Snowflake.prototype.getUniqueID = function() {
   return id.toString();
 };
 
-Snowflake.prototype.waitForNextMillis = function(lastTimestamp) {
+Snowflake.prototype.waitForNextMillis = function (lastTimestamp) {
   let timestamp = Date.now();
   while (timestamp <= lastTimestamp) {
     timestamp = Date.now();

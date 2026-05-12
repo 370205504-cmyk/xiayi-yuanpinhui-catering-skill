@@ -27,15 +27,15 @@ const storage = multer.diskStorage({
 const fileFilter = function (req, file, cb) {
   const mimeType = file.mimetype.toLowerCase();
   const ext = path.extname(file.originalname).toLowerCase();
-  
+
   if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
     return cb(new Error('只允许上传图片文件'));
   }
-  
+
   if (!ALLOWED_EXTENSIONS.includes(ext)) {
     return cb(new Error('不支持的文件格式'));
   }
-  
+
   cb(null, true);
 };
 

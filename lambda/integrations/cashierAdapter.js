@@ -11,7 +11,7 @@ class CashierAdapter {
     }
 
     const provider = this.config.cashier.provider;
-    
+
     switch (provider) {
       case 'yinbao':
         await this.connectYinbao();
@@ -66,7 +66,7 @@ class CashierAdapter {
     }
 
     const provider = this.config.cashier.provider;
-    
+
     switch (provider) {
       case 'yinbao':
         return await this.pushOrderToYinbao(order);

@@ -1,19 +1,7 @@
 const db = require('../database/db');
 const logger = require('../utils/logger');
 
-/**
- * 退款服务类
- * 处理退款创建、回调处理、状态查询等核心业务逻辑
- * 实现退款回调幂等性和跨表事务一致性
- */
 class RefundService {
-  /**
-   * 创建退款记录
-   * @param {number} orderId - 订单ID
-   * @param {number} amount - 退款金额
-   * @param {string} reason - 退款原因
-   * @returns {Object} 退款信息 {refundId, refundNo, status}
-   */
   async createRefund(orderId, amount, reason) {
     const refundNo = `REF${Date.now()}${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
@@ -25,15 +13,6 @@ class RefundService {
     return { refundId: result.insertId, refundNo, status: 'pending' };
   }
 
-  /**
-   * 处理微信退款异步回调
-   * 实现幂等性：通过FOR UPDATE行锁防止重复处理
-   * 保证跨表事务一致性：同时更新退款表和订单表
-   * 
-   * @param {string} outRefundNo - 商户退款单号
-   * @param {string} refundStatus - 退款状态 SUCCESS/FAIL
-   * @param {string} [failReason=null] - 失败原因
-   */
   async processRefundCallback(outRefundNo, refundStatus, failReason = null) {
     await db.transaction(async (connection) => {
       const [refund] = await connection.query(
@@ -41,7 +20,7 @@ class RefundService {
         [outRefundNo]
       );
 
-      if (refund.length === 0) {
+      if (!refund || refund.length === 0) {
         logger.warn(`退款记录不存在: ${outRefundNo}`);
         return;
       }
@@ -74,21 +53,11 @@ class RefundService {
     });
   }
 
-  /**
-   * 根据订单ID查询退款记录
-   * @param {number} orderId - 订单ID
-   * @returns {Object|null} 退款记录
-   */
   async getRefundByOrderId(orderId) {
     const [refunds] = await db.query('SELECT * FROM refunds WHERE order_id = ? ORDER BY created_at DESC', [orderId]);
     return refunds.length > 0 ? refunds[0] : null;
   }
 
-  /**
-   * 根据退款单号查询退款记录
-   * @param {string} refundNo - 退款单号
-   * @returns {Object|null} 退款记录
-   */
   async getRefundByRefundNo(refundNo) {
     const [refunds] = await db.query('SELECT * FROM refunds WHERE refund_no = ?', [refundNo]);
     return refunds.length > 0 ? refunds[0] : null;

@@ -9,7 +9,7 @@ class WifiService {
   initializeWifiData() {
     const defaultWifi = config.wifi?.default;
     const stores = config.stores || [];
-    
+
     if (defaultWifi) {
       stores.forEach((store, index) => {
         const storeId = store.id || `store_${String(index + 1).padStart(3, '0')}`;
@@ -23,7 +23,7 @@ class WifiService {
         });
       });
     }
-    
+
     const customWifiConfigs = [
       {
         storeId: 'store_001',
@@ -104,8 +104,10 @@ class WifiService {
 
   validateWifiPassword(storeId, password) {
     const wifi = this.wifiNetworks.get(storeId);
-    if (!wifi) return { valid: false, message: '未找到该门店的WiFi信息' };
-    
+    if (!wifi) {
+      return { valid: false, message: '未找到该门店的WiFi信息' };
+    }
+
     return {
       valid: wifi.password === password,
       message: wifi.password === password ? '密码正确' : '密码错误'
@@ -114,7 +116,9 @@ class WifiService {
 
   getConnectionGuide(storeId) {
     const wifi = this.wifiNetworks.get(storeId);
-    if (!wifi) return '请咨询店员获取WiFi信息';
+    if (!wifi) {
+      return '请咨询店员获取WiFi信息';
+    }
 
     return `
       WiFi连接步骤：

@@ -13,12 +13,16 @@ class InputValidator {
   }
 
   sanitizeString(str) {
-    if (typeof str !== 'string') return '';
+    if (typeof str !== 'string') {
+      return '';
+    }
     return validator.escape(validator.trim(str));
   }
 
   preventXSS(str) {
-    if (!str || typeof str !== 'string') return '';
+    if (!str || typeof str !== 'string') {
+      return '';
+    }
     return str
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -29,17 +33,23 @@ class InputValidator {
   }
 
   preventSQLInjection(str) {
-    if (!str || typeof str !== 'string') return '';
+    if (!str || typeof str !== 'string') {
+      return '';
+    }
     return str.replace(/['"\\;]/g, '');
   }
 
   validatePhone(phone) {
-    if (!phone || typeof phone !== 'string') return false;
+    if (!phone || typeof phone !== 'string') {
+      return false;
+    }
     return validator.isMobilePhone(phone, 'zh-CN');
   }
 
   validateEmail(email) {
-    if (!email || typeof email !== 'string') return false;
+    if (!email || typeof email !== 'string') {
+      return false;
+    }
     return validator.isEmail(email);
   }
 
@@ -54,7 +64,9 @@ class InputValidator {
   }
 
   validateOrderRemarks(remarks) {
-    if (!remarks) return '';
+    if (!remarks) {
+      return '';
+    }
     const sanitized = String(remarks)
       .slice(0, this.maxLength.orderRemarks)
       .replace(/[<>]/g, '');
@@ -62,7 +74,9 @@ class InputValidator {
   }
 
   validateSearchQuery(query) {
-    if (!query || typeof query !== 'string') return '';
+    if (!query || typeof query !== 'string') {
+      return '';
+    }
     return String(query)
       .slice(0, this.maxLength.searchQuery)
       .replace(/[<>\"\'\\]/g, '')
@@ -70,7 +84,9 @@ class InputValidator {
   }
 
   validateUserId(userId) {
-    if (!userId) return null;
+    if (!userId) {
+      return null;
+    }
     if (typeof userId === 'string' && userId.match(/^u_[a-f0-9]{32}$/)) {
       return userId;
     }
@@ -81,28 +97,38 @@ class InputValidator {
   }
 
   validateOrderNo(orderNo) {
-    if (!orderNo || typeof orderNo !== 'string') return false;
+    if (!orderNo || typeof orderNo !== 'string') {
+      return false;
+    }
     return orderNo.match(/^ORD[A-Z0-9]{16,32}$/) !== null;
   }
 
   validateStatus(status, allowedStatuses) {
-    if (!status || typeof status !== 'string') return false;
+    if (!status || typeof status !== 'string') {
+      return false;
+    }
     return allowedStatuses.includes(status);
   }
 
   validateTableNo(tableNo) {
-    if (!tableNo) return null;
+    if (!tableNo) {
+      return null;
+    }
     const sanitized = String(tableNo).slice(0, 20).replace(/[^a-zA-Z0-9\-_]/g, '');
     return sanitized || null;
   }
 
   validateAddress(address) {
-    if (!address) return null;
+    if (!address) {
+      return null;
+    }
     return String(address).slice(0, this.maxLength.address).trim();
   }
 
   sanitizeForDisplay(str) {
-    if (!str || typeof str !== 'string') return '';
+    if (!str || typeof str !== 'string') {
+      return '';
+    }
     return str
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -112,7 +138,9 @@ class InputValidator {
   }
 
   sanitizeForStorage(str) {
-    if (!str || typeof str !== 'string') return '';
+    if (!str || typeof str !== 'string') {
+      return '';
+    }
     return String(str)
       .replace(/\0/g, '')
       .replace(/[\u0000-\u001F\u007F]/g, '')
@@ -120,7 +148,9 @@ class InputValidator {
   }
 
   validateCouponCode(code) {
-    if (!code || typeof code !== 'string') return null;
+    if (!code || typeof code !== 'string') {
+      return null;
+    }
     const sanitized = code.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20);
     return sanitized || null;
   }

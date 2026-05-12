@@ -21,7 +21,7 @@ class OrderService {
    */
   createOrder(orderData) {
     const { dish, quantity, address, customerPhone, storeId } = orderData;
-    
+
     const orderId = this.generateOrderId();
     const subtotal = dish.price * quantity;
     const deliveryFeeFinal = subtotal >= this.minFreeDeliveryAmount ? 0 : this.deliveryFee;
@@ -89,11 +89,13 @@ class OrderService {
    */
   updateOrderStatus(orderId, newStatus) {
     const order = this.orders.get(orderId);
-    if (!order) return null;
+    if (!order) {
+      return null;
+    }
 
     order.status = newStatus;
     order.updatedAt = new Date().toISOString();
-    
+
     this.saveOrderToDatabase(order);
     return order;
   }
@@ -105,7 +107,9 @@ class OrderService {
    */
   cancelOrder(orderId) {
     const order = this.orders.get(orderId);
-    if (!order) return false;
+    if (!order) {
+      return false;
+    }
 
     // 只有待确认或已确认的订单可以取消
     if (['pending', 'confirmed'].includes(order.status)) {
@@ -130,7 +134,7 @@ class OrderService {
         customerOrders.push(order);
       }
     });
-    return customerOrders.sort((a, b) => 
+    return customerOrders.sort((a, b) =>
       new Date(b.createdAt) - new Date(a.createdAt)
     );
   }

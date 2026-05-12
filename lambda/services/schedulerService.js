@@ -35,7 +35,7 @@ async function processExpiredOrders() {
           }
 
           await connection.query(
-            `UPDATE orders SET status = 'expired', updated_at = NOW() WHERE id = ?`,
+            'UPDATE orders SET status = \'expired\', updated_at = NOW() WHERE id = ?',
             [order.id]
           );
 
@@ -55,7 +55,7 @@ async function processExpiredOrders() {
 async function cleanupExpiredCarts() {
   try {
     const result = await db.query(
-      `DELETE FROM carts WHERE updated_at < DATE_SUB(NOW(), INTERVAL 30 DAY)`
+      'DELETE FROM carts WHERE updated_at < DATE_SUB(NOW(), INTERVAL 30 DAY)'
     );
     if (result.affectedRows > 0) {
       logger.info(`清理了${result.affectedRows}个过期购物车`);
@@ -71,7 +71,7 @@ async function archiveOldOrders() {
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
     const [oldOrders] = await db.query(
-      `SELECT * FROM orders WHERE created_at < ? AND status IN ('completed', 'cancelled', 'expired')`,
+      'SELECT * FROM orders WHERE created_at < ? AND status IN (\'completed\', \'cancelled\', \'expired\')',
       [threeMonthsAgo]
     );
 
@@ -85,12 +85,12 @@ async function archiveOldOrders() {
     for (const order of oldOrders) {
       try {
         await db.query(
-          `INSERT INTO orders_archive SELECT * FROM orders WHERE id = ?`,
+          'INSERT INTO orders_archive SELECT * FROM orders WHERE id = ?',
           [order.id]
         );
 
-        await db.query(`DELETE FROM order_items WHERE order_id = ?`, [order.id]);
-        await db.query(`DELETE FROM orders WHERE id = ?`, [order.id]);
+        await db.query('DELETE FROM order_items WHERE order_id = ?', [order.id]);
+        await db.query('DELETE FROM orders WHERE id = ?', [order.id]);
 
         logger.info(`订单归档完成: ${order.order_no}`);
       } catch (archiveError) {

@@ -82,7 +82,7 @@ class DiskMonitor {
 
     if (status.isCritical) {
       await this.cleanOldLogs();
-      await alertService.sendAlert('磁盘空间严重不足', message + '\n已自动清理7天前的日志文件', 'error');
+      await alertService.sendAlert('磁盘空间严重不足', `${message }\n已自动清理7天前的日志文件`, 'error');
     } else {
       await alertService.sendAlert('磁盘空间警告', message, 'warn');
     }
@@ -123,11 +123,13 @@ class DiskMonitor {
   }
 
   formatBytes(bytes) {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) {
+      return '0 B';
+    }
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2)) } ${ sizes[i]}`;
   }
 
   start(intervalMs = 60 * 1000) {

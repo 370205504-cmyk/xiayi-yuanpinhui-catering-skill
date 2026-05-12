@@ -108,7 +108,7 @@ class ReservationService {
     // 实际应用中需要查询数据库中的预约情况
     const requiredTables = Math.ceil(personCount / this.maxPersonsPerTable);
     const totalTables = 20; // 假设每店有20桌
-    
+
     let bookedTables = 0;
     this.reservations.forEach(res => {
       if (res.storeId === storeId && res.date === date && res.time === time) {
@@ -180,7 +180,9 @@ class ReservationService {
    */
   updateReservation(reservationId, updates) {
     const reservation = this.reservations.get(reservationId);
-    if (!reservation) return null;
+    if (!reservation) {
+      return null;
+    }
 
     Object.assign(reservation, updates, {
       updatedAt: new Date().toISOString()
@@ -197,11 +199,13 @@ class ReservationService {
    */
   cancelReservation(reservationId) {
     const reservation = this.reservations.get(reservationId);
-    if (!reservation) return false;
+    if (!reservation) {
+      return false;
+    }
 
     reservation.status = 'cancelled';
     reservation.cancelledAt = new Date().toISOString();
-    
+
     this.saveReservationToDatabase(reservation);
     return true;
   }
@@ -218,7 +222,7 @@ class ReservationService {
         customerReservations.push(res);
       }
     });
-    return customerReservations.sort((a, b) => 
+    return customerReservations.sort((a, b) =>
       new Date(b.createdAt) - new Date(a.createdAt)
     );
   }

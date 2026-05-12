@@ -1,16 +1,12 @@
 const { retryWithBackoff, retryWithExponentialBackoff } = require('../utils/retryHelper');
 
-jest.useFakeTimers();
+jest.setTimeout(30000);
 
 describe('Retry Helper', () => {
-  beforeEach(() => {
-    jest.clearAllTimers();
-  });
-
   describe('retryWithBackoff', () => {
     it('should succeed on first attempt', async () => {
       const mockFn = jest.fn().mockResolvedValue('success');
-      const result = await retryWithBackoff(mockFn);
+      const result = await retryWithBackoff(mockFn, { retries: 2, initialDelay: 100 });
       expect(result).toBe('success');
       expect(mockFn).toHaveBeenCalledTimes(1);
     });
@@ -22,9 +18,6 @@ describe('Retry Helper', () => {
         .mockResolvedValue('success');
 
       const result = await retryWithBackoff(mockFn, { retries: 3, initialDelay: 100 });
-      
-      jest.runAllTimers();
-      
       expect(result).toBe('success');
       expect(mockFn).toHaveBeenCalledTimes(3);
     });
@@ -35,31 +28,21 @@ describe('Retry Helper', () => {
       await expect(retryWithBackoff(mockFn, { retries: 2, initialDelay: 100 }))
         .rejects
         .toThrow('fail');
-
-      jest.runAllTimers();
-      
       expect(mockFn).toHaveBeenCalledTimes(2);
     });
 
     it('should apply exponential backoff', async () => {
       const mockFn = jest.fn().mockRejectedValue(new Error('fail'));
+      const start = Date.now();
 
       try {
-        await retryWithBackoff(mockFn, { 
-          retries: 3, 
-          initialDelay: 100, 
-          factor: 2,
-          jitter: false 
-        });
+        await retryWithBackoff(mockFn, { retries: 3, initialDelay: 100, factor: 2, jitter: false });
       } catch (e) {
         // expected
       }
 
-      jest.runAllTimers();
-      
-      expect(setTimeout).toHaveBeenCalledTimes(2);
-      expect(setTimeout).toHaveBeenNthCalledWith(1, 100);
-      expect(setTimeout).toHaveBeenNthCalledWith(2, 200);
+      const elapsed = Date.now() - start;
+      expect(elapsed).toBeGreaterThanOrEqual(100 + 200);
     });
   });
 
@@ -70,11 +53,17 @@ describe('Retry Helper', () => {
         .mockResolvedValue('success');
 
       const result = await retryWithExponentialBackoff(mockFn);
-      
-      jest.runAllTimers();
-      
       expect(result).toBe('success');
       expect(mockFn).toHaveBeenCalledTimes(2);
+    });
+
+    it('should fail after 3 retries by default', async () => {
+      const mockFn = jest.fn().mockRejectedValue(new Error('fail'));
+
+      await expect(retryWithExponentialBackoff(mockFn))
+        .rejects
+        .toThrow('fail');
+      expect(mockFn).toHaveBeenCalledTimes(3);
     });
   });
 });

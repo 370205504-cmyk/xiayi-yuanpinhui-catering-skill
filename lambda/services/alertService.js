@@ -81,7 +81,9 @@ function monitorRateLimit(ip, endpoint) {
 
 function checkCertificateExpiry() {
   const certificateExpiry = process.env.WECHAT_CERT_EXPIRY;
-  if (!certificateExpiry) return;
+  if (!certificateExpiry) {
+    return;
+  }
 
   const expiryDate = new Date(certificateExpiry);
   const daysRemaining = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));

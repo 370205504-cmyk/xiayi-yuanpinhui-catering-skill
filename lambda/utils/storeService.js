@@ -6,7 +6,7 @@ class StoreService {
     this.restaurantPhone = config.restaurant?.phone || '0370-628-8888';
     this.restaurantAddress = config.restaurant?.address || '夏邑县孔祖大道南段';
     this.stores = stores || [];
-    
+
     if (this.stores.length === 0 && config.stores) {
       this.stores = config.stores.map((store, index) => ({
         id: store.id || `store_${String(index + 1).padStart(3, '0')}`,
@@ -37,7 +37,7 @@ class StoreService {
    * @returns {Array} 匹配的门店列表
    */
   getStoresByDistrict(district) {
-    return this.stores.filter(store => 
+    return this.stores.filter(store =>
       store.district.toLowerCase().includes(district.toLowerCase())
     );
   }
@@ -73,7 +73,7 @@ class StoreService {
    * @returns {Object|null} 门店对象
    */
   getStoreByName(name) {
-    return this.stores.find(store => 
+    return this.stores.find(store =>
       store.name.toLowerCase().includes(name.toLowerCase())
     ) || null;
   }
@@ -135,7 +135,9 @@ class StoreService {
    */
   getStoreDetails(storeId) {
     const store = this.getStoreById(storeId);
-    if (!store) return '未找到该门店';
+    if (!store) {
+      return '未找到该门店';
+    }
 
     return `
       ${store.name}
@@ -171,7 +173,7 @@ class StoreService {
     return {
       isOpen,
       storeName: store.name,
-      message: isOpen 
+      message: isOpen
         ? `${store.name}正在营业中`
         : `${store.name}已打烊，营业时间为 ${store.businessHours}`
     };

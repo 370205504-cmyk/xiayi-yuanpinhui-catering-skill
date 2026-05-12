@@ -43,7 +43,7 @@ class MemberService {
       const [users] = await connection.query('SELECT balance FROM users WHERE id = ?', [userId]);
       await connection.query(
         'INSERT INTO points_log (user_id, type, points, balance, description) VALUES (?, ?, ?, ?, ?)',
-        [userId, 'earn', Math.floor(amount), users[0].balance, `充值赠送积分`]
+        [userId, 'earn', Math.floor(amount), users[0].balance, '充值赠送积分']
       );
     });
 
@@ -132,7 +132,9 @@ class MemberService {
 
   async updateLevel(userId) {
     const users = await db.query('SELECT points, level FROM users WHERE id = ?', [userId]);
-    if (users.length === 0) return;
+    if (users.length === 0) {
+      return;
+    }
 
     const newLevel = this.calculateLevel(users[0].points);
     if (newLevel > users[0].level) {
@@ -142,10 +144,18 @@ class MemberService {
   }
 
   calculateLevel(points) {
-    if (points >= 50000) return 5;
-    if (points >= 10000) return 4;
-    if (points >= 5000) return 3;
-    if (points >= 1000) return 2;
+    if (points >= 50000) {
+      return 5;
+    }
+    if (points >= 10000) {
+      return 4;
+    }
+    if (points >= 5000) {
+      return 3;
+    }
+    if (points >= 1000) {
+      return 2;
+    }
     return 1;
   }
 }

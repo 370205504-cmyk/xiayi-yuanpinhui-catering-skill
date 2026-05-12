@@ -30,7 +30,7 @@ class Logger {
   }
 
   writeLog(file, content) {
-    fs.appendFileSync(file, content + '\\n');
+    fs.appendFileSync(file, `${content }\\n`);
   }
 
   info(message, data = {}) {

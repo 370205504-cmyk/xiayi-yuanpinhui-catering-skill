@@ -48,7 +48,7 @@ class DishesService {
 
   searchDishes(keyword) {
     const lowerKeyword = keyword.toLowerCase();
-    return this.dishes.filter(d => 
+    return this.dishes.filter(d =>
       d.name.toLowerCase().includes(lowerKeyword) ||
       (d.description && d.description.toLowerCase().includes(lowerKeyword)) ||
       d.category.toLowerCase().includes(lowerKeyword)

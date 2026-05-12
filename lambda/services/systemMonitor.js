@@ -79,7 +79,7 @@ class SystemMonitor {
       const stats = await this.getSystemStats();
 
       if (stats.cpu.isWarning || stats.memory.isWarning) {
-        let alertMessage = `系统资源警告:\n`;
+        let alertMessage = '系统资源警告:\n';
         alertMessage += `- CPU使用率: ${stats.cpu.usage}%\n`;
         alertMessage += `- 内存使用率: ${stats.memory.usage}%\n`;
         alertMessage += `- 负载: ${stats.loadAverage.join(', ')}`;

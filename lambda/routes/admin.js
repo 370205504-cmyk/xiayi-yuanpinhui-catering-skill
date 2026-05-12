@@ -370,7 +370,9 @@ router.get('/settings', requireAdmin, async (req, res) => {
   try {
     const settings = await db.query('SELECT * FROM system_settings');
     const result = {};
-    settings.forEach(s => { result[s.setting_key] = s.setting_value; });
+    settings.forEach(s => {
+      result[s.setting_key] = s.setting_value;
+    });
     res.json({ success: true, settings: result });
   } catch (error) {
     res.status(500).json({ success: false, message: '服务器错误' });

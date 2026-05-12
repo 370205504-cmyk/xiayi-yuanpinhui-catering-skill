@@ -22,7 +22,7 @@ router.get('/dishes', async (req, res, next) => {
   try {
     const { id, name, category } = req.query;
     let result;
-    
+
     if (id) {
       result = await dishesService.getDishById(id);
     } else if (name) {
@@ -32,7 +32,7 @@ router.get('/dishes', async (req, res, next) => {
     } else {
       result = await dishesService.getAllDishes();
     }
-    
+
     logger.info('查询菜品', { id, name, category });
     res.json({ success: true, data: result });
   } catch (error) {
@@ -85,14 +85,14 @@ router.get('/cart/:userId', async (req, res, next) => {
 router.post('/cart/add', async (req, res, next) => {
   try {
     const { userId, dishId, quantity = 1, remarks = '' } = req.body;
-    
+
     if (!userId || !dishId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: '缺少必要参数：userId 和 dishId' 
+      return res.status(400).json({
+        success: false,
+        message: '缺少必要参数：userId 和 dishId'
       });
     }
-    
+
     const result = await cartService.addItem(userId, dishId, quantity, remarks);
     logger.info('添加购物车', { userId, dishId, quantity });
     res.json({ success: true, data: result, message: '已添加到购物车' });
@@ -104,14 +104,14 @@ router.post('/cart/add', async (req, res, next) => {
 router.post('/cart/remove', async (req, res, next) => {
   try {
     const { userId, dishId } = req.body;
-    
+
     if (!userId || !dishId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: '缺少必要参数：userId 和 dishId' 
+      return res.status(400).json({
+        success: false,
+        message: '缺少必要参数：userId 和 dishId'
       });
     }
-    
+
     const result = await cartService.removeItem(userId, dishId);
     logger.info('移除购物车', { userId, dishId });
     res.json({ success: true, data: result, message: '已从购物车移除' });
@@ -123,14 +123,14 @@ router.post('/cart/remove', async (req, res, next) => {
 router.post('/cart/clear', async (req, res, next) => {
   try {
     const { userId } = req.body;
-    
+
     if (!userId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: '缺少必要参数：userId' 
+      return res.status(400).json({
+        success: false,
+        message: '缺少必要参数：userId'
       });
     }
-    
+
     await cartService.clearCart(userId);
     logger.info('清空购物车', { userId });
     res.json({ success: true, message: '购物车已清空' });
@@ -142,14 +142,14 @@ router.post('/cart/clear', async (req, res, next) => {
 router.post('/order', async (req, res, next) => {
   try {
     const { userId, storeId, tableNo, remarks, contactPhone } = req.body;
-    
+
     if (!userId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: '缺少必要参数：userId' 
+      return res.status(400).json({
+        success: false,
+        message: '缺少必要参数：userId'
       });
     }
-    
+
     const order = await orderService.createOrder({
       userId,
       storeId,
@@ -157,7 +157,7 @@ router.post('/order', async (req, res, next) => {
       remarks,
       contactPhone
     });
-    
+
     logger.info('创建订单', { userId, orderId: order.orderId });
     res.json({ success: true, data: order, message: '订单创建成功' });
   } catch (error) {
@@ -169,14 +169,14 @@ router.get('/order/:orderId', async (req, res, next) => {
   try {
     const { orderId } = req.params;
     const order = await orderService.getOrder(orderId);
-    
+
     if (!order) {
-      return res.status(404).json({ 
-        success: false, 
-        message: '订单不存在' 
+      return res.status(404).json({
+        success: false,
+        message: '订单不存在'
       });
     }
-    
+
     logger.info('查询订单', { orderId });
     res.json({ success: true, data: order });
   } catch (error) {
@@ -188,14 +188,14 @@ router.put('/order/:orderId/status', async (req, res, next) => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
-    
+
     if (!status) {
-      return res.status(400).json({ 
-        success: false, 
-        message: '缺少必要参数：status' 
+      return res.status(400).json({
+        success: false,
+        message: '缺少必要参数：status'
       });
     }
-    
+
     const order = await orderService.updateOrderStatus(orderId, status);
     logger.info('更新订单状态', { orderId, status });
     res.json({ success: true, data: order, message: '订单状态已更新' });
@@ -213,7 +213,7 @@ router.get('/orders', async (req, res, next) => {
       page: parseInt(page),
       limit: parseInt(limit)
     });
-    
+
     logger.info('查询订单列表', { userId, status, page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
@@ -225,15 +225,15 @@ router.post('/order/:orderId/print', async (req, res, next) => {
   try {
     const { orderId } = req.params;
     const printerService = require('../utils/printerService');
-    
+
     const order = await orderService.getOrder(orderId);
     if (!order) {
-      return res.status(404).json({ 
-        success: false, 
-        message: '订单不存在' 
+      return res.status(404).json({
+        success: false,
+        message: '订单不存在'
       });
     }
-    
+
     await printerService.printOrder(order);
     logger.info('打印订单', { orderId });
     res.json({ success: true, message: '打印任务已提交' });

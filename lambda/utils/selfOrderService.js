@@ -7,7 +7,7 @@ class SelfOrderService {
   generateStoreOrderQRCode(storeId) {
     const timestamp = Date.now();
     const token = this.generateToken(storeId, timestamp);
-    
+
     return {
       type: 'order',
       storeId: storeId,
@@ -20,7 +20,7 @@ class SelfOrderService {
   generateMenuQRCode(storeId) {
     const timestamp = Date.now();
     const token = this.generateToken(storeId, timestamp);
-    
+
     return {
       type: 'menu',
       storeId: storeId,
@@ -33,7 +33,7 @@ class SelfOrderService {
   generateTableQRCode(storeId, tableNumber) {
     const timestamp = Date.now();
     const token = this.generateToken(`${storeId}:${tableNumber}`, timestamp);
-    
+
     return {
       type: 'table',
       storeId: storeId,
@@ -57,7 +57,7 @@ class SelfOrderService {
 
   createSelfOrder(storeId, tableNumber, items) {
     const orderId = this.generateOrderId();
-    
+
     return {
       orderId: orderId,
       storeId: storeId,

@@ -88,7 +88,7 @@ class RecommendationService {
 
   getCustomerProfile(customerId) {
     let profile = this.customerProfiles.find(p => p.customerId === customerId);
-    
+
     if (!profile) {
       profile = {
         customerId: customerId,
@@ -107,7 +107,7 @@ class RecommendationService {
 
   updateCustomerPreference(customerId, preference) {
     const profile = this.getCustomerProfile(customerId);
-    
+
     if (this.tastePreferences[preference]) {
       if (!profile.favoriteTastes.includes(preference)) {
         profile.favoriteTastes.push(preference);
@@ -124,13 +124,13 @@ class RecommendationService {
 
   addToOrderHistory(customerId, dishName, rating = null) {
     const profile = this.getCustomerProfile(customerId);
-    
+
     profile.orderHistory.push({
       dishName: dishName,
       timestamp: new Date().toISOString(),
       rating: rating
     });
-    
+
     if (rating && rating >= 4) {
       if (!profile.favoriteDishes.includes(dishName)) {
         profile.favoriteDishes.push(dishName);
@@ -138,7 +138,7 @@ class RecommendationService {
     }
 
     profile.lastVisit = new Date().toISOString();
-    
+
     return profile;
   }
 
@@ -148,7 +148,7 @@ class RecommendationService {
 
     if (this.tastePreferences[preference]) {
       const tasteTypes = this.tastePreferences[preference];
-      filteredDishes = filteredDishes.filter(d => 
+      filteredDishes = filteredDishes.filter(d =>
         tasteTypes.some(t => d.taste.includes(t))
       );
     }
@@ -157,10 +157,18 @@ class RecommendationService {
     if (scenarioTags) {
       filteredDishes = filteredDishes.filter(d =>
         scenarioTags.some(tag => {
-          if (tag === 'forKids') return d.forKids;
-          if (tag === 'vegetarian') return d.isVegetarian;
-          if (tag === 'signature') return d.isSignature;
-          if (tag === 'popular') return d.popularity > 80;
+          if (tag === 'forKids') {
+            return d.forKids;
+          }
+          if (tag === 'vegetarian') {
+            return d.isVegetarian;
+          }
+          if (tag === 'signature') {
+            return d.isSignature;
+          }
+          if (tag === 'popular') {
+            return d.popularity > 80;
+          }
           return false;
         })
       );
@@ -179,12 +187,12 @@ class RecommendationService {
     });
 
     filteredDishes.sort((a, b) => b.matchScore - a.matchScore);
-    
+
     return filteredDishes.slice(0, 5);
   }
 
   recommendByHistory(historyDishName, customerProfile = null) {
-    const historyDish = this.dishes.find(d => 
+    const historyDish = this.dishes.find(d =>
       d.name.toLowerCase().includes(historyDishName.toLowerCase())
     );
 
@@ -193,8 +201,10 @@ class RecommendationService {
     }
 
     return this.dishes.filter(d => {
-      if (d.id === historyDish.id) return false;
-      
+      if (d.id === historyDish.id) {
+        return false;
+      }
+
       const sameCuisine = d.cuisine === historyDish.cuisine;
       const similarTaste = Math.abs(
         this.getTasteScore(d.taste) - this.getTasteScore(historyDish.taste)
@@ -235,9 +245,15 @@ class RecommendationService {
 
     const scenarioTags = this.scenarioMappings[preference];
     if (scenarioTags) {
-      if (scenarioTags.includes('forKids') && dish.forKids) score += 20;
-      if (scenarioTags.includes('signature') && dish.isSignature) score += 15;
-      if (scenarioTags.includes('vegetarian') && dish.isVegetarian) score += 20;
+      if (scenarioTags.includes('forKids') && dish.forKids) {
+        score += 20;
+      }
+      if (scenarioTags.includes('signature') && dish.isSignature) {
+        score += 15;
+      }
+      if (scenarioTags.includes('vegetarian') && dish.isVegetarian) {
+        score += 20;
+      }
     }
 
     if (customerProfile) {
@@ -289,9 +305,13 @@ class RecommendationService {
     };
 
     const getDishesForMeal = (type, count) => {
-      let suitableDishes = this.dishes.filter(d => {
-        if (type === 'breakfast') return d.calories < 300;
-        if (type === 'dinner') return d.calories < 400;
+      const suitableDishes = this.dishes.filter(d => {
+        if (type === 'breakfast') {
+          return d.calories < 300;
+        }
+        if (type === 'dinner') {
+          return d.calories < 400;
+        }
         return true;
       });
 
@@ -325,10 +345,10 @@ class RecommendationService {
     const reasons = [];
 
     if (preference === '辣' && dish.taste.includes('辣')) {
-      reasons.push(`口味符合您喜欢的辣味`);
+      reasons.push('口味符合您喜欢的辣味');
     }
     if (preference === '清淡' && dish.taste === '清淡') {
-      reasons.push(`符合您偏好的清淡口味`);
+      reasons.push('符合您偏好的清淡口味');
     }
     if (dish.isSignature) {
       reasons.push('这是本店招牌菜');

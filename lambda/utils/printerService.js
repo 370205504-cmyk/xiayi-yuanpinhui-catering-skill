@@ -3,7 +3,7 @@ const config = require('../config.json');
 class PrinterService {
   constructor() {
     const printerConfig = config.printer?.default || {};
-    
+
     this.connected = false;
     this.printerModel = printerConfig.model || '爱普生 TM-T82X';
     this.printerIp = printerConfig.ip || '192.168.1.100';
@@ -62,7 +62,7 @@ class PrinterService {
     }
 
     const receipt = this.generateReceiptContent(order);
-    
+
     return new Promise((resolve) => {
       setTimeout(() => {
         this.printQueue.push({
@@ -70,9 +70,9 @@ class PrinterService {
           content: receipt,
           timestamp: new Date().toISOString()
         });
-        
+
         console.log('[Printer] 打印小票:', receipt);
-        
+
         resolve({
           success: true,
           message: '小票已发送到打印机',
@@ -91,7 +91,7 @@ class PrinterService {
     }
 
     const menu = this.generateMenuContent(dishes);
-    
+
     return new Promise((resolve) => {
       setTimeout(() => {
         this.printQueue.push({
@@ -99,9 +99,9 @@ class PrinterService {
           content: menu,
           timestamp: new Date().toISOString()
         });
-        
+
         console.log('[Printer] 打印菜单:', menu);
-        
+
         resolve({
           success: true,
           message: '菜单已发送到打印机',
@@ -120,7 +120,7 @@ class PrinterService {
     }
 
     const content = this.generateReservationContent(reservation);
-    
+
     return new Promise((resolve) => {
       setTimeout(() => {
         this.printQueue.push({
@@ -128,7 +128,7 @@ class PrinterService {
           content: content,
           timestamp: new Date().toISOString()
         });
-        
+
         resolve({
           success: true,
           message: '预约单已发送到打印机',
@@ -221,9 +221,15 @@ ${order.dishName}        x${order.quantity}    ¥${order.subtotal}
   }
 
   updatePrinterConfig(newConfig) {
-    if (newConfig.model) this.printerModel = newConfig.model;
-    if (newConfig.ip) this.printerIp = newConfig.ip;
-    if (newConfig.port) this.printerPort = newConfig.port;
+    if (newConfig.model) {
+      this.printerModel = newConfig.model;
+    }
+    if (newConfig.ip) {
+      this.printerIp = newConfig.ip;
+    }
+    if (newConfig.port) {
+      this.printerPort = newConfig.port;
+    }
     return {
       success: true,
       message: '打印机配置已更新',

@@ -140,7 +140,7 @@ router.post('/create',
             points_earned, coupon_id, table_no, guest_count, remarks, address, contact_phone, pay_expire_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE))`,
           [orderNo, userId, safeRequestId, type, totalAmount, discountAmount, finalAmount, pointsEarned,
-           couponId, tableNo, guestCount || 1, remarks, address, contactPhone]
+            couponId, tableNo, guestCount || 1, remarks, address, contactPhone]
         );
 
         for (const item of orderItems) {

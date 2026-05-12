@@ -3,7 +3,7 @@ const logger = require('../utils/logger');
 /**
  * 带指数退避的通用重试函数
  * 用于处理第三方接口调用失败时的重试逻辑
- * 
+ *
  * @param {Function} fn - 需要重试的异步函数
  * @param {Object} options - 重试配置选项
  * @param {number} [options.retries=3] - 最大重试次数
@@ -55,7 +55,7 @@ async function retryWithBackoff(fn, options = {}) {
 /**
  * 指数退避重试（默认配置）
  * 重试3次，延迟依次为: 1s, 2s, 4s
- * 
+ *
  * @param {Function} fn - 需要重试的异步函数
  * @param {number} [retries=3] - 最大重试次数
  * @returns {Promise<any>} 函数执行结果

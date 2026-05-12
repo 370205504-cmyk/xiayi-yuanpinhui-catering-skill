@@ -130,7 +130,7 @@ class QueueService {
   async cancelQueue(queueId) {
     try {
       const queues = await db.query(
-        `SELECT * FROM queues WHERE queue_id = ? AND status = 'waiting'`,
+        'SELECT * FROM queues WHERE queue_id = ? AND status = \'waiting\'',
         [queueId]
       );
 
@@ -139,7 +139,7 @@ class QueueService {
       }
 
       await db.query(
-        `UPDATE queues SET status = 'cancelled', cancelled_at = NOW() WHERE queue_id = ?`,
+        'UPDATE queues SET status = \'cancelled\', cancelled_at = NOW() WHERE queue_id = ?',
         [queueId]
       );
 
@@ -165,7 +165,7 @@ class QueueService {
       }
 
       await db.query(
-        `UPDATE queues SET status = 'called', called_at = NOW() WHERE queue_id = ?`,
+        'UPDATE queues SET status = \'called\', called_at = NOW() WHERE queue_id = ?',
         [nextQueue.queue_id]
       );
 

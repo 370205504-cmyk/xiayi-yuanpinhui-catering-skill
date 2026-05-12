@@ -29,7 +29,7 @@ class DeliveryService {
   async assignDriver(deliveryNo, driverId) {
     try {
       const result = await db.query(
-        `UPDATE deliveries SET driver_id = ?, status = 'assigned', assigned_at = NOW() WHERE delivery_no = ?`,
+        'UPDATE deliveries SET driver_id = ?, status = \'assigned\', assigned_at = NOW() WHERE delivery_no = ?',
         [driverId, deliveryNo]
       );
 

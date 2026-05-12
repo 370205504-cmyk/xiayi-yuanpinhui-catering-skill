@@ -46,23 +46,23 @@ async function processPrintJob(job) {
 }
 
 function generatePrintContent(orderNo, items, tableNo, totalAmount, createdAt) {
-  let content = `\n\n========== 订单小票 ==========\n`;
+  let content = '\n\n========== 订单小票 ==========\n';
   content += `订单号: ${orderNo}\n`;
   content += `桌号: ${tableNo || '外卖'}\n`;
   content += `时间: ${new Date(createdAt).toLocaleString('zh-CN')}\n`;
-  content += `------------------------------\n`;
-  
+  content += '------------------------------\n';
+
   items.forEach(item => {
     content += `${item.dishName} x${item.quantity}  ${item.subtotal.toFixed(2)}\n`;
     if (item.remarks) {
       content += `  (${item.remarks})\n`;
     }
   });
-  
-  content += `------------------------------\n`;
+
+  content += '------------------------------\n';
   content += `合计: ${totalAmount.toFixed(2)}\n`;
-  content += `========== 谢谢光临 ==========\n\n`;
-  
+  content += '========== 谢谢光临 ==========\n\n';
+
   return content;
 }
 

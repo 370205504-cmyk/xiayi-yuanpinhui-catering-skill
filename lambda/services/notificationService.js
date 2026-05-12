@@ -130,9 +130,15 @@ class NotificationService {
 
     if (order.userWechatOpenid && this.wechatConfig.templateId.deliveryNotice) {
       let statusText = '配送员已接单';
-      if (delivery.status === 'picking_up') statusText = '配送员正在取餐';
-      if (delivery.status === 'delivering') statusText = '配送员正在配送中';
-      if (delivery.status === 'completed') statusText = '已送达';
+      if (delivery.status === 'picking_up') {
+        statusText = '配送员正在取餐';
+      }
+      if (delivery.status === 'delivering') {
+        statusText = '配送员正在配送中';
+      }
+      if (delivery.status === 'completed') {
+        statusText = '已送达';
+      }
 
       const result = await this.sendWechatTemplateMessage(
         order.userWechatOpenid,

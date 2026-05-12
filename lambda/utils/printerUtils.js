@@ -1,21 +1,25 @@
 const iconv = require('iconv-lite');
 
 function sanitizePrinterContent(content) {
-  if (!content) return '';
-  
-  let text = String(content);
-  
-  text = text.replace(/[^\x20-\x7E\u4E00-\u9FA5\u3000-\u303F\uFF00-\uFFEF]/g, '');
-  
-  if (text.length > 200) {
-    text = text.substring(0, 197) + '...';
+  if (!content) {
+    return '';
   }
-  
+
+  let text = String(content);
+
+  text = text.replace(/[^\x20-\x7E\u4E00-\u9FA5\u3000-\u303F\uFF00-\uFFEF]/g, '');
+
+  if (text.length > 200) {
+    text = `${text.substring(0, 197) }...`;
+  }
+
   return text;
 }
 
 function toGBK(text) {
-  if (!text) return Buffer.alloc(0);
+  if (!text) {
+    return Buffer.alloc(0);
+  }
   const utf8Buffer = Buffer.from(String(text), 'utf8');
   return iconv.encode(iconv.decode(utf8Buffer, 'utf8'), 'gbk');
 }
@@ -24,7 +28,7 @@ function formatPrinterCommand(commands) {
   const ESC = 0x1B;
   const GS = 0x1D;
   const commandsBuffer = Buffer.alloc(0);
-  
+
   for (const cmd of commands) {
     if (cmd.type === 'init') {
       commandsBuffer = Buffer.concat([commandsBuffer, Buffer.from([ESC, 0x40])]);
@@ -44,7 +48,7 @@ function formatPrinterCommand(commands) {
       commandsBuffer = Buffer.concat([commandsBuffer, Buffer.from([GS, 0x56, 0x00])]);
     }
   }
-  
+
   return commandsBuffer;
 }
 

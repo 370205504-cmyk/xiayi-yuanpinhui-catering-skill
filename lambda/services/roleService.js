@@ -26,14 +26,20 @@ class RoleService {
 
   hasPermission(role, requiredPermission) {
     const permissions = PERMISSIONS[role];
-    if (!permissions) return false;
-    if (permissions.includes('*')) return true;
+    if (!permissions) {
+      return false;
+    }
+    if (permissions.includes('*')) {
+      return true;
+    }
     return permissions.includes(requiredPermission);
   }
 
   async checkPermission(adminId, requiredPermission) {
     const role = await this.getAdminRole(adminId);
-    if (!role) return false;
+    if (!role) {
+      return false;
+    }
     return this.hasPermission(role, requiredPermission);
   }
 

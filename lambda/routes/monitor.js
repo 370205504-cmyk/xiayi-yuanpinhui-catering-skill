@@ -123,7 +123,7 @@ router.get('/orders/summary',
 
       const todayRevenue = todayStats[0].revenue || 0;
       const yesterdayRevenue = yesterdayStats[0].revenue || 0;
-      const revenueGrowth = yesterdayRevenue > 0 
+      const revenueGrowth = yesterdayRevenue > 0
         ? Math.round((todayRevenue - yesterdayRevenue) / yesterdayRevenue * 100)
         : 0;
 

@@ -113,7 +113,7 @@ ${dish.ingredients.slice(0, 5).join('、')}...`,
    */
   generateShareLink(platform, dishId) {
     const encodedDishId = encodeURIComponent(dishId);
-    
+
     switch (platform) {
       case 'xiaohongshu':
         return `https://www.xiaohongshu.com/discovery/item/${encodedDishId}?channel=alexa`;

@@ -11,7 +11,7 @@ class CartService {
       const fs = require('fs');
       const path = require('path');
       const cartFile = path.join(__dirname, '..', 'data', 'carts.json');
-      
+
       if (fs.existsSync(cartFile)) {
         const data = JSON.parse(fs.readFileSync(cartFile, 'utf-8'));
         this.carts = new Map(data);
@@ -26,7 +26,7 @@ class CartService {
       const fs = require('fs');
       const path = require('path');
       const cartFile = path.join(__dirname, '..', 'data', 'carts.json');
-      
+
       const data = Array.from(this.carts.entries());
       fs.writeFileSync(cartFile, JSON.stringify(data, null, 2));
     } catch (error) {
@@ -42,10 +42,10 @@ class CartService {
         updatedAt: new Date().toISOString()
       });
     }
-    
+
     const cart = this.carts.get(userId);
     const total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
+
     return {
       ...cart,
       total,
@@ -56,7 +56,7 @@ class CartService {
   async addItem(userId, dishId, quantity = 1, remarks = '') {
     const dishes = require('../data/dishes.json');
     const dish = dishes.find(d => d.id == dishId || d.id === dishId);
-    
+
     if (!dish) {
       throw new Error(`菜品不存在: ${dishId}`);
     }
@@ -67,10 +67,10 @@ class CartService {
         createdAt: new Date().toISOString()
       });
     }
-    
+
     const cart = this.carts.get(userId);
     const existingIndex = cart.items.findIndex(item => item.dishId == dishId && item.remarks === remarks);
-    
+
     if (existingIndex > -1) {
       cart.items[existingIndex].quantity += quantity;
     } else {
@@ -85,10 +85,10 @@ class CartService {
         addedAt: new Date().toISOString()
       });
     }
-    
+
     cart.updatedAt = new Date().toISOString();
     this.saveCarts();
-    
+
     return this.getCart(userId);
   }
 
@@ -96,16 +96,16 @@ class CartService {
     if (!this.carts.has(userId)) {
       return this.getCart(userId);
     }
-    
+
     const cart = this.carts.get(userId);
     const itemIndex = cart.items.findIndex(item => item.dishId == dishId);
-    
+
     if (itemIndex > -1) {
       cart.items.splice(itemIndex, 1);
       cart.updatedAt = new Date().toISOString();
       this.saveCarts();
     }
-    
+
     return this.getCart(userId);
   }
 
@@ -113,22 +113,22 @@ class CartService {
     if (!this.carts.has(userId)) {
       throw new Error('购物车不存在');
     }
-    
+
     const cart = this.carts.get(userId);
     const item = cart.items.find(item => item.dishId == dishId);
-    
+
     if (!item) {
       throw new Error('购物车中没有此商品');
     }
-    
+
     if (quantity <= 0) {
       return await this.removeItem(userId, dishId);
     }
-    
+
     item.quantity = quantity;
     cart.updatedAt = new Date().toISOString();
     this.saveCarts();
-    
+
     return this.getCart(userId);
   }
 
@@ -138,7 +138,7 @@ class CartService {
       this.carts.get(userId).updatedAt = new Date().toISOString();
       this.saveCarts();
     }
-    
+
     return this.getCart(userId);
   }
 
@@ -146,18 +146,18 @@ class CartService {
     if (!this.carts.has(userId)) {
       throw new Error('购物车不存在');
     }
-    
+
     const cart = this.carts.get(userId);
     const item = cart.items.find(item => item.dishId == dishId);
-    
+
     if (!item) {
       throw new Error('购物车中没有此商品');
     }
-    
+
     item.remarks = remarks;
     cart.updatedAt = new Date().toISOString();
     this.saveCarts();
-    
+
     return this.getCart(userId);
   }
 }

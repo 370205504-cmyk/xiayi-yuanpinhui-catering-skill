@@ -23,7 +23,7 @@ async function logOperation(adminId, operation, detail, ip = '0.0.0.0') {
   try {
     const sanitizedDetail = typeof detail === 'object' ? JSON.stringify(detail) : String(detail || '');
     await db.query(
-      `INSERT INTO operation_logs (admin_id, operation, detail, ip) VALUES (?, ?, ?, ?)`,
+      'INSERT INTO operation_logs (admin_id, operation, detail, ip) VALUES (?, ?, ?, ?)',
       [adminId, operation, sanitizedDetail, ip]
     );
     logger.info('管理员操作', { adminId, operation, ip });
@@ -35,10 +35,10 @@ async function logOperation(adminId, operation, detail, ip = '0.0.0.0') {
 async function getOperationLogs(options = {}) {
   const { adminId, operation, startDate, endDate, page = 1, pageSize = 50 } = options;
   const offset = (parseInt(page) - 1) * parseInt(pageSize);
-  
+
   let sql = 'SELECT * FROM operation_logs WHERE 1=1';
   const params = [];
-  
+
   if (adminId) {
     sql += ' AND admin_id = ?';
     params.push(adminId);
@@ -55,10 +55,10 @@ async function getOperationLogs(options = {}) {
     sql += ' AND created_at <= ?';
     params.push(endDate);
   }
-  
+
   sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
   params.push(parseInt(pageSize), offset);
-  
+
   return await db.query(sql, params);
 }
 
@@ -69,13 +69,13 @@ async function getAdminStats(adminId) {
       FROM operation_logs 
       WHERE admin_id = ? 
       AND DATE(created_at) = CURDATE()`,
-      [adminId]),
+    [adminId]),
     db.query(`
       SELECT COUNT(*) as count 
       FROM operation_logs 
       WHERE admin_id = ? 
       AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)`,
-      [adminId]),
+    [adminId]),
     db.query(`
       SELECT operation, COUNT(*) as count 
       FROM operation_logs 
@@ -83,9 +83,9 @@ async function getAdminStats(adminId) {
       GROUP BY operation
       ORDER BY count DESC
       LIMIT 10`,
-      [adminId])
+    [adminId])
   ]);
-  
+
   return {
     todayOperations: today[0]?.count || 0,
     weekOperations: week[0]?.count || 0,

@@ -58,7 +58,7 @@ class Database {
     return rows;
   }
 
-  async getConnection() {
+  getConnection() {
     return this.pool.getConnection();
   }
 

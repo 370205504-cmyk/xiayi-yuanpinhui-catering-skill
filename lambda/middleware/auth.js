@@ -113,7 +113,7 @@ async function revokeToken(token) {
     if (db.redis) {
       await db.redis.del(`token:${token}`);
     }
-    logger.info('Token revoked:', token.substring(0, 20) + '...');
+    logger.info('Token revoked:', `${token.substring(0, 20) }...`);
     return true;
   } catch (error) {
     logger.error('Failed to revoke token:', error);

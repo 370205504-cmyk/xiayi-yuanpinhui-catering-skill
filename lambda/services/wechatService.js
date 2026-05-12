@@ -164,7 +164,7 @@ class WechatService {
 
       await db.transaction(async (connection) => {
         await connection.query(
-          `UPDATE orders SET payment_status = ?, payment_no = ?, status = ?, paid_at = NOW() WHERE order_no = ?`,
+          'UPDATE orders SET payment_status = ?, payment_no = ?, status = ?, paid_at = NOW() WHERE order_no = ?',
           ['paid', data.transaction_id, 'confirmed', data.out_trade_no]
         );
       });
@@ -208,7 +208,9 @@ class WechatService {
   async getAccessTokenFromCache() {
     const cacheKey = 'wechat:access_token';
     const cached = await db.cacheGet(cacheKey);
-    if (cached) return cached;
+    if (cached) {
+      return cached;
+    }
 
     const params = new URLSearchParams({
       grant_type: 'client_credential',
@@ -229,7 +231,7 @@ class WechatService {
 
   signParams(params) {
     const sortedKeys = Object.keys(params).sort();
-    const signStr = sortedKeys.map(key => `${key}=${params[key]}`).join('&') + `&key=${this.apiKey}`;
+    const signStr = `${sortedKeys.map(key => `${key}=${params[key]}`).join('&') }&key=${this.apiKey}`;
     return require('crypto').createHash('md5').update(signStr, 'utf8').digest('hex').toUpperCase();
   }
 

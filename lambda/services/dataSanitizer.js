@@ -2,7 +2,9 @@ const crypto = require('crypto');
 
 class DataSanitizer {
   static desensitize(data) {
-    if (!data) return data;
+    if (!data) {
+      return data;
+    }
     if (typeof data === 'string') {
       return this.desensitizeString(data);
     }
@@ -34,28 +36,32 @@ class DataSanitizer {
   }
 
   static desensitizeString(str) {
-    if (!str) return str;
+    if (!str) {
+      return str;
+    }
     str = String(str);
-    
+
     if (/^\d{11}$/.test(str)) {
       return str.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
     }
-    
+
     if (/^\d{15}|\d{18}|\d{17}[\dXx]$/.test(str)) {
       return str.replace(/(\d{6})\d{8,11}(\d{4})/, '$1********$2');
     }
-    
+
     if (str.length > 10) {
       const prefix = str.substring(0, 3);
       const suffix = str.substring(str.length - 4);
       return `${prefix}****${suffix}`;
     }
-    
+
     return str;
   }
 
   static maskFileName(filename) {
-    if (!filename) return filename;
+    if (!filename) {
+      return filename;
+    }
     const name = String(filename);
     if (name.length > 20) {
       const ext = name.lastIndexOf('.') > 0 ? name.substring(name.lastIndexOf('.')) : '';

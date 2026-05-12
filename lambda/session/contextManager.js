@@ -47,7 +47,7 @@ class ContextManager {
       timestamp: new Date()
     });
     context.lastActive = Date.now();
-    
+
     if (context.conversationHistory.length > 50) {
       context.conversationHistory = context.conversationHistory.slice(-50);
     }
@@ -56,7 +56,7 @@ class ContextManager {
   getLastIntent(userId) {
     const context = this.getContext(userId);
     const history = context.conversationHistory;
-    
+
     for (let i = history.length - 1; i >= 0; i--) {
       if (history[i].intent) {
         return history[i].intent;

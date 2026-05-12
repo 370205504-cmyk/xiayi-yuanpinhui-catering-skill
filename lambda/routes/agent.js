@@ -34,7 +34,7 @@ function detectPromptInjection(query) {
 async function agentAdapter(req, res, next) {
   try {
     const { query, user_id, session_id, context = {} } = req.body;
-    
+
     if (!query || typeof query !== 'string') {
       return res.status(400).json({
         success: false,
@@ -60,17 +60,17 @@ async function agentAdapter(req, res, next) {
         message: '查询内容无效'
       });
     }
-    
+
     const userId = user_id ? inputValidator.validateUserId(user_id) : null;
     const sessionId = session_id || `session-${Date.now()}`;
-    
+
     logger.info('Agent请求', { userId, sessionId, query: safeQuery });
-    
+
     const userContext = contextManager.getContext(userId || sessionId);
     const result = await processAgentQuery(safeQuery, userId, sessionId, userContext);
-    
+
     contextManager.updateContext(userId || sessionId, result.context);
-    
+
     res.json({
       success: true,
       reply: result.response,
@@ -90,55 +90,55 @@ async function processAgentQuery(query, userId, sessionId, context) {
   const lowerQuery = query.toLowerCase();
   context = context || {};
   context.lastQuery = query;
-  
+
   if (lowerQuery.includes('菜单') || lowerQuery.includes('有什么菜') || lowerQuery.includes('看看菜')) {
     return await handleMenuQuery(query, userId, context);
   }
-  
+
   if (lowerQuery.includes('推荐') || lowerQuery.includes('好吃') || lowerQuery.includes('特色')) {
     return await handleRecommendQuery(query, userId, context);
   }
-  
+
   if (lowerQuery.includes('点') || lowerQuery.includes('要') || lowerQuery.includes('来一份') || lowerQuery.includes('加') || lowerQuery.includes('一份')) {
     return await handleOrderQuery(query, userId, context);
   }
-  
+
   if (lowerQuery.includes('购物车') || lowerQuery.includes('看看我点的') || lowerQuery.includes('我点的')) {
     return await handleCartQuery(userId, context);
   }
-  
+
   if (lowerQuery.includes('下单') || lowerQuery.includes('确认') || lowerQuery.includes('结账') || lowerQuery.includes('买单')) {
     return await handleCheckoutQuery(query, userId, context);
   }
-  
+
   if (lowerQuery.includes('取消') || lowerQuery.includes('不要了') || lowerQuery.includes('退')) {
     return await handleCancelQuery(query, userId, context);
   }
-  
+
   if (lowerQuery.includes('门店') || lowerQuery.includes('地址') || lowerQuery.includes('在哪') || lowerQuery.includes('怎么去')) {
     return await handleStoreQuery(query, context);
   }
-  
+
   if (lowerQuery.includes('wifi') || lowerQuery.includes('无线') || lowerQuery.includes('密码') || lowerQuery.includes('网络')) {
     return await handleWifiQuery(context);
   }
-  
+
   if (lowerQuery.includes('价格') || lowerQuery.includes('多少钱') || lowerQuery.includes('多少')) {
     return await handlePriceQuery(query, context);
   }
-  
+
   if (lowerQuery.includes('排队') || lowerQuery.includes('取号') || lowerQuery.includes('排号')) {
     return await handleQueueQuery(query, userId, context);
   }
-  
+
   if (lowerQuery.includes('电话') || lowerQuery.includes('联系') || lowerQuery.includes('营业')) {
     return await handleContactQuery(query, context);
   }
-  
+
   if (lowerQuery.includes('帮助') || lowerQuery.includes('怎么用') || lowerQuery.includes('help')) {
     return await handleHelpQuery(context);
   }
-  
+
   return {
     response: '您好！我是夏邑缘品荟创味菜的智能助手。请问有什么可以帮您？',
     actions: [{ type: 'show_help', data: {} }],
@@ -149,7 +149,7 @@ async function processAgentQuery(query, userId, sessionId, context) {
 
 async function handleMenuQuery(query, userId, context) {
   const dishes = await dishesService.getAllDishes();
-  
+
   let category = null;
   if (query.includes('凉菜') || query.includes('冷菜') || query.includes('开胃')) {
     category = '餐前开胃菜';
@@ -164,25 +164,29 @@ async function handleMenuQuery(query, userId, context) {
   } else if (query.includes('家常') || query.includes('炒菜')) {
     category = '家常炒菜';
   }
-  
-  const filteredDishes = category 
+
+  const filteredDishes = category
     ? dishes.filter(d => d.category === category)
     : dishes;
-  
+
   const displayDishes = filteredDishes.slice(0, 12);
-  
-  let dishList = displayDishes.map(d => {
+
+  const dishList = displayDishes.map(d => {
     const tags = [];
-    if (d.isRecommend || d.isSignature) tags.push('⭐');
-    if (d.spicyLevel > 0) tags.push('🌶️'.repeat(d.spicyLevel));
+    if (d.isRecommend || d.isSignature) {
+      tags.push('⭐');
+    }
+    if (d.spicyLevel > 0) {
+      tags.push('🌶️'.repeat(d.spicyLevel));
+    }
     return `${d.name} ¥${d.price} ${tags.join('')}`;
   }).join('\n');
-  
+
   const categoryText = category ? `【${category}】` : '【全部菜品】';
-  
+
   context.lastIntent = 'menu';
   context.lastCategory = category;
-  
+
   return {
     response: `${categoryText}\n\n${dishList}\n\n共${filteredDishes.length}道菜品，回复菜品名称即可添加到购物车。`,
     actions: [{ type: 'show_menu', data: displayDishes, category: category }],
@@ -194,7 +198,7 @@ async function handleMenuQuery(query, userId, context) {
 async function handleRecommendQuery(query, userId, context) {
   let taste = null;
   let budget = null;
-  
+
   if (query.includes('辣的') || query.includes('辣') || query.includes('川菜')) {
     taste = '辣';
   } else if (query.includes('清淡') || query.includes('不辣') || query.includes('养生')) {
@@ -202,29 +206,29 @@ async function handleRecommendQuery(query, userId, context) {
   } else if (query.includes('甜的') || query.includes('甜')) {
     taste = '甜';
   }
-  
+
   if (query.includes('便宜') || query.includes('实惠') || query.includes('经济')) {
     budget = 'low';
   } else if (query.includes('贵') || query.includes('好') || query.includes('档次') || query.includes('请客')) {
     budget = 'high';
   }
-  
+
   const peopleMatch = query.match(/(\d)[人位桌]/);
   const people = peopleMatch ? parseInt(peopleMatch[1]) : null;
-  
+
   const recommendations = await dishesService.recommendDishes({
     taste,
     budget,
     people,
     count: 5
   });
-  
-  const dishList = recommendations.map((d, i) => 
+
+  const dishList = recommendations.map((d, i) =>
     `${i + 1}. ${d.name} ¥${d.price}\n   ${d.description || '精选推荐'}`
   ).join('\n\n');
-  
+
   context.lastIntent = 'recommend';
-  
+
   return {
     response: `🌟 为您推荐：\n\n${dishList}\n\n请问想点哪几道？直接说菜品名称即可`,
     actions: [{ type: 'recommend', data: recommendations, reason: { taste, budget, people } }],
@@ -236,35 +240,41 @@ async function handleRecommendQuery(query, userId, context) {
 async function handleOrderQuery(query, userId, context) {
   const cart = await cartService.getCart(userId);
   const existingItems = cart.items || [];
-  
+
   const dishInfo = extractDishInfo(query);
-  
+
   if (dishInfo.name) {
     const dishes = await dishesService.getAllDishes();
-    const dish = dishes.find(d => 
-      d.name.includes(dishInfo.name) || 
+    const dish = dishes.find(d =>
+      d.name.includes(dishInfo.name) ||
       dishInfo.name.includes(d.name) ||
       d.name.includes(dishInfo.name.replace(/[来点加要一份]/g, ''))
     );
-    
+
     if (dish) {
       const remarks = [];
-      if (query.includes('少辣') || query.includes('微辣')) remarks.push('少辣');
+      if (query.includes('少辣') || query.includes('微辣')) {
+        remarks.push('少辣');
+      }
       if (query.includes('不要') || query.includes('不加')) {
         const notMatch = query.match(/不要([^，,。]+)/);
-        if (notMatch) remarks.push(`不要${notMatch[1]}`);
+        if (notMatch) {
+          remarks.push(`不要${notMatch[1]}`);
+        }
       }
-      if (query.includes('加辣')) remarks.push('加辣');
-      
+      if (query.includes('加辣')) {
+        remarks.push('加辣');
+      }
+
       await cartService.addItem(userId, dish.id, dishInfo.quantity, remarks.join('、'));
-      
+
       const cartTotal = await cartService.getCart(userId);
-      
+
       context.lastIntent = 'order';
       context.lastDishId = dish.id;
-      
+
       return {
-        response: `✅ 已添加到购物车：\n${dish.name} x${dishInfo.quantity} ¥${dish.price}\n${remarks.length ? '备注：' + remarks.join('、') : ''}\n\n当前购物车：共${cartTotal.items.length}件，合计¥${cartTotal.total}\n\n继续点餐或说"下单"确认`,
+        response: `✅ 已添加到购物车：\n${dish.name} x${dishInfo.quantity} ¥${dish.price}\n${remarks.length ? `备注：${ remarks.join('、')}` : ''}\n\n当前购物车：共${cartTotal.items.length}件，合计¥${cartTotal.total}\n\n继续点餐或说"下单"确认`,
         actions: [{ type: 'add_to_cart', data: { dish, quantity: dishInfo.quantity, remarks }, cart: cartTotal }],
         data: { cart: cartTotal, addedDish: dish },
         context: context
@@ -284,7 +294,7 @@ async function handleOrderQuery(query, userId, context) {
       };
     }
   }
-  
+
   if (existingItems.length > 0) {
     return {
       response: `您的购物车已有${existingItems.length}件菜品。\n\n请问还需要点什么？直接说菜品名称即可添加。`,
@@ -293,9 +303,9 @@ async function handleOrderQuery(query, userId, context) {
       context: context
     };
   }
-  
+
   return {
-    response: `请告诉我您想点哪些菜，例如：\n• "来一份招牌大鱼头泡饭"\n• "加一份香辣酥排骨"\n• "要一个糖醋里脊"\n\n您也可以说"推荐招牌菜"让我帮您推荐`,
+    response: '请告诉我您想点哪些菜，例如：\n• "来一份招牌大鱼头泡饭"\n• "加一份香辣酥排骨"\n• "要一个糖醋里脊"\n\n您也可以说"推荐招牌菜"让我帮您推荐',
     actions: [{ type: 'prompt_order', data: existingItems }],
     data: { cart: { items: existingItems, total: 0 } },
     context: context,
@@ -309,22 +319,22 @@ async function handleOrderQuery(query, userId, context) {
 
 async function handleCartQuery(userId, context) {
   const cart = await cartService.getCart(userId);
-  
+
   if (!cart.items || cart.items.length === 0) {
     return {
-      response: `🛒 购物车是空的\n\n您可以说"给我看看菜单"开始点餐`,
+      response: '🛒 购物车是空的\n\n您可以说"给我看看菜单"开始点餐',
       actions: [{ type: 'show_cart', data: { items: [], total: 0 } }],
       data: { cart: { items: [], total: 0 } },
       context: context
     };
   }
-  
-  const itemList = cart.items.map((item, i) => 
+
+  const itemList = cart.items.map((item, i) =>
     `${i + 1}. ${item.name} x${item.quantity} ¥${item.price * item.quantity}${item.remarks ? ` (${item.remarks})` : ''}`
   ).join('\n');
-  
+
   context.lastIntent = 'cart';
-  
+
   return {
     response: `🛒 购物车（共${cart.items.length}件）：\n\n${itemList}\n\n─────────────────\n合计：¥${cart.total}\n\n回复"下单"确认订单，或继续添加菜品`,
     actions: [{ type: 'show_cart', data: cart }],
@@ -335,33 +345,39 @@ async function handleCartQuery(userId, context) {
 
 async function handleCheckoutQuery(query, userId, context) {
   const cart = await cartService.getCart(userId);
-  
+
   if (!cart.items || cart.items.length === 0) {
     return {
-      response: `❌ 购物车是空的，请先选择想吃的菜品\n\n您可以说"给我看看菜单"开始点餐`,
+      response: '❌ 购物车是空的，请先选择想吃的菜品\n\n您可以说"给我看看菜单"开始点餐',
       actions: [{ type: 'show_menu', data: [] }],
       data: {},
       context: context
     };
   }
-  
+
   const remarks = [];
-  if (query.includes('加辣')) remarks.push('加辣');
-  if (query.includes('少盐')) remarks.push('少盐');
-  if (query.includes('打包')) remarks.push('打包');
-  
+  if (query.includes('加辣')) {
+    remarks.push('加辣');
+  }
+  if (query.includes('少盐')) {
+    remarks.push('少盐');
+  }
+  if (query.includes('打包')) {
+    remarks.push('打包');
+  }
+
   try {
     const order = await orderService.createOrder({
       userId,
       remarks: remarks.length > 0 ? remarks.join('、') : '',
       items: cart.items
     });
-    
+
     await cartService.clearCart(userId);
-    
+
     context.lastIntent = 'checkout';
     context.lastOrderId = order.orderId;
-    
+
     return {
       response: `🎉 订单创建成功！\n\n📋 订单号：${order.orderId}\n💰 金额：¥${order.totalAmount}\n${remarks.length ? `📝 备注：${remarks.join('、')}` : ''}\n\n请到前台出示订单号结账，祝您用餐愉快！🍽️`,
       actions: [{ type: 'create_order', data: order }],
@@ -382,25 +398,25 @@ async function handleCheckoutQuery(query, userId, context) {
 async function handleCancelQuery(query, userId, context) {
   if (query.includes('订单')) {
     return {
-      response: `取消订单请告诉我订单号，或访问 http://localhost:3000/mobile 查看订单后取消`,
+      response: '取消订单请告诉我订单号，或访问 http://localhost:3000/mobile 查看订单后取消',
       actions: [],
       data: {},
       context: context
     };
   }
-  
+
   if (query.includes('购物车') || query.includes('刚点的')) {
     await cartService.clearCart(userId);
     return {
-      response: `✅ 购物车已清空\n\n您可以说"给我看看菜单"重新点餐`,
+      response: '✅ 购物车已清空\n\n您可以说"给我看看菜单"重新点餐',
       actions: [{ type: 'clear_cart', data: {} }],
       data: {},
       context: context
     };
   }
-  
+
   return {
-    response: `好的，已取消\n\n请问还需要什么帮助？`,
+    response: '好的，已取消\n\n请问还需要什么帮助？',
     actions: [],
     data: {},
     context: context
@@ -410,7 +426,7 @@ async function handleCancelQuery(query, userId, context) {
 async function handleStoreQuery(query, context) {
   const storeService = require('../utils/storeService');
   const stores = await storeService.getAllStores();
-  
+
   if (stores.length > 0) {
     const store = stores[0];
     return {
@@ -420,9 +436,9 @@ async function handleStoreQuery(query, context) {
       context: context
     };
   }
-  
+
   return {
-    response: `📍 夏邑缘品荟创味菜\n\n地址：夏邑县孔祖大道南段\n电话：0370-628-8888\n营业时间：10:00-22:00`,
+    response: '📍 夏邑缘品荟创味菜\n\n地址：夏邑县孔祖大道南段\n电话：0370-628-8888\n营业时间：10:00-22:00',
     actions: [],
     data: {},
     context: context
@@ -432,7 +448,7 @@ async function handleStoreQuery(query, context) {
 async function handleWifiQuery(context) {
   const wifiService = require('../utils/wifiService');
   const wifi = await wifiService.getWifiPassword();
-  
+
   return {
     response: `📶 WiFi信息\n\n名称：${wifi.ssid || '缘品荟免费WiFi'}\n密码：${wifi.password || '88888888'}\n\n免密码连接，祝您用餐愉快！`,
     actions: [{ type: 'show_wifi', data: wifi }],
@@ -443,13 +459,13 @@ async function handleWifiQuery(context) {
 
 async function handlePriceQuery(query, context) {
   const dishName = extractDishName(query);
-  
+
   if (dishName) {
     const dishes = await dishesService.getAllDishes();
-    const dish = dishes.find(d => 
+    const dish = dishes.find(d =>
       d.name.includes(dishName) || dishName.includes(d.name)
     );
-    
+
     if (dish) {
       return {
         response: `「${dish.name}」¥${dish.price}/份\n\n${dish.description || '美味可口，欢迎品尝'}\n\n回复"来一份${dish.name}"添加到购物车`,
@@ -459,9 +475,9 @@ async function handlePriceQuery(query, context) {
       };
     }
   }
-  
+
   return {
-    response: `请告诉我您想查询价格的菜品名称，例如"招牌大鱼头泡饭多少钱"`,
+    response: '请告诉我您想查询价格的菜品名称，例如"招牌大鱼头泡饭多少钱"',
     actions: [],
     data: {},
     context: context
@@ -471,7 +487,7 @@ async function handlePriceQuery(query, context) {
 async function handleQueueQuery(query, userId, context) {
   const peopleMatch = query.match(/(\d)[人位桌]/);
   const people = peopleMatch ? parseInt(peopleMatch[1]) : 3;
-  
+
   let tableType = 'small';
   if (query.includes('中桌') || query.includes('4') || query.includes('5') || query.includes('6')) {
     tableType = 'medium';
@@ -479,14 +495,14 @@ async function handleQueueQuery(query, userId, context) {
   if (query.includes('大桌') || query.includes('7') || query.includes('8') || query.includes('包间')) {
     tableType = 'large';
   }
-  
+
   const queueService = require('../services/queueService');
-  
+
   try {
     const result = await queueService.takeQueue('store001', tableType, people, userId);
-    
+
     context.queueId = result.data.queueId;
-    
+
     return {
       response: `🎫 取号成功！\n\n排队号：${result.data.queueNo}\n桌型：${result.data.tableType}\n人数：${people}人\n当前等待：${result.data.waitCount}桌\n预计等待：约${result.data.estimatedTime}分钟\n\n请留意叫号，到号后请入座消费`,
       actions: [{ type: 'take_queue', data: result.data }],
@@ -512,7 +528,7 @@ async function handleContactQuery(query, context) {
       context: context
     };
   }
-  
+
   return {
     response: `🕐 营业时间\n\n${store.hours || '10:00-22:00'}\n\n节假日可能有调整，请以门店公告为准`,
     actions: [],
@@ -523,7 +539,7 @@ async function handleContactQuery(query, context) {
 
 async function handleHelpQuery(context) {
   return {
-    response: `🤖 我可以帮您：\n\n【点餐】\n• "给我看看菜单" - 查看所有菜品\n• "推荐招牌菜" - 获取推荐\n• "来一份xxx" - 添加到购物车\n• "查看购物车" - 查看已选菜品\n• "下单" - 确认订单\n\n【查询】\n• "门店地址在哪" - 获取地址\n• "WiFi密码" - 获取WiFi\n• "电话多少" - 联系电话\n\n【排队】\n• "帮我排个3人桌" - 排队取号\n\n还有什么可以帮您？`,
+    response: '🤖 我可以帮您：\n\n【点餐】\n• "给我看看菜单" - 查看所有菜品\n• "推荐招牌菜" - 获取推荐\n• "来一份xxx" - 添加到购物车\n• "查看购物车" - 查看已选菜品\n• "下单" - 确认订单\n\n【查询】\n• "门店地址在哪" - 获取地址\n• "WiFi密码" - 获取WiFi\n• "电话多少" - 联系电话\n\n【排队】\n• "帮我排个3人桌" - 排队取号\n\n还有什么可以帮您？',
     actions: [{ type: 'show_help', data: {} }],
     data: {},
     context: context
@@ -536,19 +552,19 @@ function extractDishName(query) {
     /加?一?份?(.+?)(?:可以吗|谢谢|好)/,
     /(?:点|要)(.+?)(?:吧|呢|好|，|。)/
   ];
-  
+
   for (const pattern of patterns) {
     const match = query.match(pattern);
     if (match && match[1]) {
       return match[1].trim();
     }
   }
-  
+
   const simpleMatch = query.match(/来?一?份?(.+)/);
   if (simpleMatch && simpleMatch[1]) {
     return simpleMatch[1].trim();
   }
-  
+
   return null;
 }
 
