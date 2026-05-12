@@ -1,7 +1,7 @@
 {
   "name": "xiayi-yuanpinhui-catering-skill",
-  "version": "3.5.0",
-  "description": "夏邑缘品荟智能餐饮服务系统 - 95个安全漏洞修复版",
+  "version": "4.0.0",
+  "description": "夏邑缘品荟智能餐饮服务系统 - MCP标准Agent Skill，支持多租户、幂等性、状态机控制",
   "main": "lambda/server.js",
   "scripts": {
     "start": "node lambda/server.js",

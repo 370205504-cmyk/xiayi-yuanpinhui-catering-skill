@@ -638,7 +638,7 @@
   "status": "ok",
   "timestamp": "2026-01-15T12:00:00Z",
   "uptime": 3600,
-  "version": "3.5.0",
+  "version": "4.0.0",
   "services": {
     "database": "connected",
     "redis": "connected",
