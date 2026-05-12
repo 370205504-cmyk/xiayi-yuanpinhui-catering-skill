@@ -554,6 +554,319 @@
           {},
           {"lat": 34.2311, "lng": 116.1315, "radius": 5}
         ]
+      },
+      {
+        "name": "get_power_bank_info",
+        "description": "获取充电宝服务信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_pet_policy",
+        "description": "获取宠物政策信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_kids_service",
+        "description": "获取儿童服务信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "request_invoice",
+        "description": "申请开具发票",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "invoice_type": {
+              "type": "string",
+              "description": "发票类型：personal(个人)或company(企业)",
+              "enum": ["personal", "company"]
+            },
+            "invoice_title": {
+              "type": "string",
+              "description": "发票抬头"
+            },
+            "tax_number": {
+              "type": "string",
+              "description": "税号（企业发票必填）"
+            },
+            "company_address": {
+              "type": "string",
+              "description": "公司地址（企业发票）"
+            },
+            "company_phone": {
+              "type": "string",
+              "description": "公司电话（企业发票）"
+            },
+            "bank_name": {
+              "type": "string",
+              "description": "开户银行（企业发票）"
+            },
+            "bank_account": {
+              "type": "string",
+              "description": "银行账号（企业发票）"
+            },
+            "email": {
+              "type": "string",
+              "description": "接收邮箱"
+            },
+            "phone": {
+              "type": "string",
+              "description": "接收电话"
+            },
+            "remark": {
+              "type": "string",
+              "description": "备注"
+            }
+          },
+          "required": ["order_no", "invoice_type", "invoice_title"]
+        },
+        "examples": [
+          {"order_no": "ORD20260115001", "invoice_type": "personal", "invoice_title": "个人", "email": "user@example.com"},
+          {"order_no": "ORD20260115002", "invoice_type": "company", "invoice_title": "某某公司", "tax_number": "91110000XXXXX", "email": "finance@company.com"}
+        ]
+      },
+      {
+        "name": "get_invoice_status",
+        "description": "查询发票状态",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "invoice_id": {
+              "type": "string",
+              "description": "发票ID（可选）"
+            }
+          },
+          "required": ["order_no"]
+        },
+        "examples": [
+          {"order_no": "ORD20260115001"}
+        ]
+      },
+      {
+        "name": "create_delivery_order",
+        "description": "创建外卖配送订单",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "store_id": {
+              "type": "string",
+              "description": "门店ID"
+            },
+            "delivery_address": {
+              "type": "string",
+              "description": "配送地址"
+            },
+            "contact_name": {
+              "type": "string",
+              "description": "联系人姓名"
+            },
+            "contact_phone": {
+              "type": "string",
+              "description": "联系电话"
+            },
+            "delivery_fee": {
+              "type": "number",
+              "description": "配送费"
+            },
+            "tips": {
+              "type": "number",
+              "description": "小费（可选）"
+            },
+            "notes": {
+              "type": "string",
+              "description": "配送备注（可选）"
+            }
+          },
+          "required": ["order_no", "store_id", "delivery_address", "contact_name", "contact_phone", "delivery_fee"]
+        },
+        "examples": [
+          {"order_no": "ORD20260115001", "store_id": "1", "delivery_address": "夏邑县某某小区1号楼1单元101室", "contact_name": "张先生", "contact_phone": "13800138000", "delivery_fee": 3}
+        ]
+      },
+      {
+        "name": "track_delivery",
+        "description": "跟踪配送状态",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            }
+          },
+          "required": ["order_no"]
+        },
+        "examples": [
+          {"order_no": "ORD20260115001"}
+        ]
+      },
+      {
+        "name": "update_delivery_status",
+        "description": "更新配送状态",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "status": {
+              "type": "string",
+              "description": "配送状态：pending(待接单), accepted(已接单), picking(取餐中), delivering(配送中), delivered(已送达), cancelled(已取消)",
+              "enum": ["pending", "accepted", "picking", "delivering", "delivered", "cancelled"]
+            },
+            "rider_name": {
+              "type": "string",
+              "description": "骑手姓名（可选）"
+            },
+            "rider_phone": {
+              "type": "string",
+              "description": "骑手电话（可选）"
+            }
+          },
+          "required": ["order_no", "status"]
+        },
+        "examples": [
+          {"order_no": "ORD20260115001", "status": "accepted", "rider_name": "李师傅", "rider_phone": "13900139000"}
+        ]
+      },
+      {
+        "name": "switch_store",
+        "description": "切换当前门店",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "要切换到的门店ID"
+            },
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            }
+          },
+          "required": ["store_id", "user_id"]
+        },
+        "examples": [
+          {"store_id": "2", "user_id": "user_001"}
+        ]
+      },
+      {
+        "name": "get_current_store",
+        "description": "获取当前选择的门店",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            }
+          },
+          "required": ["user_id"]
+        },
+        "examples": [
+          {"user_id": "user_001"}
+        ]
+      },
+      {
+        "name": "get_printer_config",
+        "description": "获取打印机配置",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "export_data",
+        "description": "导出数据",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data_type": {
+              "type": "string",
+              "description": "数据类型：orders(订单), dishes(菜品), members(会员), revenue(营收)",
+              "enum": ["orders", "dishes", "members", "revenue"]
+            },
+            "start_date": {
+              "type": "string",
+              "description": "开始日期，格式：YYYY-MM-DD"
+            },
+            "end_date": {
+              "type": "string",
+              "description": "结束日期，格式：YYYY-MM-DD"
+            },
+            "format": {
+              "type": "string",
+              "description": "导出格式：excel, csv, json",
+              "enum": ["excel", "csv", "json"]
+            },
+            "store_id": {
+              "type": "string",
+              "description": "门店ID（可选）"
+            }
+          },
+          "required": ["data_type", "start_date", "end_date", "format"]
+        },
+        "examples": [
+          {"data_type": "orders", "start_date": "2026-01-01", "end_date": "2026-01-31", "format": "excel", "store_id": "1"}
+        ]
       }
     ],
     "resources": [

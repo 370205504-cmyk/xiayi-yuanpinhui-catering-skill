@@ -64,6 +64,16 @@ CREATE TABLE IF NOT EXISTS store_settings (
   FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 用户门店偏好表
+CREATE TABLE IF NOT EXISTS user_store_preferences (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(64) NOT NULL UNIQUE COMMENT '用户ID',
+  current_store_id INT COMMENT '当前选择的门店ID',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (current_store_id) REFERENCES stores(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- 插入默认门店设置
 INSERT INTO store_settings (store_id, setting_key, setting_value, description) VALUES
 (1, 'power_bank_available', '1', '是否有充电宝服务'),
@@ -117,6 +127,190 @@ INSERT INTO announcements (title, content, type, is_active, sort_order) VALUES
 ('开业优惠', '夏邑缘品荟创味菜旗舰店开业啦！全场8.8折，满100送20优惠券', 'promotion', 1, 1),
 ('温馨提示', '尊敬的顾客，本店提供免费WiFi和充电宝服务', 'notice', 1, 2),
 ('会员日活动', '每周三会员日，会员消费双倍积分', 'activity', 1, 3);
+
+-- 外卖配送表
+CREATE TABLE IF NOT EXISTS delivery_orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_no VARCHAR(64) NOT NULL COMMENT '订单号',
+  store_id INT NOT NULL COMMENT '门店ID',
+  rider_name VARCHAR(50) COMMENT '骑手姓名',
+  rider_phone VARCHAR(20) COMMENT '骑手电话',
+  status ENUM('pending', 'accepted', 'picking', 'delivering', 'delivered', 'cancelled') DEFAULT 'pending' COMMENT '配送状态',
+  estimated_arrival DATETIME COMMENT '预计送达时间',
+  actual_arrival DATETIME COMMENT '实际送达时间',
+  delivery_address TEXT NOT NULL COMMENT '配送地址',
+  contact_name VARCHAR(50) NOT NULL COMMENT '联系人姓名',
+  contact_phone VARCHAR(20) NOT NULL COMMENT '联系电话',
+  delivery_fee DECIMAL(10,2) DEFAULT 0 COMMENT '配送费',
+  distance DECIMAL(5,2) COMMENT '配送距离(公里)',
+  tips DECIMAL(10,2) DEFAULT 0 COMMENT '小费',
+  notes TEXT COMMENT '配送备注',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_order_no (order_no),
+  INDEX idx_store_status (store_id, status),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 发票记录表
+CREATE TABLE IF NOT EXISTS invoices (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_no VARCHAR(64) NOT NULL COMMENT '订单号',
+  store_id INT COMMENT '门店ID',
+  user_id VARCHAR(64) COMMENT '用户ID',
+  invoice_type ENUM('personal', 'company') NOT NULL COMMENT '发票类型',
+  invoice_title VARCHAR(200) NOT NULL COMMENT '发票抬头',
+  tax_number VARCHAR(50) COMMENT '税号',
+  company_address VARCHAR(255) COMMENT '公司地址',
+  company_phone VARCHAR(20) COMMENT '公司电话',
+  bank_name VARCHAR(100) COMMENT '开户银行',
+  bank_account VARCHAR(50) COMMENT '银行账号',
+  amount DECIMAL(10,2) NOT NULL COMMENT '开票金额',
+  items TEXT COMMENT '开票项目',
+  status ENUM('pending', 'issued', 'sent', 'cancelled') DEFAULT 'pending' COMMENT '发票状态',
+  pdf_url VARCHAR(255) COMMENT 'PDF文件URL',
+  email VARCHAR(100) COMMENT '接收邮箱',
+  phone VARCHAR(20) COMMENT '接收电话',
+  remark TEXT COMMENT '备注',
+  issued_at DATETIME COMMENT '开票时间',
+  sent_at DATETIME COMMENT '发送时间',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_order_no (order_no),
+  INDEX idx_user_id (user_id),
+  INDEX idx_status (status),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 打印配置表
+CREATE TABLE IF NOT EXISTS printer_configs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  store_id INT NOT NULL COMMENT '门店ID',
+  name VARCHAR(100) NOT NULL COMMENT '打印机名称',
+  model VARCHAR(100) COMMENT '打印机型号',
+  type ENUM('receipt', 'kitchen', 'label') DEFAULT 'receipt' COMMENT '打印机类型',
+  ip_address VARCHAR(50) COMMENT 'IP地址',
+  port INT DEFAULT 9100 COMMENT '端口',
+  serial_port VARCHAR(50) COMMENT '串口',
+  baud_rate INT DEFAULT 115200 COMMENT '波特率',
+  paper_width INT DEFAULT 80 COMMENT '纸宽(mm)',
+  is_enabled TINYINT(1) DEFAULT 1 COMMENT '是否启用',
+  is_default TINYINT(1) DEFAULT 0 COMMENT '是否默认',
+  auto_print_order TINYINT(1) DEFAULT 1 COMMENT '自动打印订单',
+  auto_print_payment TINYINT(1) DEFAULT 1 COMMENT '自动打印支付凭证',
+  auto_print_kitchen TINYINT(1) DEFAULT 1 COMMENT '自动打印厨房单',
+  config JSON COMMENT '高级配置',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_store (store_id),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 插入打印配置
+INSERT INTO printer_configs (store_id, name, model, type, ip_address, port, paper_width, is_enabled, is_default) VALUES
+(1, '前台打印机', '爱普生 TM-T82X', 'receipt', '192.168.1.100', 9100, 80, 1, 1),
+(1, '厨房打印机', '爱普生 TM-T82X', 'kitchen', '192.168.1.101', 9100, 80, 1, 0);
+
+-- 消息队列表
+CREATE TABLE IF NOT EXISTS message_queue (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  queue_name VARCHAR(50) NOT NULL COMMENT '队列名称',
+  message_type VARCHAR(50) NOT NULL COMMENT '消息类型',
+  payload JSON NOT NULL COMMENT '消息内容',
+  priority INT DEFAULT 0 COMMENT '优先级(0-10)',
+  status ENUM('pending', 'processing', 'completed', 'failed', 'cancelled') DEFAULT 'pending' COMMENT '状态',
+  retry_count INT DEFAULT 0 COMMENT '重试次数',
+  max_retries INT DEFAULT 5 COMMENT '最大重试次数',
+  last_error TEXT COMMENT '最后错误信息',
+  available_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '可用时间',
+  processed_at TIMESTAMP NULL COMMENT '处理时间',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_queue_status (queue_name, status),
+  INDEX idx_priority (priority, available_at),
+  INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 系统监控表
+CREATE TABLE IF NOT EXISTS system_metrics (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  metric_type VARCHAR(50) NOT NULL COMMENT '指标类型',
+  metric_name VARCHAR(100) NOT NULL COMMENT '指标名称',
+  metric_value DECIMAL(20,4) COMMENT '指标值',
+  unit VARCHAR(20) COMMENT '单位',
+  tags JSON COMMENT '标签',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_type_time (metric_type, created_at),
+  INDEX idx_name_time (metric_name, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 告警规则表
+CREATE TABLE IF NOT EXISTS alert_rules (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL COMMENT '规则名称',
+  description TEXT COMMENT '规则描述',
+  metric_name VARCHAR(100) NOT NULL COMMENT '监控指标',
+  condition ENUM('gt', 'lt', 'eq', 'gte', 'lte') NOT NULL COMMENT '条件',
+  threshold DECIMAL(20,4) NOT NULL COMMENT '阈值',
+  duration INT DEFAULT 60 COMMENT '持续时间(秒)',
+  level ENUM('info', 'warning', 'error', 'critical') DEFAULT 'warning' COMMENT '告警级别',
+  channels JSON COMMENT '通知渠道',
+  is_enabled TINYINT(1) DEFAULT 1 COMMENT '是否启用',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 告警记录表
+CREATE TABLE IF NOT EXISTS alert_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  rule_id INT COMMENT '规则ID',
+  alert_name VARCHAR(100) NOT NULL COMMENT '告警名称',
+  level ENUM('info', 'warning', 'error', 'critical') NOT NULL COMMENT '告警级别',
+  message TEXT NOT NULL COMMENT '告警消息',
+  details JSON COMMENT '详细信息',
+  is_resolved TINYINT(1) DEFAULT 0 COMMENT '是否已解决',
+  resolved_at TIMESTAMP NULL COMMENT '解决时间',
+  resolved_by VARCHAR(50) COMMENT '解决人',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_level (level),
+  INDEX idx_resolved (is_resolved),
+  INDEX idx_created (created_at),
+  FOREIGN KEY (rule_id) REFERENCES alert_rules(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 数据库备份记录表
+CREATE TABLE IF NOT EXISTS backup_records (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  backup_type ENUM('full', 'incremental') NOT NULL COMMENT '备份类型',
+  file_path VARCHAR(255) NOT NULL COMMENT '文件路径',
+  file_size BIGINT COMMENT '文件大小(字节)',
+  checksum VARCHAR(64) COMMENT '校验和',
+  status ENUM('completed', 'failed') NOT NULL COMMENT '状态',
+  error_message TEXT COMMENT '错误信息',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_type_date (backup_type, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 补充门店设置
+INSERT INTO store_settings (store_id, setting_key, setting_value, description) VALUES
+(2, 'power_bank_available', '1', '是否有充电宝服务'),
+(2, 'power_bank_brand', '怪兽充电', '充电宝品牌'),
+(2, 'pet_friendly', '0', '是否允许宠物'),
+(2, 'kids_friendly', '1', '是否提供儿童服务'),
+(2, 'invoice_available', '1', '是否可开发票'),
+(3, 'power_bank_available', '1', '是否有充电宝服务'),
+(3, 'power_bank_brand', '街电', '充电宝品牌'),
+(3, 'pet_friendly', '1', '是否允许宠物'),
+(3, 'kids_friendly', '1', '是否提供儿童服务'),
+(3, 'invoice_available', '1', '是否可开发票'),
+(4, 'power_bank_available', '0', '是否有充电宝服务'),
+(4, 'pet_friendly', '0', '是否允许宠物'),
+(4, 'invoice_available', '0', '是否可开发票'),
+(5, 'power_bank_available', '1', '是否有充电宝服务'),
+(5, 'power_bank_brand', '来电', '充电宝品牌'),
+(5, 'pet_friendly', '0', '是否允许宠物'),
+(5, 'kids_friendly', '1', '是否提供儿童服务'),
+(5, 'invoice_available', '1', '是否可开发票');
 
 -- 用户表
 CREATE TABLE IF NOT EXISTS users (
