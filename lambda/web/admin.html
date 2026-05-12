@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夏邑缘品荟创味菜 - 后台管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .tabs {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            background: #f8f8f8;
+        }
+        
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            margin-bottom: -2px;
+        }
+        
+        .tab-content {
+            padding: 30px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        th {
+            background: #f8f8f8;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-preparing {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-ready {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-completed {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(102,126,234,0.5);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        
+        .search-box select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ 夏邑缘品荟创味菜 - 后台管理系统</h1>
+            <p>管理订单、查看统计、打印小票</p>
+        </div>
+        
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <h3>今日订单</h3>
+                <div class="value" id="todayOrders">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>今日营收</h3>
+                <div class="value" id="todayRevenue">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>待处理订单</h3>
+                <div class="value" id="pendingOrders">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>制作中订单</h3>
+                <div class="value" id="preparingOrders">-</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="showTab('orders')">📋 订单管理</button>
+                <button class="tab-btn" onclick="showTab('menu')">🍜 菜品管理</button>
+                <button class="tab-btn" onclick="showTab('settings')">⚙️ 系统设置</button>
+            </div>
+            
+            <div class="tab-content active" id="tab-orders">
+                <div class="search-box">
+                    <input type="text" id="searchOrderId" placeholder="搜索订单号...">
+                    <select id="filterStatus">
+                        <option value="">全部状态</option>
+                        <option value="pending">待确认</option>
+                        <option value="confirmed">已确认</option>
+                        <option value="preparing">制作中</option>
+                        <option value="ready">已完成</option>
+                        <option value="completed">已完成</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="searchOrders()">搜索</button>
+                </div>
+                
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>下单时间</th>
+                            <th>商品</th>
+                            <th>金额</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersBody">
+                        <tr>
+                            <td colspan="6" class="loading">加载中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="tab-content" id="tab-menu">
+                <h3>菜品列表</h3>
+                <p style="color: #666; margin: 10px 0;">共 <span id="totalDishes">0</span> 道菜品</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>菜品名称</th>
+                            <th>分类</th>
+                            <th>价格</th>
+                            <th>标签</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dishesBody">
+                        <tr>
+                            <td colspan="5" class="loading">加载中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="tab-content" id="tab-settings">
+                <h3>系统配置</h3>
+                <div style="background: #f8f8f8; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin-bottom: 10px;"><strong>门店名称：</strong>夏邑缘品荟创味菜</p>
+                    <p style="margin-bottom: 10px;"><strong>地址：</strong>夏邑县孔祖大道南段</p>
+                    <p style="margin-bottom: 10px;"><strong>电话：</strong>0370-628-8888</p>
+                    <p style="margin-bottom: 10px;"><strong>WiFi：</strong>缘品荟免费WiFi / 88888888</p>
+                    <p style="margin-bottom: 10px;"><strong>打印机IP：</strong>192.168.1.100</p>
+                </div>
+                <button class="btn btn-secondary" onclick="location.reload()">刷新页面</button>
+            </div>
+        </div>
+    </div>
+    
+    <button class="refresh-btn" onclick="loadAllData()" title="刷新数据">🔄</button>
+
+    <script>
+        const API_BASE = '/api/v1';
+        let currentOrders = [];
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const data = result.data;
+                    document.getElementById('todayOrders').textContent = data.todayOrders || 0;
+                    document.getElementById('todayRevenue').textContent = `¥${(data.todayRevenue || 0).toFixed(2)}`;
+                    document.getElementById('pendingOrders').textContent = data.pendingOrders || 0;
+                    document.getElementById('preparingOrders').textContent = data.preparingOrders || 0;
+                }
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+
+        async function loadOrders(status = '') {
+            try {
+                const url = status 
+                    ? `${API_BASE}/orders?status=${status}&limit=100`
+                    : `${API_BASE}/orders?limit=100`;
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentOrders = result.data.orders || [];
+                    renderOrders(currentOrders);
+                }
+            } catch (error) {
+                console.error('加载订单失败:', error);
+                document.getElementById('ordersBody').innerHTML = 
+                    '<tr><td colspan="6" class="no-data">加载失败，请刷新重试</td></tr>';
+            }
+        }
+
+        function renderOrders(orders) {
+            const tbody = document.getElementById('ordersBody');
+            
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">暂无订单</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => {
+                const items = order.items?.map(i => `${i.name} x${i.quantity}`).join(', ') || '';
+                const statusMap = {
+                    'pending': { text: '待确认', class: 'status-pending' },
+                    'confirmed': { text: '已确认', class: 'status-confirmed' },
+                    'preparing': { text: '制作中', class: 'status-preparing' },
+                    'ready': { text: '待取餐', class: 'status-ready' },
+                    'completed': { text: '已完成', class: 'status-completed' },
+                    'cancelled': { text: '已取消', class: 'status-cancelled' }
+                };
+                const status = statusMap[order.status] || { text: order.status, class: '' };
+                
+                return `
+                    <tr>
+                        <td><strong>${order.orderId}</strong></td>
+                        <td>${new Date(order.createdAt).toLocaleString('zh-CN')}</td>
+                        <td title="${items}">${items.substring(0, 30)}${items.length > 30 ? '...' : ''}</td>
+                        <td><strong>¥${order.totalAmount.toFixed(2)}</strong></td>
+                        <td><span class="status-badge ${status.class}">${status.text}</span></td>
+                        <td>
+                            ${getActionButtons(order)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getActionButtons(order) {
+            let buttons = '';
+            
+            if (order.status === 'pending') {
+                buttons += `<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${order.orderId}', 'confirmed')">接单</button> `;
+                buttons += `<button class="btn btn-secondary btn-sm" onclick="updateOrderStatus('${order.orderId}', 'cancelled')">取消</button> `;
+            } else if (order.status === 'confirmed') {
+                buttons += `<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${order.orderId}', 'preparing')">开始制作</button> `;
+            } else if (order.status === 'preparing') {
+                buttons += `<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${order.orderId}', 'ready')">制作完成</button> `;
+            } else if (order.status === 'ready') {
+                buttons += `<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${order.orderId}', 'completed')">完成取餐</button> `;
+            }
+            
+            buttons += `<button class="btn btn-secondary btn-sm" onclick="printOrder('${order.orderId}')">打印</button>`;
+            
+            return buttons;
+        }
+
+        async function updateOrderStatus(orderId, status) {
+            if (!confirm(`确认将订单 ${orderId} 状态更新为 ${status}？`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/order/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('订单状态已更新');
+                    loadOrders();
+                    loadStats();
+                } else {
+                    alert('更新失败: ' + result.message);
+                }
+            } catch (error) {
+                alert('更新失败: ' + error.message);
+            }
+        }
+
+        async function printOrder(orderId) {
+            if (!confirm(`确认打印订单 ${orderId}？`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/order/${orderId}/print`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('打印任务已提交');
+                } else {
+                    alert('打印失败: ' + result.message);
+                }
+            } catch (error) {
+                alert('打印失败: ' + error.message);
+            }
+        }
+
+        async function loadDishes() {
+            try {
+                const response = await fetch(`${API_BASE}/dishes`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const dishes = result.data || [];
+                    document.getElementById('totalDishes').textContent = dishes.length;
+                    
+                    document.getElementById('dishesBody').innerHTML = dishes.slice(0, 50).map(dish => {
+                        const tags = [];
+                        if (dish.isSignature) tags.push('🏆招牌');
+                        if (dish.isRecommend) tags.push('⭐推荐');
+                        
+                        return `
+                            <tr>
+                                <td>${dish.id}</td>
+                                <td>${dish.name}</td>
+                                <td>${dish.category}</td>
+                                <td>¥${dish.price}</td>
+                                <td>${tags.join(' ')}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error('加载菜品失败:', error);
+            }
+        }
+
+        function searchOrders() {
+            const searchId = document.getElementById('searchOrderId').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value;
+            
+            let filtered = currentOrders;
+            
+            if (searchId) {
+                filtered = filtered.filter(o => o.orderId.toLowerCase().includes(searchId));
+            }
+            
+            if (status) {
+                filtered = filtered.filter(o => o.status === status);
+            }
+            
+            renderOrders(filtered);
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        async function loadAllData() {
+            await loadStats();
+            await loadOrders();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
+            loadDishes();
+        });
+    </script>
+</body>
+</html>

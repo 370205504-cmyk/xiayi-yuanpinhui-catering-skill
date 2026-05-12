@@ -1,0 +1,405 @@
+{
+  "name": "xiayi-youpinhui-foodie-skill",
+  "version": "3.1.0",
+  "description": "夏邑缘品荟创味菜官方AI点餐服务，支持语音点餐、文字聊天、美团排队取号",
+  "author": "石中伟",
+  "license": "MIT",
+  "keywords": [
+    "restaurant",
+    "ordering",
+    "ai-agent",
+    "voice-assistant",
+    "mcp",
+    "alexa-skill"
+  ],
+  "mcp": {
+    "protocol_version": "2024-11-05",
+    "endpoint": "https://mcp.xiayi-youpinhui.com",
+    "transport": "http",
+    "authentication": {
+      "type": "bearer",
+      "header": "Authorization"
+    },
+    "tools": [
+      {
+        "name": "text_chat",
+        "description": "自然语言对话处理所有点餐和查询请求，包括：查看菜单、推荐菜品、添加购物车、提交订单、查询订单、取消订单等",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "用户输入的自然语言，如'给我推荐招牌菜'、'来一份糖醋里脊'、'查看购物车'"
+            },
+            "user_id": {
+              "type": "string",
+              "description": "用户唯一ID，用于识别用户身份、购物车和订单"
+            },
+            "session_id": {
+              "type": "string",
+              "description": "会话ID，用于多轮对话上下文"
+            }
+          },
+          "required": ["query", "user_id"]
+        },
+        "examples": [
+          {"query": "给我推荐几道招牌菜", "user_id": "user_001"},
+          {"query": "来一份招牌大鱼头泡饭，少辣", "user_id": "user_001"},
+          {"query": "查看我的购物车", "user_id": "user_001"},
+          {"query": "下单", "user_id": "user_001"}
+        ]
+      },
+      {
+        "name": "get_menu",
+        "description": "获取完整菜单或指定分类的菜品列表",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "description": "菜品分类：招牌菜、特色硬菜、宴请首选、餐前开胃、家常炒菜、汤羹主食",
+              "enum": ["招牌菜", "特色硬菜", "宴请首选", "餐前开胃", "家常炒菜", "汤羹主食", "全部"]
+            }
+          }
+        },
+        "examples": [
+          {"category": "招牌菜"},
+          {"category": "全部"}
+        ]
+      },
+      {
+        "name": "get_dish_detail",
+        "description": "获取指定菜品的详细信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "dish_id": {
+              "type": "string",
+              "description": "菜品ID"
+            }
+          },
+          "required": ["dish_id"]
+        }
+      },
+      {
+        "name": "recommend_dishes",
+        "description": "根据用户偏好推荐菜品",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "preferences": {
+              "type": "object",
+              "properties": {
+                "spicy_level": {
+                  "type": "number",
+                  "description": "辣度偏好：0不辣、1微辣、2中辣、3特辣"
+                },
+                "price_range": {
+                  "type": "string",
+                  "description": "价格区间：low(30以下)、medium(30-80)、high(80以上)"
+                },
+                "people_count": {
+                  "type": "number",
+                  "description": "用餐人数"
+                }
+              }
+            }
+          },
+          "required": ["user_id"]
+        }
+      },
+      {
+        "name": "add_to_cart",
+        "description": "添加菜品到购物车",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "dish_id": {
+              "type": "string",
+              "description": "菜品ID"
+            },
+            "quantity": {
+              "type": "number",
+              "description": "数量，默认1"
+            },
+            "remarks": {
+              "type": "string",
+              "description": "备注，如'少辣'、'不要葱'、'打包'"
+            }
+          },
+          "required": ["user_id", "dish_id"]
+        },
+        "examples": [
+          {"user_id": "user_001", "dish_id": "1", "quantity": 1, "remarks": "少辣"},
+          {"user_id": "user_001", "dish_id": "2", "quantity": 2}
+        ]
+      },
+      {
+        "name": "remove_from_cart",
+        "description": "从购物车移除菜品",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "dish_id": {
+              "type": "string",
+              "description": "菜品ID"
+            }
+          },
+          "required": ["user_id", "dish_id"]
+        }
+      },
+      {
+        "name": "get_cart",
+        "description": "获取用户购物车内容",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            }
+          },
+          "required": ["user_id"]
+        }
+      },
+      {
+        "name": "clear_cart",
+        "description": "清空用户购物车",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            }
+          },
+          "required": ["user_id"]
+        }
+      },
+      {
+        "name": "create_order",
+        "description": "提交订单",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "order_type": {
+              "type": "string",
+              "description": "订单类型：dine_in(堂食)、takeout(外带)、delivery(外卖)",
+              "enum": ["dine_in", "takeout", "delivery"]
+            },
+            "table_no": {
+              "type": "string",
+              "description": "桌号（堂食时填写）"
+            },
+            "remarks": {
+              "type": "string",
+              "description": "订单备注"
+            },
+            "address": {
+              "type": "string",
+              "description": "送餐地址（外卖时填写）"
+            },
+            "contact_phone": {
+              "type": "string",
+              "description": "联系电话"
+            }
+          },
+          "required": ["user_id", "order_type"]
+        }
+      },
+      {
+        "name": "get_orders",
+        "description": "获取用户订单列表",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "status": {
+              "type": "string",
+              "description": "订单状态筛选",
+              "enum": ["pending", "confirmed", "preparing", "ready", "completed", "cancelled"]
+            },
+            "limit": {
+              "type": "number",
+              "description": "返回数量限制，默认10"
+            }
+          },
+          "required": ["user_id"]
+        }
+      },
+      {
+        "name": "get_order_detail",
+        "description": "获取订单详情",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            }
+          },
+          "required": ["order_no"]
+        }
+      },
+      {
+        "name": "cancel_order",
+        "description": "取消订单（仅在待确认或已接单状态时可取消）",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "reason": {
+              "type": "string",
+              "description": "取消原因"
+            }
+          },
+          "required": ["user_id", "order_no"]
+        }
+      },
+      {
+        "name": "queue_take",
+        "description": "美团排队取号",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID"
+            },
+            "table_type": {
+              "type": "string",
+              "description": "桌型",
+              "enum": ["small", "medium", "large", "包间"]
+            },
+            "people": {
+              "type": "number",
+              "description": "用餐人数"
+            },
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            }
+          },
+          "required": ["store_id", "table_type", "people"]
+        },
+        "examples": [
+          {"store_id": "store001", "table_type": "medium", "people": 4, "user_id": "user_001"}
+        ]
+      },
+      {
+        "name": "query_queue",
+        "description": "查询排队进度",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "queue_id": {
+              "type": "string",
+              "description": "排队ID"
+            }
+          },
+          "required": ["queue_id"]
+        },
+        "examples": [
+          {"queue_id": "QUEUE001"}
+        ]
+      },
+      {
+        "name": "cancel_queue",
+        "description": "取消排队",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "queue_id": {
+              "type": "string",
+              "description": "排队ID"
+            }
+          },
+          "required": ["queue_id"]
+        }
+      },
+      {
+        "name": "get_store_info",
+        "description": "获取门店信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {"store_id": "store001"},
+          {}
+        ]
+      },
+      {
+        "name": "get_wifi_info",
+        "description": "获取WiFi信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID"
+            }
+          }
+        }
+      }
+    ],
+    "resources": [
+      {
+        "name": "menu",
+        "description": "餐厅完整菜单",
+        "uri": "restaurant://menu"
+      },
+      {
+        "name": "store_info",
+        "description": "门店基本信息",
+        "uri": "restaurant://store/{store_id}"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill.git"
+  },
+  "endpoints": {
+    "api": "https://mcp.xiayi-youpinhui.com/api/v1",
+    "admin": "https://mcp.xiayi-youpinhui.com/admin",
+    "customer": "https://mcp.xiayi-youpinhui.com/mobile"
+  },
+  "deployment": {
+    "platform": "tencent-cloud-scf",
+    "runtime": "Node.js 18.x",
+    "memory": 512,
+    "timeout": 30
+  }
+}
