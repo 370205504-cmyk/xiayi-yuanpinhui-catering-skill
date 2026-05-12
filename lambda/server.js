@@ -30,6 +30,8 @@ const servicesRoutes = require('./routes/services');
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection } = require('./middleware/security');
 const { requireSignature, sqlInjectionProtection } = require('./middleware/signature');
 const { IdempotencyService, CSRFProtection } = require('./middleware/securityEnhancements');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+const { requireTenant, tenantDataFilter } = require('./services/tenantService');
 
 const app = express();
 
@@ -128,7 +130,7 @@ app.get('/api/v1/health', async (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    version: '3.4.0',
+    version: '3.6.0',
     services: {
       database: 'unknown',
       redis: 'unknown',
@@ -186,69 +188,9 @@ app.post('/api/v1/restore', async (req, res) => {
   }
 });
 
-app.use((req, res, next) => {
-  if (req.path.startsWith('/api/')) {
-    res.status(404).json({ success: false, code: 1004, message: '接口不存在' });
-  } else {
-    res.status(404).sendFile(path.join(__dirname, 'web', '404.html'));
-  }
-});
+app.use(notFoundHandler);
 
-app.use((err, req, res, next) => {
-  const DataSanitizer = require('./services/dataSanitizer');
-  logger.error('错误', { error: err.message, stack: err.stack, timestamp: new Date().toISOString() });
-
-  if (err.type === 'entity.parse.failed') {
-    return res.status(400).json({ success: false, code: 1001, message: '无效的JSON数据' });
-  }
-
-  if (process.env.NODE_ENV === 'production') {
-    if (req.path.startsWith('/api/')) {
-      res.status(500).json({ success: false, code: 1000, message: '服务器内部错误' });
-    } else {
-      res.status(500).sendFile(path.join(__dirname, 'web', '500.html'));
-    }
-  } else {
-    res.status(500).json({ success: false, code: 1000, message: err.message, stack: err.stack });
-  }
-});
-
-cron.schedule('0 3 * * *', async () => {
-  logger.info('开始执行定时备份...');
-  try {
-    await backupService.backupDatabase();
-    logger.info('定时备份完成');
-  } catch (error) {
-    logger.error('定时备份失败:', error);
-  }
-});
-
-cron.schedule('0 0 * * *', async () => {
-  logger.info('检查微信支付证书有效期...');
-  try {
-    const certificateExpiry = process.env.WECHAT_CERT_EXPIRY;
-    if (certificateExpiry) {
-      const expiryDate = new Date(certificateExpiry);
-      const daysRemaining = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
-      if (daysRemaining <= 30) {
-        logger.warn(`微信支付证书即将过期，剩余${daysRemaining}天`);
-      }
-    }
-  } catch (error) {
-    logger.error('检查证书有效期失败:', error);
-  }
-});
-
-cron.schedule('0 2 * * 0', async () => {
-  logger.info('开始执行数据库索引优化...');
-  try {
-    const { databaseMonitor } = require('./services/databaseMonitor');
-    await databaseMonitor.optimizeIndexes();
-    logger.info('数据库索引优化完成');
-  } catch (error) {
-    logger.error('数据库索引优化失败:', error);
-  }
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -306,67 +248,26 @@ async function startServer() {
 
     app.listen(PORT, HOST, () => {
       console.log('═══════════════════════════════════════════════════════════');
-      console.log('🍽️  夏邑缘品荟创味菜 - 智能餐饮服务系统 v3.5.2');
+      console.log('🍽️  夏邑缘品荟创味菜 - 智能餐饮服务系统 v3.6.0');
       console.log('═══════════════════════════════════════════════════════════');
-      console.log(`🚀 服务已启动: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
-      console.log(`📱 顾客端: http://localhost:${PORT}/`);
-      console.log(`📲 移动端: http://localhost:${PORT}/mobile`);
-      console.log(`⚙️  管理端: http://localhost:${PORT}/admin`);
-      console.log(`🔌 API基础: http://localhost:${PORT}/api/v1`);
-      console.log(`📖 API文档: http://localhost:${PORT}/api-docs`);
+      console.log(`🌐 服务地址: http://${HOST}:${PORT}`);
+      console.log(`📚 API文档: http://${HOST}:${PORT}/api/v1/health`);
+      console.log(`🔧 环境: ${process.env.NODE_ENV || 'development'}`);
       console.log('═══════════════════════════════════════════════════════════');
-      console.log('✅ 数据存储: MySQL + Redis缓存');
-      console.log('✅ 安全防护: JWT令牌吊销 + XSS + CSRF + 限流');
-      console.log('✅ 熔断器: 数据库/支付接口熔断降级');
-      console.log('✅ 系统监控: 磁盘/内存/CPU/连接池监控');
-      console.log('✅ 统一错误码: 标准化API响应');
-      console.log('✅ 会员系统: 积分/充值/优惠券');
-      console.log('✅ 支付功能: 微信支付/支付宝');
-      console.log('✅ 压缩优化: Gzip静态资源压缩');
-      console.log('✅ 灰度发布: PM2 Cluster + 内存阈值重启');
+      console.log('支持的MCP工具: 18个');
+      console.log('  - text_chat: 自然语言对话');
+      console.log('  - get_menu: 获取菜单');
+      console.log('  - add_to_cart: 添加购物车');
+      console.log('  - create_order: 创建订单');
+      console.log('  - queue_take: 排队取号');
+      console.log('  - ...更多工具请查看skill.json');
       console.log('═══════════════════════════════════════════════════════════');
-      logger.info('服务启动成功', { port: PORT, host: HOST, version: '3.4.0' });
     });
   } catch (error) {
-    logger.error('服务启动失败:', error);
-    console.error('服务启动失败:', error);
+    console.error('服务器启动失败:', error);
     process.exit(1);
   }
 }
-
-process.on('SIGTERM', async () => {
-  logger.info('收到SIGTERM信号，正在关闭服务...');
-  try {
-    const { diskMonitor } = require('./services/diskMonitor');
-    diskMonitor.stop();
-  } catch (e) {}
-  try {
-    const { systemMonitor } = require('./services/systemMonitor');
-    systemMonitor.stop();
-  } catch (e) {}
-  try {
-    const { databaseMonitor } = require('./services/databaseMonitor');
-    databaseMonitor.stop();
-  } catch (e) {}
-  await db.close();
-  process.exit(0);
-});
-
-process.on('uncaughtException', (error) => {
-  logger.error('未捕获的异常', { error: error.message, stack: error.stack, name: error.name, timestamp: new Date().toISOString() });
-  if (error.message && error.message.includes('printer')) {
-    logger.warn('打印机异常，但服务继续运行');
-    return;
-  }
-  if (process.env.NODE_ENV === 'production') {
-    console.error('发生严重错误，服务将在重启后恢复');
-    process.exit(1);
-  }
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('未处理的Promise拒绝', { reason: String(reason), timestamp: new Date().toISOString() });
-});
 
 startServer();
 
