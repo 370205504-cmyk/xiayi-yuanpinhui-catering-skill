@@ -8,7 +8,7 @@ USE xiayi_restaurant;
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id VARCHAR(64) UNIQUE NOT NULL COMMENT '用户唯一标识',
-  phone VARCHAR(20) UNIQUE COMMENT '手机号',
+  phone VARCHAR(100) COMMENT '手机号(加密存储)',
   nickname VARCHAR(50) COMMENT '昵称',
   avatar VARCHAR(255) COMMENT '头像URL',
   openid VARCHAR(64) COMMENT '微信openid',
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- 管理员用户（密码: admin123）
 INSERT INTO users (user_id, phone, nickname, role) VALUES
-('admin001', '13800138000', '系统管理员', 'admin');
+('admin001', 'E2A9B5F6D4C3E2A1B5F6D4C3E2A1B5F6:E2A9B5F6D4C3E2A1B5F6D4C3E2A1B5F6', '系统管理员', 'admin');
 
 -- 菜品分类表
 CREATE TABLE IF NOT EXISTS dish_categories (
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS dishes (
 -- 订单表
 CREATE TABLE IF NOT EXISTS orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  order_no VARCHAR(64) UNIQUE NOT NULL COMMENT '订单号',
+  order_no VARCHAR(64) UNIQUE NOT NULL COMMENT '订单号(UUID)',
   request_id VARCHAR(64) UNIQUE COMMENT '幂等请求ID',
   user_id INT COMMENT '用户ID',
   type ENUM('dine_in', 'takeout', 'delivery') DEFAULT 'dine_in' COMMENT '订单类型',
@@ -90,13 +90,13 @@ CREATE TABLE IF NOT EXISTS orders (
   guest_count INT DEFAULT 1 COMMENT '用餐人数',
   remarks TEXT COMMENT '备注(限200字)',
   address TEXT COMMENT '配送地址',
-  contact_phone VARCHAR(20) COMMENT '联系电话',
+  contact_phone VARCHAR(100) COMMENT '联系电话(加密)',
   pay_expire_at DATETIME NOT NULL DEFAULT (DATE_ADD(NOW(), INTERVAL 15 MINUTE)) COMMENT '支付过期时间',
   paid_at DATETIME NULL COMMENT '支付时间',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_user (user_id),
-  INDEX idx_status (status),
+  INDEX idx_user_created (user_id, created_at),
+  INDEX idx_status_created (status, created_at),
   INDEX idx_order_no (order_no),
   INDEX idx_request_id (request_id),
   INDEX idx_created (created_at),
@@ -287,7 +287,7 @@ CREATE TABLE IF NOT EXISTS orders_archive (
   guest_count INT DEFAULT 1 COMMENT '用餐人数',
   remarks TEXT COMMENT '备注',
   address TEXT COMMENT '配送地址',
-  contact_phone VARCHAR(20) COMMENT '联系电话',
+  contact_phone VARCHAR(100) COMMENT '联系电话',
   pay_expire_at DATETIME COMMENT '支付过期时间',
   paid_at DATETIME NULL COMMENT '支付时间',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -298,9 +298,30 @@ CREATE TABLE IF NOT EXISTS orders_archive (
   INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 如果是已存在的数据库，执行以下ALTER语句添加新字段
+-- 退款记录表
+CREATE TABLE IF NOT EXISTS refunds (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL COMMENT '订单ID',
+  refund_no VARCHAR(64) UNIQUE NOT NULL COMMENT '退款单号',
+  amount DECIMAL(10,2) NOT NULL COMMENT '退款金额',
+  reason VARCHAR(255) COMMENT '退款原因',
+  status ENUM('pending', 'success', 'fail') DEFAULT 'pending' COMMENT '退款状态',
+  fail_reason VARCHAR(255) COMMENT '失败原因',
+  refund_time DATETIME NULL COMMENT '退款时间',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_order_id (order_id),
+  INDEX idx_refund_no (refund_no),
+  INDEX idx_status (status),
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 如果是已存在的数据库，执行以下ALTER语句添加新字段和索引
 -- ALTER TABLE orders ADD COLUMN pay_expire_at DATETIME NOT NULL DEFAULT (DATE_ADD(NOW(), INTERVAL 15 MINUTE)) COMMENT '支付过期时间' AFTER remarks;
 -- ALTER TABLE orders ADD COLUMN paid_at DATETIME NULL COMMENT '支付时间' AFTER pay_expire_at;
 -- ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled', 'expired') DEFAULT 'pending';
+-- ALTER TABLE orders ADD INDEX idx_user_created (user_id, created_at);
+-- ALTER TABLE orders ADD INDEX idx_status_created (status, created_at);
 -- ALTER TABLE orders ADD INDEX idx_pay_expire (pay_expire_at);
 -- ALTER TABLE carts ADD INDEX idx_updated (updated_at);
+-- ALTER TABLE users MODIFY COLUMN phone VARCHAR(100) COMMENT '手机号(加密存储)';

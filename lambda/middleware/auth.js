@@ -1,4 +1,5 @@
 const authService = require('../services/authService');
+const { v4: uuidv4 } = require('uuid');
 
 const optionalAuth = async (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -52,4 +53,19 @@ const requireAdmin = async (req, res, next) => {
   next();
 };
 
-module.exports = { optionalAuth, requireAuth, requireAdmin };
+const regenerateSession = async (req, res, next) => {
+  if (req.session) {
+    const oldSessionId = req.session.id;
+    req.session.regenerate((err) => {
+      if (err) {
+        return next(err);
+      }
+      req.session.id = uuidv4();
+      next();
+    });
+  } else {
+    next();
+  }
+};
+
+module.exports = { optionalAuth, requireAuth, requireAdmin, regenerateSession };

@@ -1,0 +1,53 @@
+const crypto = require('crypto');
+
+const algorithm = 'aes-256-cbc';
+const key = Buffer.from(process.env.ENCRYPTION_KEY || 'default-encryption-key-must-be-32-bytes!', 'utf8');
+
+if (key.length !== 32) {
+  throw new Error('ENCRYPTION_KEY must be exactly 32 bytes');
+}
+
+function encrypt(text) {
+  if (!text) return '';
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  let encrypted = cipher.update(text, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return iv.toString('hex') + ':' + encrypted;
+}
+
+function decrypt(encryptedText) {
+  if (!encryptedText) return '';
+  const [ivHex, encryptedHex] = encryptedText.split(':');
+  if (!ivHex || !encryptedHex) return '';
+  const iv = Buffer.from(ivHex, 'hex');
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
+function encryptPhone(phone) {
+  return encrypt(phone);
+}
+
+function decryptPhone(encryptedPhone) {
+  return decrypt(encryptedPhone);
+}
+
+function maskPhone(phone) {
+  if (!phone) return '';
+  const decrypted = decryptPhone(phone);
+  if (decrypted.length === 11) {
+    return decrypted.substring(0, 3) + '****' + decrypted.substring(7);
+  }
+  return '****';
+}
+
+module.exports = {
+  encrypt,
+  decrypt,
+  encryptPhone,
+  decryptPhone,
+  maskPhone
+};

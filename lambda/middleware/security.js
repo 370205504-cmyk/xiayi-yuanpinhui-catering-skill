@@ -21,13 +21,26 @@ const apiLimiter = rateLimit({
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
-  message: { success: false, message: '登录尝试次数过多，请15分钟后重试' }
+  message: { success: false, message: '登录尝试次数过多，请15分钟后重试' },
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
 const paymentLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 5,
-  message: { success: false, message: '支付请求过于频繁' }
+  message: { success: false, message: '支付请求过于频繁' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const orderLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  message: { success: false, message: '下单过于频繁，请稍后再试' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.userId || req.ip
 });
 
 const helmetConfig = helmet({
@@ -44,7 +57,9 @@ const helmetConfig = helmet({
       frameSrc: ["'none'"]
     }
   },
-  crossOriginEmbedderPolicy: false
+  crossOriginEmbedderPolicy: false,
+  hsts: { maxAge: 31536000, includeSubDomains: true },
+  frameguard: { action: 'deny' }
 });
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -162,10 +177,30 @@ const csrfProtection = (req, res, next) => {
   next();
 };
 
+const validatePasswordStrength = (password) => {
+  if (!password || password.length < 8) {
+    return { valid: false, message: '密码长度至少8位' };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { valid: false, message: '密码需包含大写字母' };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { valid: false, message: '密码需包含小写字母' };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: '密码需包含数字' };
+  }
+  if (!/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) {
+    return { valid: false, message: '密码需包含特殊字符' };
+  }
+  return { valid: true, message: '密码强度符合要求' };
+};
+
 module.exports = {
   apiLimiter,
   authLimiter,
   paymentLimiter,
+  orderLimiter,
   helmetConfig,
   corsConfig,
   validate,
@@ -174,5 +209,6 @@ module.exports = {
   xssProtection,
   csrfProtection,
   addToBlacklist,
-  removeFromBlacklist
+  removeFromBlacklist,
+  validatePasswordStrength
 };

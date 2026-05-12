@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const cron = require('node-cron');
 const winston = require('winston');
+const compression = require('compression');
 const db = require('./database/db');
 const backupService = require('./database/backup');
 
@@ -22,6 +23,7 @@ const apiRoutes = require('./routes/api');
 const agentRoutes = require('./routes/agent');
 const adminRoutes = require('./routes/admin');
 const monitorRoutes = require('./routes/monitor');
+const exportRoutes = require('./routes/export');
 
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection } = require('./middleware/security');
 
@@ -42,6 +44,7 @@ const logger = winston.createLogger({
   ]
 });
 
+app.use(compression());
 app.use(helmetConfig);
 app.use(corsConfig);
 app.use(ipProtection);
@@ -81,6 +84,7 @@ app.use('/api/v1', apiLimiter, apiRoutes);
 app.use('/agent', agentRoutes);
 app.use('/admin', adminRoutes);
 app.use('/monitor', monitorRoutes);
+app.use('/api/v1/export', exportRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'web', 'index.html'));
@@ -99,10 +103,11 @@ app.get('/api/v1/health', async (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    version: '3.0.0',
+    version: '3.3.0',
     services: {
       database: 'unknown',
-      redis: 'unknown'
+      redis: 'unknown',
+      circuitBreaker: 'closed'
     }
   };
 
@@ -166,10 +171,12 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
   const DataSanitizer = require('./services/dataSanitizer');
-  logger.error('错误', { error: err.message, stack: err.stack });
+  logger.error('错误', { error: err.message, stack: err.stack, timestamp: new Date().toISOString() });
+  
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ success: false, message: '无效的JSON数据' });
   }
+  
   if (process.env.NODE_ENV === 'production') {
     if (req.path.startsWith('/api/')) {
       res.status(500).json({ success: false, message: '服务器内部错误' });
@@ -191,11 +198,30 @@ cron.schedule('0 3 * * *', async () => {
   }
 });
 
+cron.schedule('0 0 * * *', async () => {
+  logger.info('检查微信支付证书有效期...');
+  try {
+    const certificateExpiry = process.env.WECHAT_CERT_EXPIRY;
+    if (certificateExpiry) {
+      const expiryDate = new Date(certificateExpiry);
+      const daysRemaining = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+      if (daysRemaining <= 30) {
+        logger.warn(`微信支付证书即将过期，剩余${daysRemaining}天`);
+      }
+    }
+  } catch (error) {
+    logger.error('检查证书有效期失败:', error);
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 async function startServer() {
   try {
+    const circuitBreaker = require('./services/circuitBreaker');
+    logger.info('熔断器服务已初始化');
+
     if (process.env.DB_HOST) {
       await db.initialize();
       logger.info('数据库连接成功');
@@ -205,7 +231,7 @@ async function startServer() {
 
     app.listen(PORT, HOST, () => {
       console.log('═══════════════════════════════════════════════════════════');
-      console.log('🍽️  夏邑缘品荟创味菜 - 智能餐饮服务系统 v3.0.0');
+      console.log('🍽️  夏邑缘品荟创味菜 - 智能餐饮服务系统 v3.3.0');
       console.log('═══════════════════════════════════════════════════════════');
       console.log(`🚀 服务已启动: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
       console.log(`📱 顾客端: http://localhost:${PORT}/`);
@@ -215,10 +241,12 @@ async function startServer() {
       console.log('═══════════════════════════════════════════════════════════');
       console.log('✅ 数据存储: MySQL + Redis缓存');
       console.log('✅ 安全防护: Helmet + CSRF + XSS + 限流');
+      console.log('✅ 熔断器: 数据库/支付接口熔断降级');
       console.log('✅ 会员系统: 积分/充值/优惠券');
       console.log('✅ 支付功能: 微信支付/支付宝');
+      console.log('✅ 压缩优化: Gzip静态资源压缩');
       console.log('═══════════════════════════════════════════════════════════');
-      logger.info('服务启动成功', { port: PORT, host: HOST });
+      logger.info('服务启动成功', { port: PORT, host: HOST, version: '3.3.0' });
     });
   } catch (error) {
     logger.error('服务启动失败:', error);
@@ -234,7 +262,7 @@ process.on('SIGTERM', async () => {
 });
 
 process.on('uncaughtException', (error) => {
-  logger.error('未捕获的异常', { error: error.message, stack: error.stack, name: error.name });
+  logger.error('未捕获的异常', { error: error.message, stack: error.stack, name: error.name, timestamp: new Date().toISOString() });
   if (error.message && error.message.includes('printer')) {
     logger.warn('打印机异常，但服务继续运行');
     return;
@@ -246,7 +274,7 @@ process.on('uncaughtException', (error) => {
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  logger.error('未处理的Promise拒绝', { reason: String(reason) });
+  logger.error('未处理的Promise拒绝', { reason: String(reason), timestamp: new Date().toISOString() });
 });
 
 startServer();
