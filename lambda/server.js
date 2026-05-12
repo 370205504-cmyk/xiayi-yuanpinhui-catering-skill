@@ -3,10 +3,11 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const cron = require('node-cron');
-const winston = require('winston');
 const compression = require('compression');
 const db = require('./database/db');
 const backupService = require('./database/backup');
+const logger = require('./utils/logger');
+const errorHandler = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/auth');
 const wechatRoutes = require('./routes/wechat');
@@ -30,21 +31,6 @@ const paymentConfigRoutes = require('./routes/paymentConfig');
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection } = require('./middleware/security');
 
 const app = express();
-
-const logsDir = path.join(__dirname, 'logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
-}
-
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
-  transports: [
-    new winston.transports.File({ filename: 'logs/access.log' }),
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.Console()
-  ]
-});
 
 app.use(compression());
 app.use(helmetConfig);
@@ -180,24 +166,7 @@ app.use((req, res, next) => {
   }
 });
 
-app.use((err, req, res, next) => {
-  const DataSanitizer = require('./services/dataSanitizer');
-  logger.error('错误', { error: err.message, stack: err.stack, timestamp: new Date().toISOString() });
-
-  if (err.type === 'entity.parse.failed') {
-    return res.status(400).json({ success: false, code: 1001, message: '无效的JSON数据' });
-  }
-
-  if (process.env.NODE_ENV === 'production') {
-    if (req.path.startsWith('/api/')) {
-      res.status(500).json({ success: false, code: 1000, message: '服务器内部错误' });
-    } else {
-      res.status(500).sendFile(path.join(__dirname, 'web', '500.html'));
-    }
-  } else {
-    res.status(500).json({ success: false, code: 1000, message: err.message, stack: err.stack });
-  }
-});
+app.use(errorHandler);
 
 cron.schedule('0 3 * * *', async () => {
   logger.info('开始执行定时备份...');

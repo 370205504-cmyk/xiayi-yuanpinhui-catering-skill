@@ -4,7 +4,7 @@
 
 ## 基础信息
 
-- **Base URL**: `https://mcp.xiayi-youpinhui.com/api/v1`
+- **Base URL**: `https://mcp.xiayi-yuanpinhui.com/api/v1`
 - **认证方式**: Bearer Token (JWT)
 - **Content-Type**: `application/json`
 

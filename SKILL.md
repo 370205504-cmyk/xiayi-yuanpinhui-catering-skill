@@ -9,8 +9,8 @@
 - **版本**: 3.1.0
 - **作者**: 石中伟
 - **许可证**: MIT
-- **仓库**: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill
-- **MCP端点**: https://mcp.xiayi-youpinhui.com
+- **仓库**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill
+- **MCP端点**: https://mcp.xiayi-yuanpinhui.com
 
 ## 触发词
 
@@ -234,5 +234,5 @@ AI: 门店地址：夏邑县孔祖大道南段188号
 ## 联系方式
 
 - **开发者**: 石中伟
-- **GitHub**: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill
-- **问题反馈**: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill/issues
+- **GitHub**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill
+- **问题反馈**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill/issues

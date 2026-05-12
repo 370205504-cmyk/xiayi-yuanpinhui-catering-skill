@@ -25,13 +25,13 @@ class SecureAuthService {
 
     const token = jwt.sign(payload, this.secretKey, {
       expiresIn: this.tokenExpiry,
-      issuer: 'xiayi-youpinhui'
+      issuer: 'xiayi-yuanpinhui'
     });
 
     const refreshToken = jwt.sign(
       { userId, type: 'refresh' },
       this.secretKey,
-      { expiresIn: '30d', issuer: 'xiayi-youpinhui' }
+      { expiresIn: '30d', issuer: 'xiayi-yuanpinhui' }
     );
 
     logger.info('Token生成', { userId, role });
@@ -42,7 +42,7 @@ class SecureAuthService {
   verifyToken(token) {
     try {
       const decoded = jwt.verify(token, this.secretKey, {
-        issuer: 'xiayi-youpinhui'
+        issuer: 'xiayi-yuanpinhui'
       });
       return { valid: true, decoded };
     } catch (error) {
@@ -59,7 +59,7 @@ class SecureAuthService {
   refreshAccessToken(refreshToken) {
     try {
       const decoded = jwt.verify(refreshToken, this.secretKey, {
-        issuer: 'xiayi-youpinhui'
+        issuer: 'xiayi-yuanpinhui'
       });
 
       if (decoded.type !== 'refresh') {

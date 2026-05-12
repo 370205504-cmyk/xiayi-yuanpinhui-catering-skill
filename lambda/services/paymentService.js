@@ -1,14 +1,12 @@
 const axios = require('axios');
 const crypto = require('crypto');
 const db = require('../database/db');
-const winston = require('winston');
+const logger = require('../utils/logger');
 
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
-  transports: [new winston.transports.File({ filename: 'logs/payment.log' })]
-});
-
+/**
+ * 支付服务类
+ * 负责处理微信支付和支付宝相关的支付逻辑
+ */
 class PaymentService {
   constructor() {
     this.wechatConfig = {
@@ -25,8 +23,19 @@ class PaymentService {
     };
   }
 
+  /**
+   * 创建微信支付订单
+   * @param {Object} order - 订单信息对象
+   * @param {string} order.orderNo - 订单号
+   * @param {number} order.finalAmount - 订单最终金额
+   * @returns {Promise<Object>} 包含支付二维码或错误信息的结果
+   */
   async createWechatPayOrder(order) {
     try {
+      logger.logPayment(order.orderNo, '开始创建微信支付订单', {
+        amount: order.finalAmount
+      });
+
       const nonceStr = crypto.randomBytes(16).toString('hex');
       const timeStamp = Math.floor(Date.now() / 1000).toString();
 
@@ -49,16 +58,32 @@ class PaymentService {
         }
       });
 
-      logger.info(`微信支付创建成功: ${order.orderNo}`);
+      logger.logPayment(order.orderNo, '微信支付订单创建成功', {
+        tradeNo: data.transaction_id
+      });
+
       return { success: true, codeUrl: data.code_url, tradeNo: data.transaction_id };
     } catch (error) {
-      logger.error('微信支付创建失败:', error.response?.data || error.message);
+      logger.logPayment(order.orderNo, '微信支付订单创建失败', {
+        error: error.response?.data || error.message
+      });
       return { success: false, message: '支付创建失败' };
     }
   }
 
+  /**
+   * 创建支付宝支付订单
+   * @param {Object} order - 订单信息对象
+   * @param {string} order.orderNo - 订单号
+   * @param {number} order.finalAmount - 订单最终金额
+   * @returns {Promise<Object>} 包含支付信息的结果
+   */
   async createAlipayOrder(order) {
     try {
+      logger.logPayment(order.orderNo, '开始创建支付宝支付订单', {
+        amount: order.finalAmount
+      });
+
       const bizContent = {
         out_trade_no: order.orderNo,
         total_amount: order.finalAmount.toString(),
@@ -66,20 +91,32 @@ class PaymentService {
         product_code: 'FAST_INSTANT_TRADE_PAY'
       };
 
-      logger.info(`支付宝支付创建成功: ${order.orderNo}`);
+      logger.logPayment(order.orderNo, '支付宝支付订单创建成功');
       return { success: true, tradeNo: order.orderNo };
     } catch (error) {
-      logger.error('支付宝支付创建失败:', error);
+      logger.logPayment(order.orderNo, '支付宝支付订单创建失败', {
+        error: error.message
+      });
       return { success: false, message: '支付创建失败' };
     }
   }
 
+  /**
+   * 处理微信支付回调
+   * @param {Object} req - Express 请求对象
+   * @returns {Promise<Object>} 处理结果
+   */
   async handleWechatCallback(req) {
     try {
       const body = req.body;
       const xmlData = typeof body === 'string' ? body : JSON.stringify(body);
 
       const { out_trade_no, transaction_id, trade_state, total, mch_id, sign } = body;
+
+      logger.logPayment(out_trade_no, '收到微信支付回调', {
+        tradeState: trade_state,
+        transactionId: transaction_id
+      });
 
       const order = await db.query('SELECT * FROM orders WHERE order_no = ?', [out_trade_no]);
 
@@ -119,6 +156,12 @@ class PaymentService {
     }
   }
 
+  /**
+   * 验证微信支付签名
+   * @param {Object} data - 回调数据
+   * @param {Object} order - 订单信息
+   * @returns {Promise<boolean>} 签名验证是否通过
+   */
   async verifyWechatPaySign(data, order) {
     try {
       const obj = { ...data };
@@ -144,6 +187,13 @@ class PaymentService {
     }
   }
 
+  /**
+   * 使用数据库锁更新支付状态（保证幂等性）
+   * @param {string} orderNo - 订单号
+   * @param {string} paymentNo - 第三方支付单号
+   * @param {Object} callbackData - 回调数据
+   * @returns {Promise<void>}
+   */
   async updatePaymentStatusWithLock(orderNo, paymentNo, callbackData) {
     await db.transaction(async (connection) => {
       const [order] = await connection.query(
@@ -168,10 +218,18 @@ class PaymentService {
         logger.error('打印失败，但订单已处理:', printError);
       }
 
-      logger.info(`支付回调处理成功: ${orderNo}`);
+      logger.logPayment(orderNo, '支付回调处理成功', {
+        paymentNo,
+        status: 'confirmed'
+      });
     });
   }
 
+  /**
+   * 查询订单支付状态
+   * @param {string} orderNo - 订单号
+   * @returns {Promise<Object>} 包含支付状态的结果
+   */
   async queryPaymentStatus(orderNo) {
     try {
       const orders = await db.query('SELECT * FROM orders WHERE order_no = ?', [orderNo]);
@@ -185,6 +243,13 @@ class PaymentService {
     }
   }
 
+  /**
+   * 申请退款
+   * @param {string} orderNo - 订单号
+   * @param {number} amount - 退款金额
+   * @param {string} reason - 退款原因
+   * @returns {Promise<Object>} 退款结果
+   */
   async refund(orderNo, amount, reason = '') {
     try {
       const orders = await db.query('SELECT * FROM orders WHERE order_no = ?', [orderNo]);
@@ -203,7 +268,11 @@ class PaymentService {
         );
       });
 
-      logger.info(`退款申请: ${orderNo}, 金额: ${amount}`);
+      logger.logPayment(orderNo, '退款申请已提交', {
+        amount,
+        reason
+      });
+
       return { success: true, message: '退款申请已提交' };
     } catch (error) {
       logger.error('退款失败:', error);

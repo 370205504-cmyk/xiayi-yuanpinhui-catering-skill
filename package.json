@@ -1,5 +1,5 @@
 {
-  "name": "xiayi-youpinhui-foodie-system",
+  "name": "xiayi-yuanpinhui-catering-system",
   "version": "3.0.0",
   "description": "夏邑缘品荟创味菜 - 智能餐饮管理系统 - 开发 by 石中伟",
   "main": "lambda/server.js",
@@ -12,7 +12,9 @@
     "db:init": "node lambda/database/migrate.js",
     "db:backup": "node lambda/database/backup.js",
     "lint": "eslint lambda/",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "keywords": [
     "restaurant",
@@ -58,9 +60,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill"
+    "url": "https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill"
   },
   "bugs": {
-    "url": "https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill/issues"
+    "url": "https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill/issues"
   }
 }

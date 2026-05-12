@@ -112,7 +112,7 @@
 
 ## 🔗 仓库与文档
 
-- **GitHub仓库**: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill
+- **GitHub仓库**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill
 - **部署方式**: PM2 Cluster + Docker
 - **文档目录**: /docs (待完善)
 
