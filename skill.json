@@ -1,16 +1,17 @@
 {
   "name": "xiayi-yuanpinhui-catering-skill",
-  "version": "3.6.0",
-  "description": "夏邑缘品荟智能餐饮服务系统 - MCP标准Agent Skill，支持语音点餐、文字聊天、AI Agent接入、多门店管理、多租户隔离",
+  "version": "4.0.0",
+  "description": "夏邑缘品荟智能餐饮服务系统 - MCP标准Agent Skill，支持语音点餐、AI Agent接入、多门店管理、多租户隔离、状态机控制、RBAC权限",
   "author": "石中伟",
   "license": "MIT",
   "keywords": [
     "restaurant",
     "ordering",
     "ai-agent",
-    "voice-assistant",
     "mcp",
-    "multi-tenant"
+    "multi-tenant",
+    "state-machine",
+    "rbac"
   ],
   "mcp": {
     "protocol_version": "2024-11-05",
@@ -47,59 +48,6 @@
       "5002": "退款失败"
     },
     "tools": [
-      {
-        "name": "text_chat",
-        "description": "自然语言对话处理所有点餐和查询请求。使用场景：用户用自然语言表达需求时调用，如'给我推荐招牌菜'、'来一份糖醋里脊'、'查看购物车'、'下单'等。系统会自动识别用户意图并调用相应工具。",
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "query": {
-              "type": "string",
-              "description": "用户输入的自然语言，如'给我推荐招牌菜'、'来一份糖醋里脊'、'查看购物车'",
-              "minLength": 1,
-              "maxLength": 500
-            },
-            "user_id": {
-              "type": "string",
-              "description": "用户唯一ID，用于识别用户身份、购物车和订单",
-              "pattern": "^[a-zA-Z0-9_-]+$"
-            },
-            "session_id": {
-              "type": "string",
-              "description": "会话ID，用于多轮对话上下文，首次对话可不传",
-              "pattern": "^[a-zA-Z0-9-]+$"
-            },
-            "tenant_id": {
-              "type": "string",
-              "description": "租户ID（商家ID），多租户场景必填"
-            }
-          },
-          "required": ["query", "user_id"]
-        },
-        "outputSchema": {
-          "type": "object",
-          "properties": {
-            "success": { "type": "boolean" },
-            "code": { "type": "number" },
-            "message": { "type": "string" },
-            "data": {
-              "type": "object",
-              "properties": {
-                "intent": { "type": "string", "description": "识别的意图" },
-                "response": { "type": "string", "description": "AI回复内容" },
-                "action_taken": { "type": "boolean", "description": "是否执行了操作" },
-                "session_id": { "type": "string", "description": "会话ID，用于后续对话" }
-              }
-            }
-          }
-        },
-        "examples": [
-          {"query": "给我推荐几道招牌菜", "user_id": "user_001"},
-          {"query": "来一份招牌大鱼头泡饭，少辣", "user_id": "user_001"},
-          {"query": "查看我的购物车", "user_id": "user_001"},
-          {"query": "下单", "user_id": "user_001"}
-        ]
-      },
       {
         "name": "get_menu",
         "description": "获取完整菜单或指定分类的菜品列表。使用场景：用户想浏览菜单或查看某个分类的菜品时调用。",
@@ -998,6 +946,137 @@
                   "end_date": { "type": "string" },
                   "discount": { "type": "number" }
                 }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "get_coupons",
+        "description": "获取可用优惠券列表。使用场景：用户想查看有哪些优惠券可以使用时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID，用于查询用户的专属优惠券"
+            },
+            "status": {
+              "type": "string",
+              "description": "优惠券状态",
+              "enum": ["available", "used", "expired", "all"],
+              "default": "available"
+            },
+            "tenant_id": {
+              "type": "string",
+              "description": "租户ID"
+            }
+          }
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "discount_type": { "type": "string" },
+                  "discount_value": { "type": "number" },
+                  "min_amount": { "type": "number" },
+                  "expire_date": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "get_member_info",
+        "description": "获取会员信息，包括积分、余额、等级等。使用场景：用户想查看自己的会员信息时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "tenant_id": {
+              "type": "string",
+              "description": "租户ID"
+            }
+          },
+          "required": ["user_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "member_id": { "type": "string" },
+                "level": { "type": "string" },
+                "points": { "type": "number" },
+                "balance": { "type": "number" },
+                "total_spent": { "type": "number" },
+                "order_count": { "type": "number" },
+                "join_date": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "apply_invoice",
+        "description": "申请开具发票。使用场景：用户需要发票报销时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "tax_number": {
+              "type": "string",
+              "description": "税号",
+              "pattern": "^[0-9A-Za-z]{15,20}$"
+            },
+            "company_name": {
+              "type": "string",
+              "description": "公司名称",
+              "minLength": 2,
+              "maxLength": 100
+            },
+            "email": {
+              "type": "string",
+              "description": "接收邮箱",
+              "format": "email"
+            },
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "tenant_id": {
+              "type": "string",
+              "description": "租户ID"
+            }
+          },
+          "required": ["order_no", "tax_number", "company_name"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "invoice_no": { "type": "string" },
+                "invoice_url": { "type": "string" }
               }
             }
           }

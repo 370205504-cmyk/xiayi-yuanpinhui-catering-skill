@@ -1,6 +1,6 @@
 {
   "name": "xiayi-yuanpinhui-catering-skill",
-  "version": "3.6.0",
+  "version": "4.0.0",
   "description": "夏邑缘品荟创味菜 - MCP标准Agent Skill，支持多租户、幂等性、状态机控制、RBAC权限",
   "main": "lambda/server.js",
   "scripts": {

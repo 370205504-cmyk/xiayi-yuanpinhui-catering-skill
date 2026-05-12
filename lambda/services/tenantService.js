@@ -147,53 +147,6 @@ class TenantService {
     }
   }
 
-  async regenerateApiKey(tenantId, keyId) {
-    const newApiKey = this.generateApiKey();
-    const newKeyHash = this.hashApiKey(newApiKey);
-    const newKeyPrefix = newApiKey.substring(0, 8);
-
-    await db.query(
-      `UPDATE tenant_api_keys SET key_hash = ?, key_prefix = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?`,
-      [newKeyHash, newKeyPrefix, keyId, tenantId]
-    );
-
-    const cacheKey = `${this.cachePrefix}tenant:${tenantId}`;
-    if (db.redis && db.redis.isOpen) {
-      await db.redis.del(cacheKey);
-    }
-
-    return { success: true, apiKey: newApiKey };
-  }
-
-  async revokeApiKey(tenantId, keyId) {
-    await db.query(
-      `UPDATE tenant_api_keys SET status = 'revoked', revoked_at = NOW() WHERE id = ? AND tenant_id = ?`,
-      [keyId, tenantId]
-    );
-
-    return { success: true };
-  }
-
-  async getTenantUsage(tenantId, period = 'day') {
-    const dateCondition = period === 'day'
-      ? 'DATE(created_at) = CURDATE()'
-      : period === 'month'
-      ? 'MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())'
-      : '1=1';
-
-    const [usage] = await db.query(
-      `SELECT 
-        COUNT(*) as total_requests,
-        COUNT(CASE WHEN status_code >= 400 THEN 1 END) as error_requests,
-        AVG(response_time) as avg_response_time
-       FROM tenant_usage_logs 
-       WHERE tenant_id = ? AND ${dateCondition}`,
-      [tenantId]
-    );
-
-    return usage[0];
-  }
-
   async logUsage(tenantId, endpoint, statusCode, responseTime) {
     try {
       await db.query(
@@ -254,42 +207,7 @@ const requireTenant = async (req, res, next) => {
   next();
 };
 
-const tenantDataFilter = (req, res, next) => {
-  if (!req.tenantId) {
-    return next();
-  }
-
-  const originalQuery = db.query;
-  
-  db.query = async function(sql, params = []) {
-    const upperSql = sql.toUpperCase();
-    
-    if (upperSql.includes('SELECT') || upperSql.includes('UPDATE') || upperSql.includes('DELETE')) {
-      if (!upperSql.includes('WHERE')) {
-        sql += ' WHERE tenant_id = ?';
-      } else {
-        sql = sql.replace(/WHERE/i, 'WHERE tenant_id = ? AND ');
-      }
-      
-      if (!Array.isArray(params)) {
-        params = [req.tenantId, ...params];
-      } else {
-        params = [req.tenantId, ...params];
-      }
-    }
-    
-    return originalQuery.call(this, sql, params);
-  };
-
-  res.on('finish', () => {
-    db.query = originalQuery;
-  });
-
-  next();
-};
-
 module.exports = {
   tenantService,
-  requireTenant,
-  tenantDataFilter
+  requireTenant
 };
