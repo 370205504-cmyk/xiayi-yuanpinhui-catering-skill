@@ -1,0 +1,792 @@
+{
+  "name": "zhixcantong",
+  "display_name": "智餐通",
+  "version": "4.0.0",
+  "description": "智餐通 - 智慧餐饮AI助手，基于MCP协议的专业餐饮服务技能。支持菜单查询、智能推荐、订单管理、排队取号、会员服务、支付结算等完整餐饮场景，助力餐饮企业数字化升级。",
+  "author": "石中伟",
+  "license": "MIT",
+  "tags": [
+    "餐饮",
+    "点餐",
+    "智能推荐",
+    "餐饮管理",
+    "AI助手",
+    "MCP"
+  ],
+  "icon": "🍽️",
+  "category": "生活服务",
+  "mcp": {
+    "protocol_version": "2024-11-05",
+    "endpoint": "https://api.xiayi-yuanpinhui.com",
+    "transport": "http",
+    "authentication": {
+      "type": "bearer",
+      "header": "Authorization",
+      "tenant_header": "X-Tenant-Id",
+      "api_key_header": "X-API-Key"
+    },
+    "error_codes": {
+      "1001": "参数错误或缺少必要参数",
+      "1002": "业务逻辑错误",
+      "1003": "权限不足",
+      "1004": "资源不存在",
+      "1005": "需要修改密码",
+      "1006": "请求过于频繁",
+      "1007": "签名验证失败",
+      "1008": "请求包含非法字符",
+      "1009": "幂等键无效或已使用",
+      "1010": "CSRF验证失败",
+      "2001": "订单不存在",
+      "2002": "菜品不存在",
+      "2003": "库存不足",
+      "2004": "订单状态不允许此操作",
+      "2005": "订单已支付",
+      "3001": "排队不存在",
+      "3002": "排队已取消",
+      "3003": "排队已叫号",
+      "4001": "租户不存在或已禁用",
+      "4002": "API Key无效或已过期",
+      "5001": "支付失败",
+      "5002": "退款失败"
+    },
+    "tools": [
+      {
+        "name": "get_menu",
+        "display_name": "获取菜单",
+        "description": "获取餐厅菜单，支持按分类筛选。使用场景：用户想浏览菜品时调用，如'看看有什么菜'、'来份菜单'。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "description": "菜品分类",
+              "enum": ["招牌菜", "特色硬菜", "宴请首选", "餐前开胃", "家常炒菜", "汤羹主食", "全部"]
+            },
+            "page": {
+              "type": "integer",
+              "description": "页码",
+              "minimum": 1,
+              "default": 1
+            },
+            "pageSize": {
+              "type": "integer",
+              "description": "每页数量",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          }
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "code": { "type": "number" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "name": { "type": "string" },
+                      "price": { "type": "number" },
+                      "description": { "type": "string" },
+                      "image": { "type": "string" },
+                      "category": { "type": "string" }
+                    }
+                  }
+                },
+                "total": { "type": "integer" },
+                "page": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "get_dish_detail",
+        "display_name": "获取菜品详情",
+        "description": "获取指定菜品的详细信息，包括配料、口味、营养信息等。使用场景：用户想了解某道菜的详细信息时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "dish_id": {
+              "type": "string",
+              "description": "菜品ID"
+            }
+          },
+          "required": ["dish_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "price": { "type": "number" },
+                "description": { "type": "string" },
+                "ingredients": { "type": "array", "items": { "type": "string" } },
+                "tastes": { "type": "array", "items": { "type": "string" } },
+                "nutritions": { "type": "object" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "recommend_dishes",
+        "display_name": "智能推荐菜品",
+        "description": "根据用户偏好、季节、节日等因素智能推荐菜品。使用场景：用户说'推荐几个菜'、'不知道吃什么，你推荐一下'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID，用于参考历史点餐记录"
+            },
+            "occasion": {
+              "type": "string",
+              "description": "用餐场景",
+              "enum": ["日常", "宴请", "聚会", "约会", "家庭", "商务"]
+            },
+            "budget": {
+              "type": "number",
+              "description": "预算金额"
+            },
+            "guests": {
+              "type": "integer",
+              "description": "用餐人数",
+              "minimum": 1
+            }
+          }
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "name": { "type": "string" },
+                  "price": { "type": "number" },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "add_to_cart",
+        "display_name": "添加到购物车",
+        "description": "将菜品添加到用户购物车，支持指定数量和口味备注。使用场景：用户确定要点某道菜时调用，如'来一份糖醋里脊'、'加两份米饭'。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户唯一标识"
+            },
+            "dish_id": {
+              "type": "string",
+              "description": "菜品ID"
+            },
+            "quantity": {
+              "type": "integer",
+              "description": "数量",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 1
+            },
+            "remarks": {
+              "type": "string",
+              "description": "口味备注，如'少辣'、'不要葱'"
+            }
+          },
+          "required": ["user_id", "dish_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "message": { "type": "string" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "cart_total": { "type": "number" },
+                "item_count": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "remove_from_cart",
+        "display_name": "从购物车移除",
+        "description": "从用户购物车中移除指定菜品。使用场景：用户想取消某个已点的菜时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "dish_id": {
+              "type": "string",
+              "description": "菜品ID"
+            }
+          },
+          "required": ["user_id", "dish_id"]
+        }
+      },
+      {
+        "name": "get_cart",
+        "display_name": "获取购物车",
+        "description": "获取用户当前购物车内容。使用场景：用户说'看看我点了什么'、'查一下购物车'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            }
+          },
+          "required": ["user_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "items": { "type": "array" },
+                "total": { "type": "number" },
+                "item_count": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "clear_cart",
+        "display_name": "清空购物车",
+        "description": "清空用户购物车。使用场景：用户想重新开始点餐时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            }
+          },
+          "required": ["user_id"]
+        }
+      },
+      {
+        "name": "create_order",
+        "display_name": "创建订单",
+        "description": "将购物车内容创建为正式订单，支持堂食/外卖/自提。使用场景：用户说'下单'、'结账'、'我要结账了'时调用。此接口具有幂等性，重复调用不会创建多个订单。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "type": {
+              "type": "string",
+              "description": "订单类型",
+              "enum": ["dine_in", "takeout", "self_pickup"],
+              "default": "dine_in"
+            },
+            "table_no": {
+              "type": "string",
+              "description": "桌号（堂食必填）"
+            },
+            "remarks": {
+              "type": "string",
+              "description": "订单备注"
+            },
+            "request_id": {
+              "type": "string",
+              "description": "幂等键，客户端生成的唯一ID，用于防止重复下单"
+            }
+          },
+          "required": ["user_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "order_no": { "type": "string" },
+                "total_amount": { "type": "number" },
+                "final_amount": { "type": "number" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "get_orders",
+        "display_name": "获取订单列表",
+        "description": "获取用户的订单历史列表。使用场景：用户说'看看我的订单'、'查一下历史订单'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "status": {
+              "type": "string",
+              "description": "订单状态筛选",
+              "enum": ["pending", "confirmed", "preparing", "ready", "completed", "cancelled", "all"]
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "page_size": {
+              "type": "integer",
+              "maximum": 50
+            }
+          },
+          "required": ["user_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "orders": { "type": "array" },
+                "total": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "get_order_detail",
+        "display_name": "获取订单详情",
+        "description": "获取指定订单的详细信息。使用场景：用户想查看某个订单的具体内容时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "user_id": {
+              "type": "string",
+              "description": "用户ID，用于验证订单归属"
+            }
+          },
+          "required": ["order_no", "user_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "order_no": { "type": "string" },
+                "status": { "type": "string" },
+                "items": { "type": "array" },
+                "total_amount": { "type": "number" },
+                "final_amount": { "type": "number" },
+                "created_at": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "cancel_order",
+        "display_name": "取消订单",
+        "description": "取消未支付的订单。使用场景：用户说'取消订单'、'不要了'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "reason": {
+              "type": "string",
+              "description": "取消原因"
+            }
+          },
+          "required": ["order_no", "user_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "message": { "type": "string" }
+          }
+        }
+      },
+      {
+        "name": "queue_take",
+        "display_name": "排队取号",
+        "description": "获取排队号。使用场景：用户到店需要排队时调用，如'取个号'、'我要排队'。此接口具有幂等性。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "guests": {
+              "type": "integer",
+              "description": "用餐人数",
+              "minimum": 1,
+              "maximum": 20
+            },
+            "phone": {
+              "type": "string",
+              "description": "手机号，用于接收叫号通知"
+            }
+          },
+          "required": ["user_id", "guests"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "queue_no": { "type": "string" },
+                "position": { "type": "integer" },
+                "estimated_wait": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "query_queue",
+        "display_name": "查询排队进度",
+        "description": "查询当前排队进度。使用场景：用户说'看看前面还有几个人'、'现在排到多少号了'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "queue_no": {
+              "type": "string",
+              "description": "排队号"
+            }
+          },
+          "required": ["queue_no"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "queue_no": { "type": "string" },
+                "position": { "type": "integer" },
+                "status": { "type": "string" },
+                "estimated_wait": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "cancel_queue",
+        "display_name": "取消排队",
+        "description": "取消排队号。使用场景：用户不想等了，说'取消排队'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "queue_no": {
+              "type": "string",
+              "description": "排队号"
+            },
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            }
+          },
+          "required": ["queue_no", "user_id"]
+        }
+      },
+      {
+        "name": "get_store_info",
+        "display_name": "获取门店信息",
+        "description": "获取餐厅门店信息，包括地址、营业时间、联系方式等。使用场景：用户想了解门店信息时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID（可选，不填则返回默认门店）"
+            }
+          }
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "address": { "type": "string" },
+                "phone": { "type": "string" },
+                "hours": { "type": "object" },
+                "location": { "type": "object" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "get_wifi_info",
+        "display_name": "获取WiFi信息",
+        "description": "获取门店WiFi信息。使用场景：用户说'WiFi密码多少'、'连一下WiFi'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "wifi_name": { "type": "string" },
+                "wifi_password": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "issue_invoice",
+        "display_name": "开具发票",
+        "description": "为订单开具发票。使用场景：用户说'开发票'、'要报销'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "order_no": {
+              "type": "string",
+              "description": "订单号"
+            },
+            "type": {
+              "type": "string",
+              "description": "发票类型",
+              "enum": ["personal", "company"],
+              "default": "personal"
+            },
+            "title": {
+              "type": "string",
+              "description": "发票抬头（公司发票必填）"
+            },
+            "tax_number": {
+              "type": "string",
+              "description": "税号（公司发票必填）"
+            }
+          },
+          "required": ["order_no"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "invoice_no": { "type": "string" },
+                "status": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "reserve_room",
+        "display_name": "预订包间",
+        "description": "预订餐厅包间。使用场景：用户需要预订包间时调用，如'预订包间'、'订个包厢'。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "date": {
+              "type": "string",
+              "description": "预订日期，格式：YYYY-MM-DD"
+            },
+            "time": {
+              "type": "string",
+              "description": "预订时间，格式：HH:mm"
+            },
+            "guests": {
+              "type": "integer",
+              "description": "用餐人数",
+              "minimum": 1
+            },
+            "room_id": {
+              "type": "string",
+              "description": "包间ID（可选）"
+            },
+            "remarks": {
+              "type": "string",
+              "description": "特殊要求"
+            }
+          },
+          "required": ["user_id", "date", "time", "guests"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "reservation_no": { "type": "string" },
+                "room_name": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "get_events",
+        "display_name": "查询活动信息",
+        "description": "查询餐厅当前优惠活动。使用场景：用户说'有什么优惠'、'最近有什么活动'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "活动类型",
+              "enum": ["promotion", "holiday", "member", "all"]
+            }
+          }
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "start_date": { "type": "string" },
+                  "end_date": { "type": "string" },
+                  "discount": { "type": "number" }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "get_coupons",
+        "display_name": "获取优惠券",
+        "description": "获取用户可用的优惠券列表。使用场景：用户说'看看优惠券'、'有什么优惠券可以用'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            },
+            "status": {
+              "type": "string",
+              "description": "优惠券状态",
+              "enum": ["available", "used", "expired", "all"],
+              "default": "available"
+            }
+          },
+          "required": ["user_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "discount_type": { "type": "string" },
+                  "discount_value": { "type": "number" },
+                  "min_amount": { "type": "number" },
+                  "expire_date": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "get_member_info",
+        "display_name": "获取会员信息",
+        "description": "获取用户会员信息，包括积分、余额、等级等。使用场景：用户说'看看我的会员卡'、'查一下积分'时调用。",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "description": "用户ID"
+            }
+          },
+          "required": ["user_id"]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "boolean" },
+            "data": {
+              "type": "object",
+              "properties": {
+                "member_id": { "type": "string" },
+                "level": { "type": "string" },
+                "points": { "type": "number" },
+                "balance": { "type": "number" },
+                "total_spent": { "type": "number" },
+                "order_count": { "type": "number" },
+                "join_date": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
