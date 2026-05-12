@@ -25,6 +25,7 @@ const adminRoutes = require('./routes/admin');
 const monitorRoutes = require('./routes/monitor');
 const exportRoutes = require('./routes/export');
 const userDataRoutes = require('./routes/userData');
+const paymentConfigRoutes = require('./routes/paymentConfig');
 
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection } = require('./middleware/security');
 
@@ -88,6 +89,7 @@ app.use('/api/v1/delivery', deliveryRoutes);
 app.use('/api/v1/queue', queueRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/store', storeRoutes);
+app.use('/api/v1/payment-config', paymentConfigRoutes);
 app.use('/api/v1', apiLimiter, apiRoutes);
 app.use('/agent', agentRoutes);
 app.use('/admin', adminRoutes);

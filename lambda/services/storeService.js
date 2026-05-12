@@ -26,6 +26,236 @@ class StoreService {
     }
   }
 
+  async getDefaultStore() {
+    try {
+      const stores = await db.query('SELECT * FROM stores WHERE is_default = 1 AND status = ? LIMIT 1', ['active']);
+      if (stores.length === 0) {
+        const fallback = await db.query('SELECT * FROM stores WHERE status = ? ORDER BY sort_order ASC LIMIT 1', ['active']);
+        if (fallback.length === 0) {
+          return { success: false, message: '没有可用门店' };
+        }
+        return { success: true, store: fallback[0] };
+      }
+      return { success: true, store: stores[0] };
+    } catch (error) {
+      logger.error('获取默认门店失败:', error);
+      throw error;
+    }
+  }
+
+  async getStoreInfo(storeId = null) {
+    try {
+      let store;
+      if (!storeId) {
+        const result = await this.getDefaultStore();
+        if (!result.success) return result;
+        store = result.store;
+      } else {
+        const result = await this.getStores(storeId);
+        if (!result.success) return result;
+        store = result.store;
+      }
+
+      const settings = await this.getStoreSettings(store.id);
+      return {
+        success: true,
+        store,
+        settings: settings.success ? settings.settings : {}
+      };
+    } catch (error) {
+      logger.error('获取门店信息失败:', error);
+      throw error;
+    }
+  }
+
+  async getBusinessHours(storeId = null) {
+    try {
+      const result = await this.getStoreInfo(storeId);
+      if (!result.success) return result;
+      return {
+        success: true,
+        business_hours: result.store.business_hours,
+        store_name: result.store.name
+      };
+    } catch (error) {
+      logger.error('获取营业时间失败:', error);
+      throw error;
+    }
+  }
+
+  async getWifiInfo(storeId = null) {
+    try {
+      const result = await this.getStoreInfo(storeId);
+      if (!result.success) return result;
+      return {
+        success: true,
+        has_wifi: Boolean(result.store.has_wifi),
+        wifi_name: result.store.wifi_name,
+        wifi_password: result.store.wifi_password,
+        store_name: result.store.name
+      };
+    } catch (error) {
+      logger.error('获取WiFi信息失败:', error);
+      throw error;
+    }
+  }
+
+  async getParkingInfo(storeId = null) {
+    try {
+      const result = await this.getStoreInfo(storeId);
+      if (!result.success) return result;
+      return {
+        success: true,
+        has_parking: Boolean(result.store.has_parking),
+        parking_info: result.store.parking_info,
+        store_name: result.store.name
+      };
+    } catch (error) {
+      logger.error('获取停车信息失败:', error);
+      throw error;
+    }
+  }
+
+  async getContactInfo(storeId = null) {
+    try {
+      const result = await this.getStoreInfo(storeId);
+      if (!result.success) return result;
+      return {
+        success: true,
+        address: result.store.address,
+        phone: result.store.phone,
+        store_name: result.store.name,
+        location: {
+          lat: result.store.lat,
+          lng: result.store.lng
+        }
+      };
+    } catch (error) {
+      logger.error('获取联系信息失败:', error);
+      throw error;
+    }
+  }
+
+  async getAddress(storeId = null) {
+    try {
+      const result = await this.getContactInfo(storeId);
+      if (!result.success) return result;
+      return {
+        success: true,
+        address: result.address,
+        store_name: result.store_name
+      };
+    } catch (error) {
+      logger.error('获取地址失败:', error);
+      throw error;
+    }
+  }
+
+  async getPhone(storeId = null) {
+    try {
+      const result = await this.getContactInfo(storeId);
+      if (!result.success) return result;
+      return {
+        success: true,
+        phone: result.phone,
+        store_name: result.store_name
+      };
+    } catch (error) {
+      logger.error('获取电话失败:', error);
+      throw error;
+    }
+  }
+
+  async getStoreServices(storeId = null) {
+    try {
+      const result = await this.getStoreInfo(storeId);
+      if (!result.success) return result;
+
+      const services = {
+        wifi: Boolean(result.store.has_wifi),
+        parking: Boolean(result.store.has_parking),
+        delivery: Boolean(result.store.can_deliver),
+        reservation: Boolean(result.store.can_reserve),
+        self_order: Boolean(result.store.has_self_order),
+        power_bank: result.settings.power_bank_available === '1',
+        kids_friendly: result.settings.kids_friendly === '1',
+        pet_friendly: result.settings.pet_friendly === '1',
+        invoice_available: result.settings.invoice_available === '1'
+      };
+
+      return {
+        success: true,
+        services,
+        store_name: result.store.name,
+        features: result.store.features
+      };
+    } catch (error) {
+      logger.error('获取门店服务失败:', error);
+      throw error;
+    }
+  }
+
+  async getAnnouncements(storeId = null) {
+    try {
+      let query = 'SELECT * FROM announcements WHERE is_active = 1';
+      const params = [];
+
+      if (storeId) {
+        query += ' AND (store_id = ? OR store_id IS NULL)';
+        params.push(storeId);
+      } else {
+        query += ' AND store_id IS NULL';
+      }
+
+      query += ' ORDER BY sort_order ASC, created_at DESC';
+
+      const announcements = await db.query(query, params);
+      return { success: true, announcements };
+    } catch (error) {
+      logger.error('获取公告失败:', error);
+      throw error;
+    }
+  }
+
+  async getReservationInfo(storeId = null) {
+    try {
+      const result = await this.getStoreInfo(storeId);
+      if (!result.success) return result;
+
+      return {
+        success: true,
+        can_reserve: Boolean(result.store.can_reserve),
+        store_name: result.store.name,
+        table_count: result.store.table_count,
+        minimum_order: parseFloat(result.settings.minimum_order || 0)
+      };
+    } catch (error) {
+      logger.error('获取预订信息失败:', error);
+      throw error;
+    }
+  }
+
+  async getTakeoutInfo(storeId = null) {
+    try {
+      const result = await this.getStoreInfo(storeId);
+      if (!result.success) return result;
+
+      return {
+        success: true,
+        can_deliver: Boolean(result.store.can_deliver),
+        takeout_available: result.settings.takeout_available === '1',
+        takeout_fee: parseFloat(result.settings.takeout_fee || 0),
+        delivery_range: result.store.delivery_range,
+        minimum_order: parseFloat(result.settings.minimum_order || 0),
+        delivery_fee: parseFloat(result.settings.delivery_fee || 0),
+        store_name: result.store.name
+      };
+    } catch (error) {
+      logger.error('获取外卖信息失败:', error);
+      throw error;
+    }
+  }
+
   async createStore(data) {
     try {
       const result = await db.query(

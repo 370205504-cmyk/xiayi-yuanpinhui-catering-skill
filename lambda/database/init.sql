@@ -4,6 +4,120 @@
 CREATE DATABASE IF NOT EXISTS xiayi_restaurant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE xiayi_restaurant;
 
+-- 门店表
+CREATE TABLE IF NOT EXISTS stores (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL COMMENT '门店名称',
+  short_name VARCHAR(50) COMMENT '简称',
+  district VARCHAR(50) COMMENT '区域',
+  area VARCHAR(50) COMMENT '商圈',
+  address VARCHAR(255) NOT NULL COMMENT '详细地址',
+  phone VARCHAR(20) COMMENT '联系电话',
+  business_hours VARCHAR(100) COMMENT '营业时间',
+  lat DECIMAL(10, 6) COMMENT '纬度',
+  lng DECIMAL(10, 6) COMMENT '经度',
+  image VARCHAR(255) COMMENT '门店图片',
+  description TEXT COMMENT '门店描述',
+  features JSON COMMENT '门店特色(数组)',
+  table_count INT DEFAULT 0 COMMENT '桌位数量',
+  has_wifi TINYINT(1) DEFAULT 1 COMMENT '是否有WiFi',
+  wifi_name VARCHAR(100) COMMENT 'WiFi名称',
+  wifi_password VARCHAR(100) COMMENT 'WiFi密码',
+  has_parking TINYINT(1) DEFAULT 0 COMMENT '是否有停车场',
+  parking_info VARCHAR(255) COMMENT '停车说明',
+  can_deliver TINYINT(1) DEFAULT 0 COMMENT '是否支持外卖',
+  delivery_range INT DEFAULT 3 COMMENT '配送范围(公里)',
+  can_reserve TINYINT(1) DEFAULT 0 COMMENT '是否支持包间预订',
+  has_printer TINYINT(1) DEFAULT 0 COMMENT '是否有打印机',
+  printer_model VARCHAR(100) COMMENT '打印机型号',
+  has_self_order TINYINT(1) DEFAULT 1 COMMENT '是否支持自助点餐',
+  rating DECIMAL(2, 1) DEFAULT 4.5 COMMENT '评分',
+  status ENUM('active', 'inactive', 'maintenance') DEFAULT 'active',
+  is_default TINYINT(1) DEFAULT 0 COMMENT '是否为默认门店',
+  sort_order INT DEFAULT 0 COMMENT '排序',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_status (status),
+  INDEX idx_location (lat, lng),
+  INDEX idx_default (is_default)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 插入示例门店数据
+INSERT INTO stores (name, short_name, district, area, address, phone, business_hours, lat, lng, features, table_count, has_wifi, wifi_name, wifi_password, has_parking, can_deliver, delivery_range, can_reserve, has_printer, has_self_order, rating, is_default, sort_order) VALUES
+('夏邑缘品荟创味菜 - 旗舰店', '旗舰店', '夏邑县城', '县中心商业区', '河南省商丘市夏邑县府前路188号', '0370-628-9999', '09:00-22:00', 34.2334, 116.1298, '["旗舰店","面积最大","菜品最全","有VIP包间","支持外卖","支持婚宴","WiFi覆盖","打印服务","自主下单"]', 35, 1, 'XYYP_005_VIP', '99999999', 1, 1, 6, 1, 1, 1, 4.9, 1, 1),
+('夏邑缘品荟创味菜 - 县城中心店', '中心店', '夏邑县城', '县中心商业区', '河南省商丘市夏邑县县城中路128号', '0370-628-8888', '09:00-21:00', 34.2311, 116.1315, '["招牌店","菜品最全","有包间","支持外卖","WiFi覆盖","打印服务"]', 25, 1, 'XYYP_001_Guest', '88888888', 1, 1, 5, 1, 1, 1, 4.8, 0, 2),
+('夏邑缘品荟创味菜 - 城东店', '城东店', '夏邑县城', '城东开发区', '河南省商丘市夏邑县东环路56号', '0370-628-6666', '09:30-20:30', 34.2356, 116.1456, '["新店开业","环境优美","支持外卖","WiFi覆盖","打印服务"]', 18, 1, 'XYYP_002_WiFi', '66666666', 1, 1, 4, 1, 1, 1, 4.6, 0, 3),
+('夏邑缘品荟创味菜 - 城西店', '城西店', '夏邑县城', '城西老城区', '河南省商丘市夏邑县西环路89号', '0370-628-5555', '09:00-21:00', 34.2289, 116.1189, '["老字号","口味正宗","支持外卖","有包间","WiFi覆盖","打印服务"]', 20, 1, 'XYYP_003_Free', '55555555', 0, 1, 4, 1, 1, 1, 4.7, 0, 4),
+('夏邑缘品荟创味菜 - 城郊店', '城郊店', '城郊区域', '城郊工业区', '河南省商丘市夏邑县城郊工业园108号', '0370-628-4444', '10:00-20:00', 34.2412, 116.1089, '["支持外卖","快餐为主","价格实惠","WiFi覆盖","打印服务"]', 12, 1, 'XYYP_004', '44444444', 1, 1, 3, 0, 1, 1, 4.5, 0, 5);
+
+-- 门店设置表
+CREATE TABLE IF NOT EXISTS store_settings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  store_id INT NOT NULL COMMENT '门店ID',
+  setting_key VARCHAR(100) NOT NULL COMMENT '设置键',
+  setting_value TEXT COMMENT '设置值',
+  description VARCHAR(255) COMMENT '设置说明',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_store_key (store_id, setting_key),
+  INDEX idx_store_id (store_id),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 插入默认门店设置
+INSERT INTO store_settings (store_id, setting_key, setting_value, description) VALUES
+(1, 'power_bank_available', '1', '是否有充电宝服务'),
+(1, 'power_bank_brand', '街电', '充电宝品牌'),
+(1, 'pet_friendly', '0', '是否允许宠物'),
+(1, 'kids_friendly', '1', '是否提供儿童服务'),
+(1, 'kids_high_chair', '1', '是否有儿童椅'),
+(1, 'invoice_available', '1', '是否可开发票'),
+(1, 'invoice_type', '增值税普通发票', '发票类型'),
+(1, 'takeout_available', '1', '是否支持打包'),
+(1, 'takeout_fee', '0', '打包费'),
+(1, 'minimum_order', '20', '最低起送价'),
+(1, 'delivery_fee', '3', '配送费');
+
+-- 全局支付配置表
+CREATE TABLE IF NOT EXISTS payment_configs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  store_id INT COMMENT '门店ID(为空则是全局配置)',
+  config_type ENUM('wechat', 'alipay') NOT NULL COMMENT '配置类型',
+  app_id VARCHAR(100) COMMENT '应用ID',
+  app_secret VARCHAR(255) COMMENT '应用密钥',
+  mch_id VARCHAR(100) COMMENT '商户号',
+  mch_key VARCHAR(255) COMMENT '商户密钥',
+  cert_path VARCHAR(255) COMMENT '证书路径',
+  is_active TINYINT(1) DEFAULT 1 COMMENT '是否启用',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_store_type (store_id, config_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 活动/公告表
+CREATE TABLE IF NOT EXISTS announcements (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  store_id INT COMMENT '门店ID(为空则是全局)',
+  title VARCHAR(200) NOT NULL COMMENT '标题',
+  content TEXT COMMENT '内容',
+  image VARCHAR(255) COMMENT '图片',
+  type ENUM('activity', 'notice', 'promotion') DEFAULT 'notice' COMMENT '类型',
+  start_time DATETIME COMMENT '开始时间',
+  end_time DATETIME COMMENT '结束时间',
+  is_active TINYINT(1) DEFAULT 1,
+  sort_order INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_store_active (store_id, is_active),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 插入示例活动
+INSERT INTO announcements (title, content, type, is_active, sort_order) VALUES
+('开业优惠', '夏邑缘品荟创味菜旗舰店开业啦！全场8.8折，满100送20优惠券', 'promotion', 1, 1),
+('温馨提示', '尊敬的顾客，本店提供免费WiFi和充电宝服务', 'notice', 1, 2),
+('会员日活动', '每周三会员日，会员消费双倍积分', 'activity', 1, 3);
+
 -- 用户表
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,

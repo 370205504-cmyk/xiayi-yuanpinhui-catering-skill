@@ -25,6 +25,138 @@ router.get('/stores',
   }
 );
 
+router.get('/stores/default',
+  async (req, res) => {
+    try {
+      const result = await storeService.getDefaultStore();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/info',
+  async (req, res) => {
+    try {
+      const result = await storeService.getStoreInfo(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/business-hours',
+  async (req, res) => {
+    try {
+      const result = await storeService.getBusinessHours(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/wifi',
+  async (req, res) => {
+    try {
+      const result = await storeService.getWifiInfo(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/parking',
+  async (req, res) => {
+    try {
+      const result = await storeService.getParkingInfo(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/contact',
+  async (req, res) => {
+    try {
+      const result = await storeService.getContactInfo(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/address',
+  async (req, res) => {
+    try {
+      const result = await storeService.getAddress(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/phone',
+  async (req, res) => {
+    try {
+      const result = await storeService.getPhone(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/services',
+  async (req, res) => {
+    try {
+      const result = await storeService.getStoreServices(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/announcements',
+  async (req, res) => {
+    try {
+      const result = await storeService.getAnnouncements(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/reservation',
+  async (req, res) => {
+    try {
+      const result = await storeService.getReservationInfo(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
+router.get('/stores/takeout',
+  async (req, res) => {
+    try {
+      const result = await storeService.getTakeoutInfo(req.query.store_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: '服务器错误' });
+    }
+  }
+);
+
 router.get('/stores/:id',
   async (req, res) => {
     try {

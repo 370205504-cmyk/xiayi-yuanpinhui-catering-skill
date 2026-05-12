@@ -1,7 +1,7 @@
 {
   "name": "xiayi-youpinhui-foodie-skill",
-  "version": "3.1.0",
-  "description": "夏邑缘品荟创味菜官方AI点餐服务，支持语音点餐、文字聊天、美团排队取号",
+  "version": "4.1.0",
+  "description": "夏邑缘品荟创味菜官方AI点餐服务，支持语音点餐、文字聊天、排队取号、商业服务查询（地址、电话、营业时间、WiFi、停车等）",
   "author": "石中伟",
   "license": "MIT",
   "keywords": [
@@ -368,10 +368,192 @@
           "properties": {
             "store_id": {
               "type": "string",
-              "description": "门店ID"
+              "description": "门店ID，不填则返回默认门店"
             }
           }
-        }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_business_hours",
+        "description": "获取营业时间",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_parking_info",
+        "description": "获取停车信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_contact_info",
+        "description": "获取联系信息（地址、电话、坐标）",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_address",
+        "description": "获取门店地址",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_phone",
+        "description": "获取门店电话",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_store_services",
+        "description": "获取门店服务（WiFi、停车、外卖、预订、充电宝、儿童服务、宠物政策、发票等）",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_announcements",
+        "description": "获取活动公告",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回全局公告"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_reservation_info",
+        "description": "获取包间预订信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_takeout_info",
+        "description": "获取外卖信息",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "store_id": {
+              "type": "string",
+              "description": "门店ID，不填则返回默认门店"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"store_id": "1"}
+        ]
+      },
+      {
+        "name": "get_stores",
+        "description": "获取所有门店列表",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "lat": {
+              "type": "number",
+              "description": "纬度，用于附近门店查询"
+            },
+            "lng": {
+              "type": "number",
+              "description": "经度，用于附近门店查询"
+            },
+            "radius": {
+              "type": "number",
+              "description": "搜索半径（公里），默认10"
+            }
+          }
+        },
+        "examples": [
+          {},
+          {"lat": 34.2311, "lng": 116.1315, "radius": 5}
+        ]
       }
     ],
     "resources": [

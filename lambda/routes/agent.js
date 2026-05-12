@@ -4,6 +4,7 @@ const dishesService = require('../services/dishesService');
 const orderService = require('../services/orderServiceV2');
 const inputValidator = require('../services/inputValidator');
 const logger = require('../utils/logger');
+const storeService = require('../services/storeService');
 
 const PROMPT_INJECTION_PATTERNS = [
   /ignore\s+(previous|all|your)/i,
@@ -424,21 +425,19 @@ async function handleCancelQuery(query, userId, context) {
 }
 
 async function handleStoreQuery(query, context) {
-  const storeService = require('../utils/storeService');
-  const stores = await storeService.getAllStores();
-
-  if (stores.length > 0) {
-    const store = stores[0];
+  const result = await storeService.getStoreInfo();
+  if (result.success && result.store) {
+    const store = result.store;
+    const settings = result.settings || {};
     return {
-      response: `📍 门店信息\n\n名称：${store.name}\n地址：${store.address || '夏邑县孔祖大道南段'}\n电话：${store.phone || '0370-628-8888'}\n营业：${store.hours || '10:00-22:00'}\n\n期待您的光临！`,
+      response: `📍 门店信息\n\n名称：${store.name}\n地址：${store.address}\n电话：${store.phone}\n营业时间：${store.businessHours}\n${store.hasParking ? '\n🅿️ 提供停车场' : ''}\n${store.hasWifi ? `\n📶 WiFi：${store.wifiName} 密码：${store.wifiPassword}` : ''}\n\n期待您的光临！`,
       actions: [{ type: 'show_store', data: store }],
-      data: { store },
+      data: { store, settings },
       context: context
     };
   }
-
   return {
-    response: '📍 夏邑缘品荟创味菜\n\n地址：夏邑县孔祖大道南段\n电话：0370-628-8888\n营业时间：10:00-22:00',
+    response: '📍 夏邑缘品荟创味菜\n\n地址：河南省商丘市夏邑县府前路188号\n电话：0370-628-9999\n营业时间：09:00-22:00',
     actions: [],
     data: {},
     context: context
@@ -446,13 +445,28 @@ async function handleStoreQuery(query, context) {
 }
 
 async function handleWifiQuery(context) {
-  const wifiService = require('../utils/wifiService');
-  const wifi = await wifiService.getWifiPassword();
-
+  const result = await storeService.getWifiInfo();
+  if (result.success) {
+    const wifi = result;
+    if (wifi.hasWifi) {
+      return {
+        response: `📶 WiFi信息\n\n名称：${wifi.wifiName || '缘品荟免费WiFi'}\n密码：${wifi.wifiPassword || '88888888'}\n\n免密码连接，祝您用餐愉快！`,
+        actions: [{ type: 'show_wifi', data: wifi }],
+        data: { wifi },
+        context: context
+      };
+    }
+    return {
+      response: '抱歉，该门店暂无WiFi服务',
+      actions: [],
+      data: {},
+      context: context
+    };
+  }
   return {
-    response: `📶 WiFi信息\n\n名称：${wifi.ssid || '缘品荟免费WiFi'}\n密码：${wifi.password || '88888888'}\n\n免密码连接，祝您用餐愉快！`,
-    actions: [{ type: 'show_wifi', data: wifi }],
-    data: { wifi },
+    response: '📶 WiFi信息\n\n名称：缘品荟免费WiFi\n密码：88888888\n\n免密码连接，祝您用餐愉快！',
+    actions: [],
+    data: {},
     context: context
   };
 }
@@ -521,16 +535,151 @@ async function handleQueueQuery(query, userId, context) {
 
 async function handleContactQuery(query, context) {
   if (query.includes('电话') || query.includes('联系')) {
+    const result = await storeService.getPhone();
+    if (result.success) {
+      return {
+        response: `📞 联系电话\n\n${result.phone}\n\n门店：${result.storeName}`,
+        actions: [{ type: 'show_phone', data: result }],
+        data: result,
+        context: context
+      };
+    }
     return {
-      response: `📞 联系电话\n\n${store.phone || '0370-628-8888'}\n\n服务时间：${store.hours || '10:00-22:00'}`,
+      response: '📞 联系电话\n\n0370-628-9999',
       actions: [],
       data: {},
       context: context
     };
   }
 
+  if (query.includes('营业')) {
+    const result = await storeService.getBusinessHours();
+    if (result.success) {
+      return {
+        response: `🕐 营业时间\n\n${result.businessHours}\n\n门店：${result.storeName}`,
+        actions: [{ type: 'show_business_hours', data: result }],
+        data: result,
+        context: context
+      };
+    }
+    return {
+      response: `🕐 营业时间\n\n09:00-22:00\n\n节假日可能有调整，请以门店公告为准`,
+      actions: [],
+      data: {},
+      context: context
+    };
+  }
+
+  if (query.includes('停车') || query.includes('车位')) {
+    const result = await storeService.getParkingInfo();
+    if (result.success) {
+      const parkingInfo = result.hasParking ? `提供停车位\n${result.parkingInfo || ''}` : '暂无停车场';
+      return {
+        response: `🅿️ 停车信息\n\n${parkingInfo}\n\n门店：${result.storeName}`,
+        actions: [{ type: 'show_parking', data: result }],
+        data: result,
+        context: context
+      };
+    }
+    return {
+      response: '🅿️ 停车信息\n\n提供免费停车场，欢迎光临',
+      actions: [],
+      data: {},
+      context: context
+    };
+  }
+
+  if (query.includes('活动') || query.includes('优惠') || query.includes('公告')) {
+    const result = await storeService.getAnnouncements();
+    if (result.success && result.announcements && result.announcements.length > 0) {
+      const announcements = result.announcements.map(a => `【${a.title}】\n${a.content}`).join('\n\n');
+      return {
+        response: `📢 最新活动公告\n\n${announcements}`,
+        actions: [{ type: 'show_announcements', data: result.announcements }],
+        data: result,
+        context: context
+      };
+    }
+    return {
+      response: '📢 最新活动公告\n\n暂无活动，敬请期待',
+      actions: [],
+      data: {},
+      context: context
+    };
+  }
+
+  if (query.includes('充电宝') || query.includes('租借充电宝')) {
+    const result = await storeService.getStoreServices();
+    if (result.success) {
+      const hasPowerBank = result.services.powerBank;
+      const response = hasPowerBank ? '提供充电宝租借服务' : '暂无充电宝服务';
+      return {
+        response: `🔋 充电宝\n\n${response}`,
+        actions: [],
+        data: result,
+        context: context
+      };
+    }
+    return {
+      response: '🔋 充电宝\n\n提供充电宝租借服务',
+      actions: [],
+      data: {},
+      context: context
+    };
+  }
+
+  if (query.includes('宠物') || query.includes('带狗') || query.includes('带猫')) {
+    const result = await storeService.getStoreServices();
+    if (result.success) {
+      const petFriendly = result.services.petFriendly;
+      const response = petFriendly ? '欢迎携带宠物入店' : '抱歉，暂时不允许携带宠物入店';
+      return {
+        response: `🐕 宠物政策\n\n${response}`,
+        actions: [],
+        data: result,
+        context: context
+      };
+    }
+    return {
+      response: '🐕 宠物政策\n\n抱歉，暂时不允许携带宠物入店',
+      actions: [],
+      data: {},
+      context: context
+    };
+  }
+
+  if (query.includes('发票') || query.includes('开发票')) {
+    const result = await storeService.getStoreServices();
+    if (result.success) {
+      const invoice = result.services.invoiceAvailable;
+      const response = invoice ? '可以开具发票，请联系前台' : '暂时无法提供发票服务';
+      return {
+        response: `📄 发票服务\n\n${response}`,
+        actions: [],
+        data: result,
+        context: context
+      };
+    }
+    return {
+      response: '📄 发票服务\n\n可以开具发票，请联系前台',
+      actions: [],
+      data: {},
+      context: context
+    };
+  }
+
+  const result = await storeService.getStoreInfo();
+  if (result.success && result.store) {
+    return {
+      response: `📍 门店信息\n\n名称：${result.store.name}\n地址：${result.store.address}\n电话：${result.store.phone}\n营业时间：${result.store.businessHours}`,
+      actions: [{ type: 'show_store_info', data: result }],
+      data: result,
+      context: context
+    };
+  }
+
   return {
-    response: `🕐 营业时间\n\n${store.hours || '10:00-22:00'}\n\n节假日可能有调整，请以门店公告为准`,
+    response: `📍 夏邑缘品荟创味菜\n\n地址：河南省商丘市夏邑县府前路188号\n电话：0370-628-9999\n营业时间：09:00-22:00`,
     actions: [],
     data: {},
     context: context
