@@ -1,6 +1,6 @@
 {
-  "name": "xiayi-youpinhui-foodie-skill",
-  "version": "3.0.0",
+  "name": "xiayi-yuanpinhui-catering-skill",
+  "version": "3.5.0",
   "description": "夏邑缘品荟创味菜 - 智能餐饮服务系统，支持语音点餐、文字聊天、AI Agent接入、完整订单生命周期",
   "main": "lambda/server.js",
   "scripts": {

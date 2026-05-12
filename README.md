@@ -1,13 +1,12 @@
-# 夏邑缘品荟创味菜 - 智能餐饮服务系统 v3.1.0
+# 夏邑缘品荟智能餐饮服务系统 v3.5.0
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.1.0-blue)
+![Version](https://img.shields.io/badge/version-3.5.0-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 
-**夏邑缘品荟创味菜 - 智能餐饮服务 Skill，支持语音点餐、文字聊天、AI Agent接入（扣子/龙虾/Dify）、美团排队取号、完整订单生命周期**
-
+**夏邑缘品荟智能餐饮服务系统，支持语音点餐、文字聊天、AI Agent接入（扣子/龙虾/Dify）、多门店管理、完整订单生命周期、安全加固95个漏洞**
 </div>
 
 ## 功能特性
@@ -54,8 +53,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill.git
-cd xiayi-youpinhui-foodie-skill
+git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
+cd xiayi-yuanpinhui-catering-skill
 
 # 一键启动
 chmod +x quick-start.sh
@@ -343,8 +342,8 @@ chmod +x deploy-tencent.sh
 
 ## 技术支持
 
-- **GitHub**: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill
-- **问题反馈**: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill/issues
+- **GitHub**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill
+- **问题反馈**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill/issues
 - **开发者**: 石中伟
 
 ## License

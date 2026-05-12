@@ -1,7 +1,7 @@
 {
-  "name": "xiayi-youpinhui-foodie-system",
-  "version": "3.0.0",
-  "description": "夏邑缘品荟创味菜 - 智能餐饮管理系统 - 开发 by 石中伟",
+  "name": "xiayi-yuanpinhui-catering-skill",
+  "version": "3.5.0",
+  "description": "夏邑缘品荟智能餐饮服务系统 - 95个安全漏洞修复版",
   "main": "lambda/server.js",
   "scripts": {
     "start": "node lambda/server.js",
@@ -58,9 +58,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill"
+    "url": "https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill"
   },
   "bugs": {
-    "url": "https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill/issues"
+    "url": "https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill/issues"
   }
 }

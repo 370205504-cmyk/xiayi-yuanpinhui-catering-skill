@@ -1,16 +1,16 @@
-# 夏邑缘品荟创味菜 AI Skill
+# 夏邑缘品荟智能餐饮系统 AI Skill
 
 ## 技能描述
 
-夏邑缘品荟创味菜官方AI服务，支持查询菜单、智能推荐菜品、在线点餐、购物车管理、提交订单、查询门店信息、WiFi密码、美团排队取号。
+夏邑缘品荟智能餐饮系统官方AI服务，支持查询菜单、智能推荐菜品、在线点餐、购物车管理、提交订单、查询门店信息、WiFi密码、多门店管理。
 
 ## 技能信息
 
-- **版本**: 3.1.0
+- **版本**: 3.5.0
 - **作者**: 石中伟
 - **许可证**: MIT
-- **仓库**: https://github.com/370205504-cmyk/xiayi-youpinhui-foodie-skill
-- **MCP端点**: https://mcp.xiayi-youpinhui.com
+- **仓库**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill
+- **MCP端点**: https://mcp.xiayi-yuanpinhui.com
 
 ## 触发词
 
