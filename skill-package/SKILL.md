@@ -73,12 +73,6 @@ links:
 
 ## 🚀 快速开始
 
-### 环境要求
-- Node.js >= 16.0.0
-- MySQL >= 8.0
-- Redis >= 6.0
-
-### 安装部署
 ```bash
 git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
 cd xiayi-yuanpinhui-catering-skill/lambda
@@ -94,11 +88,6 @@ npm start
 - **支付签名验证** - 微信/支付宝完整验证
 - **RBAC权限控制** - 细粒度角色管理
 - **限流熔断** - 多维度保护
-
-## 📚 文档
-
-完整文档和API说明请访问：
-https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill
 
 ## 👨‍💻 作者
 
