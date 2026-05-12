@@ -94,10 +94,11 @@ docker-compose up -d
 - **移动端**: http://localhost:3000/mobile
 - **管理后台**: http://localhost:3000/admin
 
-### 测试账号
+### ⚠️ 安全提示
 
-- 手机号: 13800138000
-- 密码: 123456
+- 首次登录后请立即修改默认密码
+- 生产环境请务必配置强JWT密钥
+- Redis建议设置密码保护
 
 ## AI Agent接入
 

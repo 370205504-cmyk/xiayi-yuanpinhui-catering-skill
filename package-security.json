@@ -1,0 +1,13 @@
+{
+  "name": "security-audit",
+  "version": "1.0.0",
+  "description": "Security audit script",
+  "scripts": {
+    "audit": "npm audit --audit-level=moderate",
+    "audit:fix": "npm audit fix",
+    "scan": "node scripts/security-scan.js"
+  },
+  "devDependencies": {
+    "snyk": "^1.1200.0"
+  }
+}
