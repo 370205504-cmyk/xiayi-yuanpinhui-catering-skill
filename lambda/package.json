@@ -43,7 +43,9 @@
     "node-cron": "^3.0.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
-    "opossum": "^8.1.4"
+    "opossum": "^8.1.4",
+    "nodemailer": "^6.9.8",
+    "validator": "^13.11.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",
