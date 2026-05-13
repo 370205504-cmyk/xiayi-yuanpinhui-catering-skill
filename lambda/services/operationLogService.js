@@ -1,5 +1,5 @@
 const db = require('../database/db');
-const logger = require('./logger');
+const logger = require('../utils/logger');
 
 const OPERATION_TYPES = {
   ORDER_STATUS_CHANGE: 'ORDER_STATUS_CHANGE',
