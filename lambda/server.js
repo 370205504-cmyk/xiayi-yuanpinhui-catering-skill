@@ -7,7 +7,7 @@ const compression = require('compression');
 const db = require('./database/db');
 const backupService = require('./database/backup');
 const logger = require('./utils/logger');
-const errorHandler = require('./middleware/errorHandler');
+const { errorHandler } = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/auth');
 const wechatRoutes = require('./routes/wechat');
