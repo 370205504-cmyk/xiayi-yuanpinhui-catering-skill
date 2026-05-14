@@ -1,0 +1,20 @@
+# Git Configuration for xiayi-yuanpinhui-catering-skill
+# Created: 2026-05-14
+
+[user]
+    name = 370205504-cmyk
+    email = 370205504-cmyk@users.noreply.github.com
+
+[credential]
+    helper = store --file ~/.git-credentials
+
+[push]
+    default = simple
+    autoSetupRemote = true
+
+[pull]
+    rebase = false
+
+[alias]
+    sync = !bash -c \"source git-sync.sh\"
+    save = !git add -A && git commit -m \"$1\" && git push
