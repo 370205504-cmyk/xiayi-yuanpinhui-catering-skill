@@ -1,9 +1,10 @@
-# 雨姗AI收银助手 v4.1.0
+# 雨姗AI收银助手 v4.3.0
 
 雨姗AI收银助手 - 市面所有收银系统通用AI智能增强助手。不用换收银，不用重新录菜品，不用培训员工，5分钟上线AI点餐、语音点餐、企业微信机器人点餐。
 
 ## 功能特点
 
+### 核心功能
 - 多渠道点餐：语音点餐、文字聊天、Web/移动端点餐、AI Agent对话
 - AI Agent适配：支持扣子/龙虾/Dify等AI平台，完整MCP标准工具集
 - 商业服务查询：20+种自然语言查询（WiFi、停车、营业时间等）
@@ -13,6 +14,23 @@
 - 支付集成：微信支付、支付宝、余额支付、扫码支付
 - 会员系统：积分、充值、优惠券、会员等级
 - 多租户支持：SaaS架构，支持多门店
+
+### v4.2.0 新功能（可插拔适配器）
+- 可插拔适配器架构：所有收银系统对接都实现统一接口
+- 美团收银/银豹/哗啦啦/思迅/科脉 五大主流收银系统适配
+- 数据库直连适配器：支持MySQL/Access/SQL Server，自动识别表结构
+- 打印旁路兜底适配器：监听网口/串口打印机，小票逆向解析，虚拟打印入单
+- 自动扫描与一键对接：启动后自动扫描本地进程、数据库、打印机，自动匹配适配器
+- 双向数据同步引擎：增量同步、冲突解决、数据校验、防错机制
+
+### v4.3.0 新功能（AI智能体）
+- MCP工具扩展：新增收银对接相关的工具（拉取收银菜品、同步订单到收银、查询收银库存）
+- 自然语义理解升级：支持大白话点餐（如"来个两人份辣的套餐"、"跟上次一样12点到店取"）
+- 上下文记忆增强：记住顾客口味、历史订单、当前会话状态
+- AI主动技能：主动迎宾、主动推荐菜品、主动提醒口味忌口、订单状态自动推送
+- 企业微信机器人：基于扣子平台，实现加好友、私聊、语音点餐、订单通知
+- 自动转人工机制：AI识别无法处理的问题，自动推送人工客服二维码
+- AI经营简报：每日自动生成营收、客流、爆款菜品分析
 
 ## 快速开始
 
@@ -53,17 +71,38 @@ docker-compose up -d
 ```
 yushan-ai-cashier-assistant/
 ├── lambda/
-│   ├── server.js              # 完整版服务器
-│   ├── server-simple.js       # 简化版服务器
-│   ├── routes/                # API路由
-│   ├── services/              # 业务逻辑
-│   ├── database/              # 数据库相关
-│   ├── utils/                 # 工具函数
-│   └── web/                   # 前端页面
-├── .env.example               # 环境变量示例
-├── package.json               # 项目配置
-├── docker-compose.yml         # Docker配置
-└── README.md                  # 项目说明
+│   ├── server.js              # 完整版服务
+│   ├── adapters/            # 收银系统适配器
+│   │   ├── base-adapter.js       # 适配器基类
+│   │   ├── index.js              # 适配器管理
+│   │   ├── meituan-adapter.js  # 美团收银
+│   │   ├── yinbao-adapter.js   # 银豹收银
+│   │   ├── hualala-adapter.js # 哗啦啦收银
+│   │   ├── sixun-adapter.js   # 思迅收银
+│   │   ├── kemai-adapter.js    # 科脉收银
+│   │   ├── db-adapter.js       # 数据库直连
+│   │   └── printer-adapter.js  # 打印旁路兜底
+│   ├── mcp/                 # MCP 工具和处理器
+│   │   ├── tools.js            # MCP 工具
+│   │   ├── handler.js          # MCP 消息处理
+│   │   └── context.js          # 上下文记忆
+│   ├── integrations/         # 第三方集成
+│   │   └── wework-bot.js       # 企业微信机器人
+│   ├── routes/              # API路由
+│   ├── services/            # 业务逻辑
+│   │   ├── ai-agent.js         # AI 主动技能
+│   │   ├── ai-report.js        # AI 经营简报
+│   │   ├── sync-engine.js     # 双向数据同步引擎
+│   │   ├── detector.js          # 环境检测器
+│   │   └── ticket-parser.js    # 小票解析器
+│   ├── database/            # 数据库相关
+│   ├── middleware/          # 中间件
+│   ├── utils/             # 工具函数
+│   └── web/               # 前端页面
+├── .env.example           # 环境变量示例
+├── package.json           # 项目配置
+├── docker-compose.yml     # Docker 配置
+└── README.md              # 项目说明
 ```
 
 ## 技术栈
