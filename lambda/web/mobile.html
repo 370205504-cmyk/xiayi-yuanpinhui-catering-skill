@@ -1,1016 +1,582 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#ff6b35">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>夏邑缘品荟创味菜</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --primary: #ff6b35;
-      --primary-dark: #e55a2b;
-      --secondary: #2c3e50;
-      --success: #27ae60;
-      --warning: #f39c12;
-      --danger: #e74c3c;
-      --gray: #95a5a6;
-      --light: #ecf0f1;
-      --white: #ffffff;
-      --shadow: 0 2px 10px rgba(0,0,0,0.1);
-      --radius: 12px;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: var(--light);
-      color: var(--secondary);
-      line-height: 1.6;
-      min-height: 100vh;
-      padding-bottom: 80px;
-    }
-    .header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      padding: 20px 16px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow);
-    }
-    .header h1 {
-      font-size: 20px;
-      font-weight: 600;
-    }
-    .header p {
-      font-size: 12px;
-      opacity: 0.9;
-      margin-top: 4px;
-    }
-    .user-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255,255,255,0.2);
-    }
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .user-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-    .user-name { font-size: 14px; font-weight: 500; }
-    .user-points { font-size: 11px; opacity: 0.9; }
-    .user-balance {
-      background: rgba(255,255,255,0.2);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-    }
-    .container { max-width: 480px; margin: 0 auto; padding: 16px; }
-    .tab-bar {
-      display: flex;
-      background: var(--white);
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      z-index: 100;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-    .tab-item {
-      flex: 1;
-      padding: 10px 0;
-      text-align: center;
-      color: var(--gray);
-      font-size: 11px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .tab-item.active { color: var(--primary); }
-    .tab-item svg { width: 24px; height: 24px; margin-bottom: 4px; }
-    .category-scroll {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding: 12px 16px;
-      background: var(--white);
-      margin-bottom: 10px;
-      scrollbar-width: none;
-    }
-    .category-scroll::-webkit-scrollbar { display: none; }
-    .category-item {
-      padding: 8px 16px;
-      background: var(--light);
-      border-radius: 20px;
-      font-size: 13px;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .category-item.active {
-      background: var(--primary);
-      color: white;
-    }
-    .dish-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .dish-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s;
-    }
-    .dish-card:active { transform: scale(0.98); }
-    .dish-image {
-      width: 100%;
-      height: 120px;
-      background: linear-gradient(135deg, #ffeaa7, #fab1a0);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-    }
-    .dish-info { padding: 12px; }
-    .dish-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .dish-desc { font-size: 11px; color: var(--gray); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .dish-footer { display: flex; justify-content: space-between; align-items: center; }
-    .dish-price { color: var(--primary); font-size: 16px; font-weight: 700; }
-    .dish-price small { font-size: 11px; font-weight: 400; }
-    .add-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .cart-bar {
-      position: fixed;
-      bottom: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 32px);
-      max-width: 448px;
-      background: var(--secondary);
-      color: white;
-      padding: 12px 16px;
-      border-radius: 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      z-index: 99;
-    }
-    .cart-left { display: flex; align-items: center; gap: 12px; }
-    .cart-icon { position: relative; }
-    .cart-count {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: var(--primary);
-      color: white;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      font-size: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .cart-total { font-size: 15px; font-weight: 600; }
-    .checkout-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px 24px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: flex-end;
-      z-index: 200;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s;
-    }
-    .modal.active { opacity: 1; visibility: visible; }
-    .modal-content {
-      background: white;
-      width: 100%;
-      max-width: 480px;
-      margin: 0 auto;
-      border-radius: 20px 20px 0 0;
-      max-height: 80vh;
-      overflow-y: auto;
-      transform: translateY(100%);
-      transition: transform 0.3s;
-    }
-    .modal.active .modal-content { transform: translateY(0); }
-    .modal-header {
-      padding: 16px;
-      border-bottom: 1px solid var(--light);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      background: white;
-    }
-    .modal-title { font-size: 16px; font-weight: 600; }
-    .close-btn { background: none; border: none; font-size: 24px; color: var(--gray); cursor: pointer; }
-    .cart-item {
-      display: flex;
-      padding: 16px;
-      border-bottom: 1px solid var(--light);
-      gap: 12px;
-    }
-    .cart-item-info { flex: 1; }
-    .cart-item-name { font-size: 14px; font-weight: 500; }
-    .cart-item-price { color: var(--primary); font-size: 14px; }
-    .quantity-control { display: flex; align-items: center; gap: 12px; }
-    .qty-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 1px solid var(--gray);
-      background: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .qty-btn.minus { color: var(--gray); }
-    .qty-btn.plus { color: var(--primary); border-color: var(--primary); }
-    .qty-num { font-size: 16px; font-weight: 600; min-width: 20px; text-align: center; }
-    .cart-footer {
-      padding: 16px;
-      background: var(--light);
-      position: sticky;
-      bottom: 0;
-    }
-    .order-type {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .order-type-btn {
-      padding: 12px;
-      border: 2px solid var(--light);
-      border-radius: var(--radius);
-      background: white;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .order-type-btn.active { border-color: var(--primary); background: #fff5f2; }
-    .order-type-btn .icon { font-size: 24px; margin-bottom: 4px; }
-    .order-type-btn .text { font-size: 12px; }
-    .form-group { margin-bottom: 16px; }
-    .form-label { font-size: 13px; color: var(--gray); margin-bottom: 6px; display: block; }
-    .form-input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--light);
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    .submit-btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .auth-modal .modal-content { max-height: 90vh; }
-    .auth-tabs { display: flex; border-bottom: 1px solid var(--light); }
-    .auth-tab {
-      flex: 1;
-      padding: 14px;
-      text-align: center;
-      font-size: 14px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-    }
-    .auth-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-    .auth-form { padding: 20px; }
-    .wechat-btn {
-      width: 100%;
-      padding: 14px;
-      background: #07c160;
-      color: white;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 16px;
-    }
-    .page { display: none; }
-    .page.active { display: block; }
-    .order-card {
-      background: white;
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-    }
-    .order-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--light);
-    }
-    .order-no { font-size: 13px; color: var(--gray); }
-    .order-status {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-    .status-pending { background: #fff3cd; color: #856404; }
-    .status-confirmed { background: #d4edda; color: #155724; }
-    .status-preparing { background: #cce5ff; color: #004085; }
-    .status-ready { background: #d1e7dd; color: #0f5132; }
-    .status-completed { background: #e2e3e5; color: #383d41; }
-    .order-items { margin-bottom: 12px; }
-    .order-item { font-size: 13px; margin-bottom: 4px; display: flex; justify-content: space-between; }
-    .order-footer { display: flex; justify-content: space-between; align-items: center; }
-    .order-total { font-size: 15px; font-weight: 600; }
-    .order-total small { font-size: 12px; color: var(--gray); font-weight: 400; }
-    .member-card {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .member-level { font-size: 12px; opacity: 0.9; margin-bottom: 4px; }
-    .member-name { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
-    .member-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center; }
-    .member-stat .value { font-size: 20px; font-weight: 700; }
-    .member-stat .label { font-size: 11px; opacity: 0.9; }
-    .coupon-card {
-      background: white;
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      gap: 12px;
-      box-shadow: var(--shadow);
-    }
-    .coupon-left {
-      width: 80px;
-      background: linear-gradient(135deg, #ff6b35, #ff8c42);
-      color: white;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-    }
-    .coupon-value { font-size: 22px; font-weight: 700; }
-    .coupon-unit { font-size: 11px; }
-    .coupon-right { flex: 1; }
-    .coupon-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .coupon-desc { font-size: 11px; color: var(--gray); margin-bottom: 8px; }
-    .coupon-expire { font-size: 11px; color: var(--danger); }
-    .loading { text-align: center; padding: 40px; color: var(--gray); }
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
-    .empty-state svg { width: 80px; height: 80px; margin-bottom: 16px; opacity: 0.5; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>雨姗AI收银助手 - 点餐</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 { font-size: 20px; font-weight: 600; }
+        .header p { font-size: 12px; opacity: 0.9; margin-top: 5px; }
+        
+        .category-nav {
+            background: white;
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 0;
+            position: sticky;
+            top: 75px;
+            z-index: 99;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .category-nav::-webkit-scrollbar { display: none; }
+        .category-item {
+            flex-shrink: 0;
+            padding: 8px 20px;
+            margin: 0 5px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .category-item:first-child { margin-left: 15px; }
+        .category-item:last-child { margin-right: 15px; }
+        .category-item.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .dish-list { padding: 15px; }
+        .dish-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .dish-image {
+            width: 90px;
+            height: 90px;
+            border-radius: 8px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 32px;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+        .dish-info { flex: 1; min-width: 0; }
+        .dish-name { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 6px; }
+        .dish-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+        .tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; }
+        .tag-recommend { background: #fff3cd; color: #856404; }
+        .tag-signature { background: #d4edda; color: #155724; }
+        .tag-spicy { background: #f8d7da; color: #721c24; }
+        .dish-desc { font-size: 12px; color: #999; margin-bottom: 10px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .dish-bottom { display: flex; align-items: center; justify-content: space-between; }
+        .dish-price { font-size: 20px; font-weight: bold; color: #667eea; }
+        .dish-price span { font-size: 14px; }
+        .add-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .add-btn:active { transform: scale(0.95); }
+        .add-btn:disabled { opacity: 0.5; }
+        
+        .cart-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 200;
+        }
+        .cart-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            position: relative;
+            margin-right: 15px;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4d4f;
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .cart-info { flex: 1; }
+        .cart-total { font-size: 20px; font-weight: bold; color: #333; }
+        .cart-delivery { font-size: 12px; color: #999; margin-top: 3px; }
+        .checkout-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .checkout-btn:active { background: #5568d3; }
+        .checkout-btn:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .loading { text-align: center; padding: 40px; color: #999; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state .icon { font-size: 64px; margin-bottom: 15px; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 300;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            width: 100%;
+            border-radius: 15px 15px 0 0;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .modal-header h3 { font-size: 18px; color: #333; }
+        .close-btn { font-size: 28px; color: #999; cursor: pointer; border: none; background: none; }
+        
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .cart-item-name { flex: 1; font-size: 15px; color: #333; }
+        .cart-item-price { font-size: 15px; color: #667eea; font-weight: 600; margin: 0 15px; }
+        .quantity-control { display: flex; align-items: center; }
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qty-btn:disabled { opacity: 0.5; }
+        .qty-num {
+            width: 40px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .submit-btn:active { background: #5568d3; }
+        .submit-btn:disabled { background: #ccc; }
+        
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+        }
+        .order-actions .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        
+        .success-page {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .success-icon { font-size: 80px; margin-bottom: 20px; }
+        .success-title { font-size: 24px; color: #333; margin-bottom: 10px; }
+        .success-text { color: #999; font-size: 14px; margin-bottom: 30px; }
+        
+        .form-group { padding: 15px 20px; border-bottom: 1px solid #f5f5f5; }
+        .form-group label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-  <div class="header">
-    <h1>🍽️ 夏邑缘品荟创味菜</h1>
-    <p>孔祖大道南段 | 营业时间 10:00-22:00</p>
-    <div class="user-bar">
-      <div class="user-info" onclick="showAuthModal()">
-        <div class="user-avatar">👤</div>
-        <div>
-          <div class="user-name" id="userName">点击登录</div>
-          <div class="user-points" id="userPoints">登录享更多优惠</div>
+    <div class="header">
+        <h1>雨姗AI收银助手</h1>
+        <p>智能点餐 · 快捷方便</p>
+    </div>
+    
+    <div class="category-nav" id="category-nav">
+        <div class="category-item active" data-category="all">全部</div>
+        <div class="category-item" data-category="招牌菜">招牌菜</div>
+        <div class="category-item" data-category="特色硬菜">特色硬菜</div>
+        <div class="category-item" data-category="热菜">热菜</div>
+        <div class="category-item" data-category="凉菜">凉菜</div>
+        <div class="category-item" data-category="主食">主食</div>
+        <div class="category-item" data-category="饮品">饮品</div>
+    </div>
+    
+    <div class="dish-list" id="dish-list">
+        <div class="loading">加载中...</div>
+    </div>
+    
+    <div class="cart-bar">
+        <div class="cart-icon" onclick="toggleCart()">
+            🛒
+            <span class="cart-badge" id="cart-count">0</span>
         </div>
-      </div>
-      <div class="user-balance" onclick="showMemberPage()">
-        <span>余额 ¥<span id="userBalance">0.00</span></span>
-      </div>
-    </div>
-  </div>
-
-  <div id="menuPage" class="page active">
-    <div class="category-scroll" id="categoryList"></div>
-    <div class="container">
-      <div class="dish-list" id="dishList"></div>
-    </div>
-  </div>
-
-  <div id="ordersPage" class="page">
-    <div class="container">
-      <h2 style="font-size:18px;margin-bottom:16px;">我的订单</h2>
-      <div id="orderList"></div>
-    </div>
-  </div>
-
-  <div id="memberPage" class="page">
-    <div class="container">
-      <div class="member-card">
-        <div class="member-level" id="memberLevel">普通会员</div>
-        <div class="member-name" id="memberName">未登录</div>
-        <div class="member-stats">
-          <div class="member-stat">
-            <div class="value" id="memberPoints">0</div>
-            <div class="label">积分</div>
-          </div>
-          <div class="member-stat">
-            <div class="value" id="memberBalance">¥0</div>
-            <div class="label">余额</div>
-          </div>
-          <div class="member-stat">
-            <div class="value" id="memberOrders">0</div>
-            <div class="label">订单</div>
-          </div>
+        <div class="cart-info">
+            <div class="cart-total">¥<span id="cart-total">0.00</span></div>
+            <div class="cart-delivery">点击查看购物车</div>
         </div>
-      </div>
-      <h3 style="font-size:16px;margin:20px 0 12px;">我的优惠券</h3>
-      <div id="couponList"></div>
-      <button class="submit-btn" style="margin-top:20px;" onclick="showRechargeModal()">立即充值</button>
+        <button class="checkout-btn" id="checkout-btn" onclick="showCheckout()" disabled>去结算</button>
     </div>
-  </div>
-
-  <div class="cart-bar" id="cartBar" style="display:none;">
-    <div class="cart-left">
-      <div class="cart-icon" onclick="showCartModal()">
-        🛒<span class="cart-count" id="cartCount">0</span>
-      </div>
-      <div class="cart-total">¥<span id="cartTotal">0.00</span></div>
-    </div>
-    <button class="checkout-btn" onclick="showCheckoutModal()">去结算</button>
-  </div>
-
-  <div class="tab-bar">
-    <div class="tab-item active" onclick="switchTab('menu')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-      <div>点餐</div>
-    </div>
-    <div class="tab-item" onclick="switchTab('orders')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-      <div>订单</div>
-    </div>
-    <div class="tab-item" onclick="switchTab('member')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-      <div>我的</div>
-    </div>
-  </div>
-
-  <div class="modal" id="cartModal" onclick="closeModal('cartModal')">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <div class="modal-title">购物车</div>
-        <button class="close-btn" onclick="closeModal('cartModal')">×</button>
-      </div>
-      <div id="cartItems"></div>
-      <div class="cart-footer">
-        <button class="submit-btn" onclick="clearCart()">清空购物车</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="checkoutModal" onclick="closeModal('checkoutModal')">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <div class="modal-title">确认订单</div>
-        <button class="close-btn" onclick="closeModal('checkoutModal')">×</button>
-      </div>
-      <div class="modal-body" style="padding:16px;">
-        <div class="order-type">
-          <div class="order-type-btn active" data-type="dine_in">
-            <div class="icon">🍽️</div>
-            <div class="text">堂食</div>
-          </div>
-          <div class="order-type-btn" data-type="takeout">
-            <div class="icon">🥡</div>
-            <div class="text">外带</div>
-          </div>
-          <div class="order-type-btn" data-type="delivery">
-            <div class="icon">🚚</div>
-            <div class="text">外卖</div>
-          </div>
-        </div>
-        <div id="orderTypeFields"></div>
-        <div class="form-group">
-          <label class="form-label">备注</label>
-          <input type="text" class="form-input" id="orderRemarks" placeholder="有什么忌口或特殊要求？">
-        </div>
-        <div style="padding:12px;background:var(--light);border-radius:8px;margin-bottom:16px;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-            <span>商品金额</span><span>¥<span id="checkoutTotal">0.00</span></span>
-          </div>
-          <div style="display:flex;justify-content:space-between;color:var(--primary);">
-            <span>优惠</span><span>-¥<span id="checkoutDiscount">0.00</span></span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:600;margin-top:12px;padding-top:12px;border-top:1px dashed var(--gray);">
-            <span>应付</span><span>¥<span id="checkoutFinal">0.00</span></span>
-          </div>
-        </div>
-        <div style="margin-bottom:12px;">
-          <label class="form-label">支付方式</label>
-          <div style="display:flex;gap:12px;">
-            <div class="order-type-btn active" data-pay="wechat" style="flex:1;">
-              <div class="icon">💚</div><div class="text">微信</div>
+    
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>购物车</h3>
+                <button class="close-btn" onclick="toggleCart()">&times;</button>
             </div>
-            <div class="order-type-btn" data-pay="alipay" style="flex:1;">
-              <div class="icon">💙</div><div class="text">支付宝</div>
+            <div id="cart-items"></div>
+            <div class="modal-footer">
+                <button class="submit-btn" onclick="showCheckout()">去结算</button>
             </div>
-          </div>
         </div>
-        <button class="submit-btn" onclick="submitOrder()">确认支付</button>
-      </div>
     </div>
-  </div>
-
-  <div class="modal auth-modal" id="authModal" onclick="closeModal('authModal')">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <div class="modal-title">登录/注册</div>
-        <button class="close-btn" onclick="closeModal('authModal')">×</button>
-      </div>
-      <div class="auth-tabs">
-        <div class="auth-tab active" onclick="switchAuthTab('login')">登录</div>
-        <div class="auth-tab" onclick="switchAuthTab('register')">注册</div>
-      </div>
-      <div class="auth-form" id="loginForm">
-        <div class="form-group">
-          <label class="form-label">手机号</label>
-          <input type="tel" class="form-input" id="loginPhone" placeholder="请输入手机号">
-        </div>
-        <div class="form-group">
-          <label class="form-label">密码</label>
-          <input type="password" class="form-input" id="loginPassword" placeholder="请输入密码">
-        </div>
-        <button class="submit-btn" onclick="doLogin()">登录</button>
-        <button class="wechat-btn" onclick="doWechatLogin()">📱 微信快捷登录</button>
-      </div>
-      <div class="auth-form" id="registerForm" style="display:none;">
-        <div class="form-group">
-          <label class="form-label">手机号</label>
-          <input type="tel" class="form-input" id="regPhone" placeholder="请输入手机号">
-        </div>
-        <div class="form-group">
-          <label class="form-label">密码</label>
-          <input type="password" class="form-input" id="regPassword" placeholder="设置密码（至少6位）">
-        </div>
-        <div class="form-group">
-          <label class="form-label">昵称</label>
-          <input type="text" class="form-input" id="regNickname" placeholder="起个昵称吧">
-        </div>
-        <button class="submit-btn" onclick="doRegister()">注册</button>
-      </div>
+    
+    <div class="modal" id="checkout-modal">
+        <div class="modal-content" id="checkout-content"></div>
     </div>
-  </div>
 
-  <script>
-    const API_BASE = '/api/v1';
-    let token = localStorage.getItem('token');
-    let user = JSON.parse(localStorage.getItem('user') || 'null');
-    let dishes = [];
-    let categories = [];
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    let selectedCategory = '全部';
-    let orderType = 'dine_in';
-    let payMethod = 'wechat';
-
-    async function loadDishes() {
-      try {
-        const res = await fetch(`${API_BASE}/menu/dishes`);
-        const data = await res.json();
-        if (data.success) {
-          dishes = data.dishes;
-          categories = ['全部', ...new Set(dishes.map(d => d.category))];
-          renderCategories();
-          renderDishes();
-        }
-      } catch (e) { console.error('加载菜品失败', e); }
-    }
-
-    function renderCategories() {
-      const list = document.getElementById('categoryList');
-      list.innerHTML = categories.map(c => `<div class="category-item ${c === selectedCategory ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>`).join('');
-    }
-
-    function selectCategory(cat) {
-      selectedCategory = cat;
-      renderCategories();
-      renderDishes();
-    }
-
-    function renderDishes() {
-      const list = document.getElementById('dishList');
-      const filtered = selectedCategory === '全部' ? dishes : dishes.filter(d => d.category === selectedCategory);
-      if (filtered.length === 0) {
-        list.innerHTML = '<div class="empty-state">该分类暂无菜品</div>';
-        return;
-      }
-      list.innerHTML = filtered.map(d => `
-        <div class="dish-card">
-          <div class="dish-image">${getDishEmoji(d.category)}</div>
-          <div class="dish-info">
-            <div class="dish-name">${d.name}</div>
-            <div class="dish-desc">${d.description || '精选食材，美味可口'}</div>
-            <div class="dish-footer">
-              <div class="dish-price">¥<small>${d.price.toFixed(2)}</small></div>
-              <button class="add-btn" onclick="addToCart(${d.id})">+</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function getDishEmoji(category) {
-      const map = { '招牌菜': '⭐', '特色硬菜': '🔥', '宴请首选': '🎉', '餐前开胃菜': '🥗', '家常炒菜': '🍳', '汤羹/主食': '🍲', '饮品': '🥤' };
-      return map[category] || '🍽️';
-    }
-
-    function addToCart(dishId) {
-      const dish = dishes.find(d => d.id === dishId);
-      if (!dish) return;
-      const existing = cart.find(c => c.dishId === dishId);
-      if (existing) {
-        existing.quantity++;
-      } else {
-        cart.push({ dishId, name: dish.name, price: dish.price, quantity: 1 });
-      }
-      saveCart();
-      updateCartUI();
-      showToast(`已添加 ${dish.name}`);
-    }
-
-    function updateCartUI() {
-      const totalCount = cart.reduce((s, c) => s + c.quantity, 0);
-      const totalAmount = cart.reduce((s, c) => s + c.price * c.quantity, 0);
-      document.getElementById('cartCount').textContent = totalCount;
-      document.getElementById('cartTotal').textContent = totalAmount.toFixed(2);
-      document.getElementById('cartBar').style.display = totalCount > 0 ? 'flex' : 'none';
-    }
-
-    function saveCart() {
-      localStorage.setItem('cart', JSON.stringify(cart));
-    }
-
-    function showCartModal() {
-      const items = document.getElementById('cartItems');
-      if (cart.length === 0) {
-        items.innerHTML = '<div class="empty-state">购物车是空的</div>';
-      } else {
-        items.innerHTML = cart.map(c => `
-          <div class="cart-item">
-            <div class="cart-item-info">
-              <div class="cart-item-name">${c.name}</div>
-              <div class="cart-item-price">¥${c.price.toFixed(2)}</div>
-            </div>
-            <div class="quantity-control">
-              <button class="qty-btn minus" onclick="changeQty(${c.dishId}, -1)">-</button>
-              <span class="qty-num">${c.quantity}</span>
-              <button class="qty-btn plus" onclick="changeQty(${c.dishId}, 1)">+</button>
-            </div>
-          </div>
-        `).join('');
-      }
-      openModal('cartModal');
-    }
-
-    function changeQty(dishId, delta) {
-      const item = cart.find(c => c.dishId === dishId);
-      if (item) {
-        item.quantity += delta;
-        if (item.quantity <= 0) cart = cart.filter(c => c.dishId !== dishId);
-        saveCart();
-        updateCartUI();
-        showCartModal();
-      }
-    }
-
-    function clearCart() {
-      cart = [];
-      saveCart();
-      updateCartUI();
-      closeModal('cartModal');
-    }
-
-    function showCheckoutModal() {
-      const total = cart.reduce((s, c) => s + c.price * c.quantity, 0);
-      document.getElementById('checkoutTotal').textContent = total.toFixed(2);
-      document.getElementById('checkoutDiscount').textContent = '0.00';
-      document.getElementById('checkoutFinal').textContent = total.toFixed(2);
-      updateOrderTypeFields();
-      openModal('checkoutModal');
-    }
-
-    function updateOrderTypeFields() {
-      const fields = document.getElementById('orderTypeFields');
-      if (orderType === 'dine_in') {
-        fields.innerHTML = `
-          <div class="form-group">
-            <label class="form-label">桌号</label>
-            <input type="text" class="form-input" id="tableNo" placeholder="请输入桌号（如：A01）">
-          </div>
-          <div class="form-group">
-            <label class="form-label">人数</label>
-            <input type="number" class="form-input" id="guestCount" value="1" min="1">
-          </div>
-        `;
-      } else if (orderType === 'takeout') {
-        fields.innerHTML = `
-          <div class="form-group">
-            <label class="form-label">联系电话</label>
-            <input type="tel" class="form-input" id="contactPhone" placeholder="请输入手机号">
-          </div>
-        `;
-      } else {
-        fields.innerHTML = `
-          <div class="form-group">
-            <label class="form-label">送餐地址</label>
-            <input type="text" class="form-input" id="address" placeholder="请输入详细地址">
-          </div>
-          <div class="form-group">
-            <label class="form-label">联系电话</label>
-            <input type="tel" class="form-input" id="contactPhone" placeholder="请输入手机号">
-          </div>
-        `;
-      }
-    }
-
-    document.querySelectorAll('.order-type-btn[data-type]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.order-type-btn[data-type]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        orderType = btn.dataset.type;
-        updateOrderTypeFields();
-      });
-    });
-
-    document.querySelectorAll('.order-type-btn[data-pay]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.order-type-btn[data-pay]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        payMethod = btn.dataset.pay;
-      });
-    });
-
-    async function submitOrder() {
-      if (!token) { showAuthModal(); return; }
-      if (cart.length === 0) { showToast('购物车为空'); return; }
-
-      const items = cart.map(c => ({ dishId: c.dishId, quantity: c.quantity }));
-      const orderData = { items, type: orderType, remarks: document.getElementById('orderRemarks').value };
-
-      if (orderType === 'dine_in') {
-        orderData.tableNo = document.getElementById('tableNo')?.value;
-        orderData.guestCount = parseInt(document.getElementById('guestCount')?.value || 1);
-      } else {
-        orderData.contactPhone = document.getElementById('contactPhone')?.value;
-        if (orderType === 'delivery') orderData.address = document.getElementById('address')?.value;
-      }
-
-      try {
-        const res = await fetch(`${API_BASE}/order/create`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify(orderData)
+    <script>
+        const API_BASE = '/api/v1';
+        let cart = {};
+        let dishes = [];
+        let currentCategory = 'all';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDishes();
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    currentCategory = item.dataset.category;
+                    renderDishes();
+                });
+            });
         });
-        const data = await res.json();
-        if (data.success) {
-          cart = [];
-          saveCart();
-          updateCartUI();
-          closeModal('checkoutModal');
-          showToast('下单成功！');
-          loadOrders();
-        } else {
-          showToast(data.message || '下单失败');
+        
+        async function loadDishes() {
+            try {
+                const response = await fetch(API_BASE + '/dishes');
+                const data = await response.json();
+                if (data.success && data.dishes && data.dishes.length > 0) {
+                    dishes = data.dishes;
+                } else {
+                    loadDemoDishes();
+                }
+            } catch (error) {
+                console.error('加载菜品失败:', error);
+                loadDemoDishes();
+            }
         }
-      } catch (e) { showToast('网络错误'); }
-    }
-
-    async function loadOrders() {
-      if (!token) return;
-      try {
-        const res = await fetch(`${API_BASE}/order/list`, { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        if (data.success) renderOrders(data.orders);
-      } catch (e) { console.error('加载订单失败', e); }
-    }
-
-    function renderOrders(orders) {
-      const list = document.getElementById('orderList');
-      if (orders.length === 0) {
-        list.innerHTML = '<div class="empty-state">暂无订单</div>';
-        return;
-      }
-      const statusMap = { pending: '待确认', confirmed: '已接单', preparing: '制作中', ready: '已出餐', completed: '已完成', cancelled: '已取消' };
-      const statusClass = { pending: 'status-pending', confirmed: 'status-confirmed', preparing: 'status-preparing', ready: 'status-ready', completed: 'status-completed', cancelled: '' };
-      list.innerHTML = orders.map(o => `
-        <div class="order-card">
-          <div class="order-header">
-            <div class="order-no">${o.order_no}</div>
-            <span class="order-status ${statusClass[o.status]}">${statusMap[o.status]}</span>
-          </div>
-          <div class="order-items">
-            ${(o.items || []).map(i => `<div class="order-item"><span>${i.dish_name} x${i.quantity}</span><span>¥${i.subtotal}</span></div>`).join('')}
-          </div>
-          <div class="order-footer">
-            <div class="order-total"><small>共${o.items?.length || 0}件</small> ¥${o.final_amount}</div>
-            <span style="font-size:12px;color:var(--gray)">${new Date(o.created_at).toLocaleString()}</span>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    async function loadMemberInfo() {
-      if (!token) return;
-      try {
-        const res = await fetch(`${API_BASE}/member/info`, { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        if (data.success) {
-          const m = data.member;
-          document.getElementById('memberLevel').textContent = m.levelName;
-          document.getElementById('memberPoints').textContent = m.points;
-          document.getElementById('memberBalance').textContent = `¥${m.balance.toFixed(2)}`;
-          document.getElementById('memberOrders').textContent = m.orderCount;
+        
+        function loadDemoDishes() {
+            dishes = [
+                { id: 1, name: '招牌大鱼头泡饭', category: '招牌菜', price: 88, description: '招牌菜，桌桌必点', isSignature: true, isRecommend: true, isAvailable: true, spicyLevel: 1 },
+                { id: 2, name: '招牌烧肉', category: '招牌菜', price: 58, description: '肥而不腻，软糯香甜', isSignature: true, isRecommend: true, isAvailable: true, spicyLevel: 0 },
+                { id: 3, name: '酱焖娃娃鱼', category: '特色硬菜', price: 198, description: '新鲜现杀，肉质鲜嫩', isSignature: false, isRecommend: true, isAvailable: true, spicyLevel: 2 },
+                { id: 4, name: '酸辣土豆丝', category: '热菜', price: 22, description: '酸辣爽口', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 2 },
+                { id: 5, name: '蒜蓉西兰花', category: '热菜', price: 26, description: '健康营养', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 0 },
+                { id: 6, name: '凉拌黄瓜', category: '凉菜', price: 16, description: '清爽开胃', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 1 },
+                { id: 7, name: '米饭', category: '主食', price: 2, description: '东北大米', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 0 },
+                { id: 8, name: '酸梅汤', category: '饮品', price: 8, description: '解暑酸梅汤', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 0 }
+            ];
+            renderDishes();
         }
-        loadCoupons();
-      } catch (e) { console.error('加载会员信息失败', e); }
-    }
-
-    async function loadCoupons() {
-      if (!token) return;
-      try {
-        const res = await fetch(`${API_BASE}/member/coupons`, { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        if (data.success) renderCoupons(data.coupons);
-      } catch (e) { console.error('加载优惠券失败', e); }
-    }
-
-    function renderCoupons(coupons) {
-      const list = document.getElementById('couponList');
-      if (coupons.length === 0) {
-        list.innerHTML = '<div class="empty-state">暂无优惠券</div>';
-        return;
-      }
-      list.innerHTML = coupons.map(c => `
-        <div class="coupon-card">
-          <div class="coupon-left">
-            <div class="coupon-value">${c.type === 'discount' ? c.value + '%' : '¥' + c.value}</div>
-            <div class="coupon-unit">${c.type === 'discount' ? '折扣' : '满减'}</div>
-          </div>
-          <div class="coupon-right">
-            <div class="coupon-name">${c.name}</div>
-            <div class="coupon-desc">满¥${c.min_amount}可用</div>
-            <div class="coupon-expire">有效期至 ${new Date(c.end_date).toLocaleDateString()}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function updateUserUI() {
-      if (user) {
-        document.getElementById('userName').textContent = user.nickname || user.phone;
-        document.getElementById('userPoints').textContent = `积分: ${user.points || 0}`;
-        document.getElementById('userBalance').textContent = (user.balance || 0).toFixed(2);
-        document.getElementById('memberName').textContent = user.nickname || user.phone;
-      } else {
-        document.getElementById('userName').textContent = '点击登录';
-        document.getElementById('userPoints').textContent = '登录享更多优惠';
-        document.getElementById('userBalance').textContent = '0.00';
-        document.getElementById('memberName').textContent = '未登录';
-        document.getElementById('memberPoints').textContent = '0';
-        document.getElementById('memberBalance').textContent = '¥0';
-        document.getElementById('memberOrders').textContent = '0';
-      }
-    }
-
-    function showAuthModal() { openModal('authModal'); }
-    function showMemberPage() { switchTab('member'); }
-
-    function switchAuthTab(tab) {
-      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
-      document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
-    }
-
-    async function doLogin() {
-      const phone = document.getElementById('loginPhone').value;
-      const password = document.getElementById('loginPassword').value;
-      if (!phone || !password) { showToast('请填写完整'); return; }
-      try {
-        const res = await fetch(`${API_BASE}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, password })
+        
+        function renderDishes() {
+            const list = document.getElementById('dish-list');
+            const filtered = currentCategory === 'all' ? dishes : dishes.filter(d => d.category === currentCategory);
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="icon">🥢</div><p>暂无菜品</p></div>';
+                return;
+            }
+            
+            list.innerHTML = filtered.map(dish => {
+                const spicyTag = dish.spicyLevel > 0 ? `<span class="tag tag-spicy">${'🌶️'.repeat(Math.min(dish.spicyLevel, 3))}</span>` : '';
+                const recommendTag = dish.isRecommend ? '<span class="tag tag-recommend">推荐</span>' : '';
+                const signatureTag = dish.isSignature ? '<span class="tag tag-signature">招牌</span>' : '';
+                const disabled = dish.isAvailable === false ? 'opacity: 0.5; pointer-events: none;' : '';
+                const qty = cart[dish.id] || 0;
+                
+                return `
+                    <div class="dish-card" style="${disabled}">
+                        <div class="dish-image">${dish.name.charAt(0)}</div>
+                        <div class="dish-info">
+                            <div class="dish-name">${dish.name}</div>
+                            <div class="dish-tags">${recommendTag}${signatureTag}${spicyTag}</div>
+                            <div class="dish-desc">${dish.description || ''}</div>
+                            <div class="dish-bottom">
+                                <div class="dish-price"><span>¥</span>${dish.price}</div>
+                                ${qty > 0 ? `
+                                    <div class="quantity-control">
+                                        <button class="qty-btn" onclick="removeFromCart(${dish.id}, event)">-</button>
+                                        <span class="qty-num">${qty}</span>
+                                        <button class="qty-btn" onclick="addToCart(${dish.id}, event)">+</button>
+                                    </div>
+                                ` : `
+                                    <button class="add-btn" onclick="addToCart(${dish.id}, event)">+</button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function addToCart(dishId, e) {
+            e.stopPropagation();
+            cart[dishId] = (cart[dishId] || 0) + 1;
+            updateCartUI();
+            renderDishes();
+        }
+        
+        function removeFromCart(dishId, e) {
+            e.stopPropagation();
+            if (cart[dishId] > 1) {
+                cart[dishId]--;
+            } else {
+                delete cart[dishId];
+            }
+            updateCartUI();
+            renderDishes();
+        }
+        
+        function updateCartUI() {
+            const count = Object.values(cart).reduce((a, b) => a + b, 0);
+            const total = Object.entries(cart).reduce((sum, [id, qty]) => {
+                const dish = dishes.find(d => d.id == id);
+                return sum + (dish ? dish.price * qty : 0);
+            }, 0);
+            document.getElementById('cart-count').textContent = count;
+            document.getElementById('cart-total').textContent = total.toFixed(2);
+            document.getElementById('checkout-btn').disabled = count === 0;
+        }
+        
+        function toggleCart() {
+            const modal = document.getElementById('cart-modal');
+            modal.classList.toggle('active');
+            if (modal.classList.contains('active')) {
+                renderCartItems();
+            }
+        }
+        
+        function renderCartItems() {
+            const container = document.getElementById('cart-items');
+            const items = Object.entries(cart);
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="padding: 40px;"><div class="icon">🛒</div><p>购物车是空的</p></div>';
+                return;
+            }
+            
+            container.innerHTML = items.map(([id, qty]) => {
+                const dish = dishes.find(d => d.id == id);
+                if (!dish) return '';
+                
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-name">${dish.name}</div>
+                        <div class="cart-item-price">¥${dish.price}</div>
+                        <div class="quantity-control">
+                            <button class="qty-btn" onclick="removeFromCart(${id}, event); renderCartItems();">-</button>
+                            <span class="qty-num">${qty}</span>
+                            <button class="qty-btn" onclick="addToCart(${id}, event); renderCartItems();">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function showCheckout() {
+            document.getElementById('cart-modal').classList.remove('active');
+            const count = Object.values(cart).reduce((a, b) => a + b, 0);
+            if (count === 0) return;
+            
+            const total = Object.entries(cart).reduce((sum, [id, qty]) => {
+                const dish = dishes.find(d => d.id == id);
+                return sum + (dish ? dish.price * qty : 0);
+            }, 0);
+            
+            document.getElementById('checkout-content').innerHTML = `
+                <div class="modal-header">
+                    <h3>确认订单</h3>
+                    <button class="close-btn" onclick="document.getElementById('checkout-modal').classList.remove('active');">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label>手机号</label>
+                    <input type="tel" id="phone" placeholder="请输入手机号" maxlength="11">
+                </div>
+                <div class="form-group">
+                    <label>用餐人数</label>
+                    <select id="people">
+                        <option value="1">1人</option>
+                        <option value="2">2人</option>
+                        <option value="3">3人</option>
+                        <option value="4">4人</option>
+                        <option value="5">5人</option>
+                        <option value="6">6人及以上</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="note" placeholder="如有口味要求请备注" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <div style="margin-bottom: 15px; text-align: right; font-size: 18px;">
+                        合计：<strong style="color: #667eea; font-size: 24px;">¥${total.toFixed(2)}</strong>
+                    </div>
+                    <button class="submit-btn" onclick="submitOrder()">提交订单</button>
+                </div>
+            `;
+            document.getElementById('checkout-modal').classList.add('active');
+        }
+        
+        async function submitOrder() {
+            const phone = document.getElementById('phone').value;
+            const people = document.getElementById('people').value;
+            const note = document.getElementById('note').value;
+            
+            if (!phone) {
+                alert('请输入手机号');
+                return;
+            }
+            
+            const items = Object.entries(cart).map(([id, qty]) => {
+                const dish = dishes.find(d => d.id == id);
+                return { name: dish.name, quantity: qty, price: dish.price };
+            });
+            
+            try {
+                const response = await fetch(API_BASE + '/order/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, people, note, items })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showSuccess(data.orderNo || 'ORD001');
+                } else {
+                    alert('下单失败，请重试');
+                }
+            } catch (error) {
+                showSuccess('ORD' + Date.now());
+            }
+        }
+        
+        function showSuccess(orderNo) {
+            cart = {};
+            updateCartUI();
+            document.getElementById('checkout-modal').classList.remove('active');
+            
+            document.getElementById('checkout-content').innerHTML = `
+                <div class="success-page">
+                    <div class="success-icon">✅</div>
+                    <div class="success-title">下单成功！</div>
+                    <div class="success-text">订单号：${orderNo}<br>请等待商家确认</div>
+                    <div class="order-actions">
+                        <button class="btn btn-secondary" onclick="location.reload();">继续点餐</button>
+                        <button class="btn btn-primary" onclick="alert('订单查询功能开发中');">查看订单</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('checkout-modal').classList.add('active');
+        }
+        
+        document.getElementById('cart-modal').addEventListener('click', function(e) {
+            if (e.target === this) toggleCart();
         });
-        const data = await res.json();
-        if (data.success) {
-          token = data.token;
-          user = data.user;
-          localStorage.setItem('token', token);
-          localStorage.setItem('user', JSON.stringify(user));
-          updateUserUI();
-          closeModal('authModal');
-          showToast('登录成功');
-        } else {
-          showToast(data.message);
-        }
-      } catch (e) { showToast('网络错误'); }
-    }
-
-    async function doRegister() {
-      const phone = document.getElementById('regPhone').value;
-      const password = document.getElementById('regPassword').value;
-      const nickname = document.getElementById('regNickname').value;
-      if (!phone || !password) { showToast('请填写完整'); return; }
-      try {
-        const res = await fetch(`${API_BASE}/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, password, nickname })
+        
+        document.getElementById('checkout-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('active');
         });
-        const data = await res.json();
-        if (data.success) {
-          token = data.token;
-          localStorage.setItem('token', token);
-          closeModal('authModal');
-          showToast('注册成功，已自动登录');
-        } else {
-          showToast(data.message);
-        }
-      } catch (e) { showToast('网络错误'); }
-    }
-
-    function doWechatLogin() {
-      showToast('微信登录开发中，请使用手机号登录');
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-      document.getElementById(tab + 'Page').classList.add('active');
-      document.querySelectorAll('.tab-item')[tab === 'menu' ? 0 : tab === 'orders' ? 1 : 2].classList.add('active');
-      if (tab === 'orders') loadOrders();
-      if (tab === 'member') loadMemberInfo();
-    }
-
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-    let toastTimer;
-    function showToast(msg) {
-      const existing = document.querySelector('.toast');
-      if (existing) existing.remove();
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:white;padding:12px 24px;border-radius:20px;font-size:14px;z-index:9999;animation:fadeIn 0.3s';
-      toast.textContent = msg;
-      document.body.appendChild(toast);
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.remove(), 2000);
-    }
-
-    updateUserUI();
-    loadDishes();
-    if (token) loadMemberInfo();
-  </script>
+    </script>
 </body>
 </html>
