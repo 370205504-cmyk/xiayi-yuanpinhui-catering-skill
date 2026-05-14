@@ -18,6 +18,8 @@ const SyncEngine = require('./services/sync-engine');
 const MCPHandler = require('./mcp/handler');
 const WeWorkBot = require('./integrations/wework-bot');
 const AIReport = require('./services/ai-report');
+const DataValidator = require('./services/data-validator');
+const DataWatcher = require('./services/data-watcher');
 
 const authRoutes = require('./routes/auth');
 const wechatRoutes = require('./routes/wechat');
@@ -239,6 +241,55 @@ app.post('/api/v1/report/send', async (req, res) => {
   const report = aiReport.generateDailyReport();
   await aiReport.sendReportToWeChat(report);
   res.json({ success: true, message: '报告已发送' });
+});
+
+// ========== v4.3.0 新增：数据校验和实时监听 ==========
+let dataValidator;
+let dataWatcher;
+
+app.post('/api/v1/validate/data', async (req, res) => {
+  if (!dataValidator) dataValidator = new DataValidator();
+  const { dishes, inventory, members, orders } = req.body;
+  const result = await dataValidator.validateAllData(dishes, inventory, members, orders);
+  const report = dataValidator.generateReport();
+  res.json({ success: true, result, report });
+});
+
+app.get('/api/v1/watcher/status', async (req, res) => {
+  if (dataWatcher) {
+    res.json({ success: true, status: dataWatcher.getStatus(), log: dataWatcher.getChangeLog(20) });
+  } else {
+    res.json({ success: true, status: { isWatching: false } });
+  }
+});
+
+app.post('/api/v1/watcher/start', async (req, res) => {
+  try {
+    const adapterManager = getAdapterManager();
+    const activeAdapter = adapterManager.getActiveAdapter();
+    
+    if (!activeAdapter) {
+      return res.json({ success: false, message: '请先激活收银适配器' });
+    }
+
+    if (!dataWatcher) {
+      dataWatcher = new DataWatcher(activeAdapter);
+    }
+
+    await dataWatcher.startWatching(req.body.interval || 10000);
+    res.json({ success: true, message: '实时监听已启动' });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+app.post('/api/v1/watcher/stop', async (req, res) => {
+  if (dataWatcher) {
+    dataWatcher.stopWatching();
+    res.json({ success: true, message: '实时监听已停止' });
+  } else {
+    res.json({ success: false, message: '监听未启动' });
+  }
 });
 
 app.use((req, res, next) => {
