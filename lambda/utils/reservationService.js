@@ -154,13 +154,13 @@ class ReservationService {
    */
   getStoreName(storeId) {
     const storeNames = {
-      'store_001': '夏邑缘品荟创味菜 - 县城中心店',
-      'store_002': '夏邑缘品荟创味菜 - 城东店',
-      'store_003': '夏邑缘品荟创味菜 - 城西店',
-      'store_004': '夏邑缘品荟创味菜 - 城郊店',
-      'store_005': '夏邑缘品荟创味菜 - 旗舰店'
+      'store_001': '雨姗AI收银助手创味菜 - 县城中心店',
+      'store_002': '雨姗AI收银助手创味菜 - 城东店',
+      'store_003': '雨姗AI收银助手创味菜 - 城西店',
+      'store_004': '雨姗AI收银助手创味菜 - 城郊店',
+      'store_005': '雨姗AI收银助手创味菜 - 旗舰店'
     };
-    return storeNames[storeId] || '夏邑缘品荟创味菜';
+    return storeNames[storeId] || '雨姗AI收银助手创味菜';
   }
 
   /**

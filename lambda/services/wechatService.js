@@ -15,7 +15,7 @@ class WechatService {
     this.appSecret = process.env.WECHAT_SECRET;
     this.mchId = process.env.WECHAT_MCHID;
     this.apiKey = process.env.WECHAT_APIKEY;
-    this.redirectUri = process.env.WECHAT_REDIRECT_URI || 'https://mcp.xiayi-yuanpinhui.com/api/v1/auth/wechat/callback';
+    this.redirectUri = process.env.WECHAT_REDIRECT_URI || 'https://mcp.yushan-ai-cashier.com/api/v1/auth/wechat/callback';
     this.unifiedOrderUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
     this.accessTokenUrl = 'https://api.weixin.qq.com/cgi-bin/token';
     this.userInfoUrl = 'https://api.weixin.qq.com/cgi-bin/user/info';
@@ -108,7 +108,7 @@ class WechatService {
         mch_id: this.mchId,
         nonce_str: nonceStr,
         sign_type: 'MD5',
-        body: `夏邑缘品荟-${order.orderNo}`,
+        body: `雨姗AI收银助手-${order.orderNo}`,
         out_trade_no: order.orderNo,
         total_fee: Math.round(order.amount * 100),
         spbill_create_ip: order.clientIp || '127.0.0.1',

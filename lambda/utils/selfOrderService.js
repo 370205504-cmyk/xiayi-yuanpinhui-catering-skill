@@ -45,7 +45,7 @@ class SelfOrderService {
   }
 
   generateToken(storeId, timestamp) {
-    const data = `${storeId}:${timestamp}:夏邑缘品荟创味菜`;
+    const data = `${storeId}:${timestamp}:雨姗AI收银助手创味菜`;
     let hash = 0;
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);

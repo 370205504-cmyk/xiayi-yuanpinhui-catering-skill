@@ -5,27 +5,27 @@ const SAMPLE_DATA = {
   stores: [
     {
       id: 1,
-      name: '夏邑缘品荟创味菜(孔祖店)',
+      name: '雨姗AI收银助手创味菜(孔祖店)',
       name_en: 'Xiayi Youpinhui Restaurant',
-      address: '夏邑县孔祖大道南段188号',
+      address: '县孔祖大道南段188号',
       phone: '0370-6288888',
       business_hours: '10:00-22:00',
       lat: 34.238,
       lng: 116.081,
-      description: '夏邑缘品荟创味菜，精选食材，美味可口',
+      description: '雨姗AI收银助手创味菜，精选食材，美味可口',
       is_default: true,
       status: 'active'
     },
     {
       id: 2,
-      name: '夏邑缘品荟创味菜(雪枫路店)',
+      name: '雨姗AI收银助手创味菜(雪枫路店)',
       name_en: 'Xiayi Youpinhui Restaurant',
-      address: '夏邑县雪枫路中段66号',
+      address: '县雪枫路中段66号',
       phone: '0370-6286666',
       business_hours: '10:00-22:00',
       lat: 34.241,
       lng: 116.079,
-      description: '夏邑缘品荟创味菜，精选食材，美味可口',
+      description: '雨姗AI收银助手创味菜，精选食材，美味可口',
       is_default: false,
       status: 'active'
     }
@@ -104,7 +104,7 @@ async function importSampleData() {
 
   const logger = console;
   logger.log('========================================');
-  logger.log('夏邑缘品荟创味菜 - 导入示例数据');
+  logger.log('雨姗AI收银助手创味菜 - 导入示例数据');
   logger.log('========================================');
 
   let connection;

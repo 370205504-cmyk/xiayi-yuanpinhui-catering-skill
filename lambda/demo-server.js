@@ -29,8 +29,8 @@ const sampleData = {
     { id: 'B2', name: 'B2包间(12人)', status: 'available' }
   ],
   store: {
-    name: '夏邑缘品荟创味菜',
-    address: '河南省商丘市夏邑县',
+    name: '雨姗AI收银助手创味菜',
+    address: '河南省商丘市县',
     phone: '0370-1234567',
     hours: '10:00 - 22:00',
     wifi: { name: 'Xiayi-Free', password: '88888888' }
@@ -146,7 +146,7 @@ app.get('/mobile', (req, res) => {
 console.log(`
 ╔═══════════════════════════════════════════════════╗
 ║                                                   ║
-║   🍽️  夏邑缘品荟智能餐饮系统 v3.1.0             ║
+║   🍽️  雨姗AI收银助手智能餐饮系统 v3.1.0             ║
 ║                                                   ║
 ║   演示模式启动成功！                              ║
 ║                                                   ║

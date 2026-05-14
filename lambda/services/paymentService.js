@@ -42,7 +42,7 @@ class PaymentService {
       const params = {
         appid: this.wechatConfig.appid,
         mchid: this.wechatConfig.mchid,
-        description: `夏邑缘品荟订单-${order.orderNo}`,
+        description: `雨姗AI收银助手订单-${order.orderNo}`,
         out_trade_no: order.orderNo,
         amount: {
           total: Math.round(order.finalAmount * 100),
@@ -87,7 +87,7 @@ class PaymentService {
       const bizContent = {
         out_trade_no: order.orderNo,
         total_amount: order.finalAmount.toString(),
-        subject: `夏邑缘品荟订单-${order.orderNo}`,
+        subject: `雨姗AI收银助手订单-${order.orderNo}`,
         product_code: 'FAST_INSTANT_TRADE_PAY'
       };
 

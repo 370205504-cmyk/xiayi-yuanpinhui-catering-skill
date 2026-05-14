@@ -140,7 +140,7 @@ class PrinterService {
 
   generateReceiptContent(order) {
     const now = new Date();
-    const restaurantName = config.restaurant?.name || '夏邑缘品荟创味菜';
+    const restaurantName = config.restaurant?.name || '雨姗AI收银助手创味菜';
     const receipt = `
 ================================
      ${restaurantName}
@@ -168,7 +168,7 @@ ${order.dishName}        x${order.quantity}    ¥${order.subtotal}
   }
 
   generateMenuContent(dishes) {
-    const restaurantName = config.restaurant?.name || '夏邑缘品荟创味菜';
+    const restaurantName = config.restaurant?.name || '雨姗AI收银助手创味菜';
     let menu = `
 ================================
      ${restaurantName} 菜单
@@ -190,7 +190,7 @@ ${order.dishName}        x${order.quantity}    ¥${order.subtotal}
   }
 
   generateReservationContent(reservation) {
-    const restaurantName = config.restaurant?.name || '夏邑缘品荟创味菜';
+    const restaurantName = config.restaurant?.name || '雨姗AI收银助手创味菜';
     const receipt = `
 ================================
      ${restaurantName}

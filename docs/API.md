@@ -1,10 +1,10 @@
 # API Documentation
 
-# 夏邑缘品荟创味菜 - API接口文档
+# 雨姗AI收银助手创味菜 - API接口文档
 
 ## 基础信息
 
-- **Base URL**: `https://mcp.xiayi-yuanpinhui.com/api/v1`
+- **Base URL**: `https://mcp.yushan-ai-cashier.com/api/v1`
 - **认证方式**: Bearer Token (JWT)
 - **Content-Type**: `application/json`
 
@@ -102,7 +102,7 @@
         "name": "招牌大鱼头泡饭",
         "category": "招牌菜",
         "price": 88.00,
-        "description": "缘品荟头牌菜"
+        "description": "雨姗AI收银助手头牌菜"
       }
     ],
     "total": 120
@@ -177,7 +177,7 @@
   "data": {
     "queueId": "QUEUE123456",
     "queueNo": "A025",
-    "storeName": "夏邑缘品荟(孔祖大道店)",
+    "storeName": "雨姗AI收银助手(孔祖大道店)",
     "tableType": "中桌",
     "people": 4,
     "waitCount": 5,

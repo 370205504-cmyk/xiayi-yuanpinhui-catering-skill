@@ -23,8 +23,8 @@
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
-cd xiayi-yuanpinhui-catering-skill
+git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
+cd yushan-ai-cashier-assistant
 
 # 2. 配置环境变量
 cp .env.example .env
@@ -76,17 +76,17 @@ start-demo.bat
 
 ```bash
 # 方式1: 下载ZIP
-# https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill/archive/refs/heads/main.zip
+# https://github.com/370205504-cmyk/yushan-ai-cashier-assistant/archive/refs/heads/main.zip
 
 # 方式2: 使用Git
-git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
+git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
 ```
 
 #### 3. 运行
 
 ```bash
 # 进入项目目录
-cd xiayi-yuanpinhui-catering-skill
+cd yushan-ai-cashier-assistant
 
 # 演示模式（无需数据库）
 # 双击 start-demo.bat
@@ -121,8 +121,8 @@ sudo yum install -y nodejs
 #### 2. 下载项目
 
 ```bash
-git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
-cd xiayi-yuanpinhui-catering-skill
+git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
+cd yushan-ai-cashier-assistant
 ```
 
 #### 3. 运行
@@ -170,8 +170,8 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
-cd xiayi-yuanpinhui-catering-skill
+git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
+cd yushan-ai-cashier-assistant
 
 # 2. 配置环境变量
 cp .env.example .env
@@ -255,8 +255,8 @@ curl -fsSL https://get.docker.com | sh
 
 4. 部署项目
 ```bash
-git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
-cd xiayi-yuanpinhui-catering-skill
+git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
+cd yushan-ai-cashier-assistant
 cp .env.example .env
 # 编辑 .env 配置
 docker-compose up -d
@@ -418,7 +418,7 @@ npm install
 
 ## 获取帮助
 
-- GitHub Issues: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill/issues
+- GitHub Issues: https://github.com/370205504-cmyk/yushan-ai-cashier-assistant/issues
 - 文档: docs/
 - 快速开始: quick-start.sh
 

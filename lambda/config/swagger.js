@@ -5,9 +5,9 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: '夏邑缘品荟智能餐饮系统 API',
+      title: '雨姗AI收银助手智能餐饮系统 API',
       version: '1.0.0',
-      description: '夏邑缘品荟智能餐饮系统 RESTful API 文档',
+      description: '雨姗AI收银助手智能餐饮系统 RESTful API 文档',
       contact: {
         name: '技术支持',
         email: 'support@xiayi.com'
@@ -71,7 +71,7 @@ const specs = swaggerJsdoc(options);
 
 const swaggerOptions = {
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: '夏邑缘品荟 API 文档',
+  customSiteTitle: '雨姗AI收银助手 API 文档',
   swaggerOptions: {
     persistAuthorization: true,
     docExpansion: 'list',

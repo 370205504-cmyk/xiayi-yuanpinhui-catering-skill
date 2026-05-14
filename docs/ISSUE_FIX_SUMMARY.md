@@ -1,4 +1,4 @@
-# 夏邑缘品荟 - 核心问题修复总结报告
+# 雨姗AI收银助手 - 核心问题修复总结报告
 
 ## 📋 报告信息
 - **修复日期**: 2026-05-12
@@ -112,7 +112,7 @@
 
 ## 🔗 仓库与文档
 
-- **GitHub仓库**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill
+- **GitHub仓库**: https://github.com/370205504-cmyk/yushan-ai-cashier-assistant
 - **部署方式**: PM2 Cluster + Docker
 - **文档目录**: /docs (待完善)
 

@@ -2,9 +2,9 @@ const config = require('../config.json');
 
 class StoreService {
   constructor(stores) {
-    this.restaurantName = config.restaurant?.name || '夏邑缘品荟创味菜';
+    this.restaurantName = config.restaurant?.name || '雨姗AI收银助手创味菜';
     this.restaurantPhone = config.restaurant?.phone || '0370-628-8888';
-    this.restaurantAddress = config.restaurant?.address || '夏邑县孔祖大道南段';
+    this.restaurantAddress = config.restaurant?.address || '县孔祖大道南段';
     this.stores = stores || [];
 
     if (this.stores.length === 0 && config.stores) {
@@ -14,7 +14,7 @@ class StoreService {
         address: store.address || this.restaurantAddress,
         phone: store.phone || this.restaurantPhone,
         businessHours: store.hours || store.businessHours || '10:00-22:00',
-        district: store.district || '夏邑县',
+        district: store.district || '县',
         features: store.features || ['WiFi', '打印机'],
         canDeliver: store.canDeliver !== false,
         canReserve: store.canReserve !== false,

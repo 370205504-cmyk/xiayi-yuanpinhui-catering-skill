@@ -1,7 +1,7 @@
 {
-  "name": "xiayi-yuanpinhui-catering-skill",
+  "name": "yushan-ai-cashier-assistant",
   "version": "3.0.0",
-  "description": "夏邑缘品荟创味菜 - 智能餐饮服务系统，支持语音点餐、文字聊天、AI Agent接入、完整订单生命周期",
+  "description": "雨姗AI收银助手创味菜 - 智能餐饮服务系统，支持语音点餐、文字聊天、AI Agent接入、完整订单生命周期",
   "main": "lambda/server.js",
   "scripts": {
     "start": "node lambda/server.js",

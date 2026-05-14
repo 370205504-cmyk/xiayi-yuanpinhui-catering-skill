@@ -29,11 +29,11 @@ console.log(`  Database: ${dbConfig.database}\n`);
 // 演示门店数据
 const stores = [
   {
-    name: '夏邑缘品荟创味菜 - 旗舰店',
+    name: '雨姗AI收银助手创味菜 - 旗舰店',
     short_name: '旗舰店',
-    district: '夏邑县',
+    district: '县',
     area: '县中心商业区',
-    address: '河南省商丘市夏邑县府前路188号',
+    address: '河南省商丘市县府前路188号',
     phone: '0370-628-9999',
     business_hours: '09:00-22:00',
     lat: 34.2334,
@@ -57,11 +57,11 @@ const stores = [
     sort_order: 1
   },
   {
-    name: '夏邑缘品荟创味菜 - 县城中心店',
+    name: '雨姗AI收银助手创味菜 - 县城中心店',
     short_name: '中心店',
-    district: '夏邑县',
+    district: '县',
     area: '县中心商业区',
-    address: '河南省商丘市夏邑县县城中路128号',
+    address: '河南省商丘市县县城中路128号',
     phone: '0370-628-8888',
     business_hours: '09:00-21:00',
     lat: 34.2311,
@@ -105,7 +105,7 @@ const storeSettings = [
 const announcements = [
   {
     title: '开业优惠',
-    content: '夏邑缘品荟创味菜旗舰店开业啦！全场8.8折，满100送20优惠券，欢迎光临！',
+    content: '雨姗AI收银助手创味菜旗舰店开业啦！全场8.8折，满100送20优惠券，欢迎光临！',
     type: 'promotion',
     start_time: new Date().toISOString().split('T')[0],
     end_time: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],

@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
  */
 class SecurityEnhancementService {
   constructor() {
-    this.jwtSecret = process.env.JWT_SECRET || 'xiayi-yuanpinhui-jwt-secret-key-change-in-production';
+    this.jwtSecret = process.env.JWT_SECRET || 'yushan-ai-cashier-jwt-secret-key-change-in-production';
     this.jwtExpiresIn = process.env.JWT_EXPIRES_IN || '2h';
     this.jwtRefreshExpiresIn = '30d';
   }
@@ -43,13 +43,13 @@ class SecurityEnhancementService {
 
     const token = jwt.sign(payload, this.jwtSecret, {
       expiresIn: this.jwtExpiresIn,
-      issuer: 'xiayi-yuanpinhui'
+      issuer: 'yushan-ai-cashier'
     });
 
     const refreshToken = jwt.sign(
       { userId, type: 'refresh' },
       this.jwtSecret,
-      { expiresIn: this.jwtRefreshExpiresIn, issuer: 'xiayi-yuanpinhui' }
+      { expiresIn: this.jwtRefreshExpiresIn, issuer: 'yushan-ai-cashier' }
     );
 
     logger.logOperation(userId, 'JWT Token生成', { role });
@@ -63,7 +63,7 @@ class SecurityEnhancementService {
   verifyJwtToken(token) {
     try {
       const decoded = jwt.verify(token, this.jwtSecret, {
-        issuer: 'xiayi-yuanpinhui'
+        issuer: 'yushan-ai-cashier'
       });
       return { valid: true, decoded };
     } catch (error) {

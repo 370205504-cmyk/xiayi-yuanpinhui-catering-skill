@@ -74,8 +74,8 @@ A: 确保点击 `start-demo.bat` 后等待出现 "启动成功" 提示
 
 ## 📞 获取帮助
 
-- 项目地址：https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill
-- 问题反馈：https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill/issues
+- 项目地址：https://github.com/370205504-cmyk/yushan-ai-cashier-assistant
+- 问题反馈：https://github.com/370205504-cmyk/yushan-ai-cashier-assistant/issues
 
 ---
 

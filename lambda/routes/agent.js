@@ -141,7 +141,7 @@ async function processAgentQuery(query, userId, sessionId, context) {
   }
 
   return {
-    response: '您好！我是夏邑缘品荟创味菜的智能助手。请问有什么可以帮您？',
+    response: '您好！我是雨姗AI收银助手创味菜的智能助手。请问有什么可以帮您？',
     actions: [{ type: 'show_help', data: {} }],
     data: {},
     context: context
@@ -437,7 +437,7 @@ async function handleStoreQuery(query, context) {
     };
   }
   return {
-    response: '📍 夏邑缘品荟创味菜\n\n地址：河南省商丘市夏邑县府前路188号\n电话：0370-628-9999\n营业时间：09:00-22:00',
+    response: '📍 雨姗AI收银助手创味菜\n\n地址：河南省商丘市县府前路188号\n电话：0370-628-9999\n营业时间：09:00-22:00',
     actions: [],
     data: {},
     context: context
@@ -450,7 +450,7 @@ async function handleWifiQuery(context) {
     const wifi = result;
     if (wifi.hasWifi) {
       return {
-        response: `📶 WiFi信息\n\n名称：${wifi.wifiName || '缘品荟免费WiFi'}\n密码：${wifi.wifiPassword || '88888888'}\n\n免密码连接，祝您用餐愉快！`,
+        response: `📶 WiFi信息\n\n名称：${wifi.wifiName || '雨姗AI收银助手免费WiFi'}\n密码：${wifi.wifiPassword || '88888888'}\n\n免密码连接，祝您用餐愉快！`,
         actions: [{ type: 'show_wifi', data: wifi }],
         data: { wifi },
         context: context
@@ -464,7 +464,7 @@ async function handleWifiQuery(context) {
     };
   }
   return {
-    response: '📶 WiFi信息\n\n名称：缘品荟免费WiFi\n密码：88888888\n\n免密码连接，祝您用餐愉快！',
+    response: '📶 WiFi信息\n\n名称：雨姗AI收银助手免费WiFi\n密码：88888888\n\n免密码连接，祝您用餐愉快！',
     actions: [],
     data: {},
     context: context
@@ -679,7 +679,7 @@ async function handleContactQuery(query, context) {
   }
 
   return {
-    response: `📍 夏邑缘品荟创味菜\n\n地址：河南省商丘市夏邑县府前路188号\n电话：0370-628-9999\n营业时间：09:00-22:00`,
+    response: `📍 雨姗AI收银助手创味菜\n\n地址：河南省商丘市县府前路188号\n电话：0370-628-9999\n营业时间：09:00-22:00`,
     actions: [],
     data: {},
     context: context

@@ -1,13 +1,13 @@
 {
   "skill": {
-    "name": "夏邑缘品荟创味菜",
-    "invocationName": "夏邑缘品荟创味菜",
+    "name": "雨姗AI收银助手创味菜",
+    "invocationName": "雨姗AI收银助手创味菜",
     "version": "3.0.0",
     "developer": "石中伟"
   },
   "restaurant": {
-    "name": "夏邑缘品荟创味菜",
-    "address": "夏邑县孔祖大道南段",
+    "name": "雨姗AI收银助手创味菜",
+    "address": "县孔祖大道南段",
     "phone": "0370-628-8888",
     "businessHours": "10:00-22:00"
   },
@@ -21,7 +21,7 @@
   },
   "wifi": {
     "default": {
-      "ssid": "缘品荟免费WiFi",
+      "ssid": "雨姗AI收银助手免费WiFi",
       "password": "88888888"
     }
   },
@@ -36,7 +36,7 @@
     {
       "id": "default",
       "name": "总店",
-      "address": "夏邑县孔祖大道南段123号",
+      "address": "县孔祖大道南段123号",
       "hours": "10:00-22:00",
       "phone": "0370-628-8888"
     }

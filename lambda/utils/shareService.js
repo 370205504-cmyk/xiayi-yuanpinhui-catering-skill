@@ -56,7 +56,7 @@ ${dish.ingredients.map(i => `• ${i}`).join('\n')}
         '#美食分享',
         '#今天吃什么',
         '#烹饪教程',
-        '#夏邑缘品荟创味菜'
+        '#雨姗AI收银助手创味菜'
       ],
       image: commonContent.image
     };
@@ -93,13 +93,13 @@ ${dish.ingredients.slice(0, 5).join('、')}...`,
   generateWeiboContent(dish, commonContent) {
     return {
       title: commonContent.title,
-      content: `${commonContent.description} ${dish.ingredients.slice(0, 3).join('、')}... @夏邑缘品荟创味菜`,
+      content: `${commonContent.description} ${dish.ingredients.slice(0, 3).join('、')}... @雨姗AI收银助手创味菜`,
       hashtags: [
         `#${dish.cuisine}`,
         '#美食',
         '#烹饪',
         '#下厨房',
-        '夏邑缘品荟创味菜'
+        '雨姗AI收银助手创味菜'
       ],
       image: commonContent.image
     };

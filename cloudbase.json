@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "envId": "xiayi-yuanpinhui",
+  "envId": "yushan-ai-cashier",
   "functionRoot": "./lambda",
   "functions": [
     {
@@ -29,7 +29,7 @@
         "config": {
           "methods": ["ANY"],
           "path": "/api/v1",
-          "serviceName": "xiayi-yuanpinhui-api",
+          "serviceName": "yushan-ai-cashier-api",
           "apiName": "xiayi-catering-api"
         }
       }

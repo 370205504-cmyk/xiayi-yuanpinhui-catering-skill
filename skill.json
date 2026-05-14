@@ -1,7 +1,7 @@
 {
-  "name": "xiayi-yuanpinhui-catering-skill",
+  "name": "yushan-ai-cashier-assistant",
   "version": "4.1.0",
-  "description": "夏邑缘品荟创味菜官方AI点餐服务，支持语音点餐、文字聊天、排队取号、商业服务查询（地址、电话、营业时间、WiFi、停车等）",
+  "description": "雨姗AI收银助手创味菜官方AI点餐服务，支持语音点餐、文字聊天、排队取号、商业服务查询（地址、电话、营业时间、WiFi、停车等）",
   "author": "石中伟",
   "license": "MIT",
   "keywords": [
@@ -14,7 +14,7 @@
   ],
   "mcp": {
     "protocol_version": "2024-11-05",
-    "endpoint": "https://mcp.xiayi-yuanpinhui.com",
+    "endpoint": "https://mcp.yushan-ai-cashier.com",
     "transport": "http",
     "authentication": {
       "type": "bearer",
@@ -728,7 +728,7 @@
           "required": ["order_no", "store_id", "delivery_address", "contact_name", "contact_phone", "delivery_fee"]
         },
         "examples": [
-          {"order_no": "ORD20260115001", "store_id": "1", "delivery_address": "夏邑县某某小区1号楼1单元101室", "contact_name": "张先生", "contact_phone": "13800138000", "delivery_fee": 3}
+          {"order_no": "ORD20260115001", "store_id": "1", "delivery_address": "县某某小区1号楼1单元101室", "contact_name": "张先生", "contact_phone": "13800138000", "delivery_fee": 3}
         ]
       },
       {
@@ -884,12 +884,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git"
+    "url": "https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git"
   },
   "endpoints": {
-    "api": "https://mcp.xiayi-yuanpinhui.com/api/v1",
-    "admin": "https://mcp.xiayi-yuanpinhui.com/admin",
-    "customer": "https://mcp.xiayi-yuanpinhui.com/mobile"
+    "api": "https://mcp.yushan-ai-cashier.com/api/v1",
+    "admin": "https://mcp.yushan-ai-cashier.com/admin",
+    "customer": "https://mcp.yushan-ai-cashier.com/mobile"
   },
   "deployment": {
     "platform": "tencent-cloud-scf",

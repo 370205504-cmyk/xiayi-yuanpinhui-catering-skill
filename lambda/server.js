@@ -246,7 +246,7 @@ async function startServer() {
 
     app.listen(PORT, HOST, () => {
       console.log('═══════════════════════════════════════════════════════════');
-      console.log('🍽️  夏邑缘品荟创味菜 - 智能餐饮服务系统 v3.4.0');
+      console.log('🍽️  雨姗AI收银助手创味菜 - 智能餐饮服务系统 v3.4.0');
       console.log('═══════════════════════════════════════════════════════════');
       console.log(`🚀 服务已启动: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
       console.log(`📱 顾客端: http://localhost:${PORT}/`);

@@ -430,7 +430,7 @@
                         </div>
                         <div class="form-group">
                             <label>门店地址</label>
-                            <textarea id="setting-store-address" rows="3">河南省商丘市夏邑县孔祖大道南段</textarea>
+                            <textarea id="setting-store-address" rows="3">河南省商丘市县孔祖大道南段</textarea>
                         </div>
                         <button class="btn btn-primary" onclick="saveStoreSettings()">保存</button>
                     </div>
@@ -1011,7 +1011,7 @@
                 if (data.success && data.settings) {
                     document.getElementById('setting-store-name').value = data.settings.storeName || '雨姗AI收银助手';
                     document.getElementById('setting-store-phone').value = data.settings.storePhone || '0370-628-8888';
-                    document.getElementById('setting-store-address').value = data.settings.storeAddress || '河南省商丘市夏邑县孔祖大道南段';
+                    document.getElementById('setting-store-address').value = data.settings.storeAddress || '河南省商丘市县孔祖大道南段';
                     document.getElementById('setting-wifi-name').value = data.settings.wifiName || '雨姗AI收银助手免费WiFi';
                     document.getElementById('setting-wifi-password').value = data.settings.wifiPassword || '88888888';
                 }

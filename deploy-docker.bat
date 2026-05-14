@@ -1,9 +1,9 @@
 @echo off
 chcp 65001 >nul
-title 夏邑缘品荟智能餐饮系统 - Docker部署
+title 雨姗AI收银助手智能餐饮系统 - Docker部署
 
 echo ========================================
-echo   夏邑缘品荟智能餐饮系统
+echo   雨姗AI收银助手智能餐饮系统
 echo   Docker一键部署脚本 (Windows)
 echo ========================================
 echo.

@@ -1,4 +1,4 @@
-# 🍔 缘品荟餐饮系统 - Windows 完整部署教程
+# 🍔 雨姗AI收银助手餐饮系统 - Windows 完整部署教程
 
 ## 目录
 
@@ -64,17 +64,17 @@ mkdir xiayi_restaurant
 cd xiayi_restaurant
 
 # 克隆项目
-git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
+git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
 
 # 进入项目
-cd xiayi-yuanpinhui-catering-skill
+cd yushan-ai-cashier-assistant
 ```
 
 ### 方式二：下载 ZIP 包（如果 Git 网络不行）
 
-1. 打开浏览器访问 https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill
+1. 打开浏览器访问 https://github.com/370205504-cmyk/yushan-ai-cashier-assistant
 2. 点击绿色 **Code** 按钮 → **Download ZIP**
-3. 解压到 `D:\xiayi_restaurant\xiayi-yuanpinhui-catering-skill`
+3. 解压到 `D:\xiayi_restaurant\yushan-ai-cashier-assistant`
 
 ---
 
@@ -83,7 +83,7 @@ cd xiayi-yuanpinhui-catering-skill
 ```cmd
 # 进入项目目录
 D:
-cd D:\xiayi_restaurant\xiayi-yuanpinhui-catering-skill
+cd D:\xiayi_restaurant\yushan-ai-cashier-assistant
 
 # 复制环境变量文件
 copy .env.example .env
@@ -118,7 +118,7 @@ EXIT;
 ### 4.2 导入表结构
 
 ```cmd
-cd D:\xiayi_restaurant\xiayi-yuanpinhui-catering-skill\lambda
+cd D:\xiayi_restaurant\yushan-ai-cashier-assistant\lambda
 mysql -u root -p catering_system < database\init.sql
 ```
 
@@ -129,7 +129,7 @@ mysql -u root -p catering_system < database\init.sql
 ### 5.1 安装依赖
 
 ```cmd
-cd D:\xiayi_restaurant\xiayi-yuanpinhui-catering-skill\lambda
+cd D:\xiayi_restaurant\yushan-ai-cashier-assistant\lambda
 npm install
 ```
 
@@ -143,7 +143,7 @@ node server.js
 
 ```
 ═══════════════════════════════════════════════════════════
-🍽️  夏邑缘品荟创味菜 - 智能餐饮服务系统
+🍽️  雨姗AI收银助手创味菜 - 智能餐饮服务系统
 ═══════════════════════════════════════════════════════════
 🚀 服务已启动: http://localhost:3000
 📱 顾客端: http://localhost:3000/
@@ -252,10 +252,10 @@ taskkill /PID 进程ID /F
 
 ```batch
 @echo off
-title 缘品荟餐饮系统
-cd /d D:\xiayi_restaurant\xiayi-yuanpinhui-catering-skill\lambda
+title 雨姗AI收银助手餐饮系统
+cd /d D:\xiayi_restaurant\yushan-ai-cashier-assistant\lambda
 echo ========================================
-echo  缘品荟餐饮系统 - 正在启动...
+echo  雨姗AI收银助手餐饮系统 - 正在启动...
 echo ========================================
 node server.js
 pause

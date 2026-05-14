@@ -1,6 +1,6 @@
 # 快速开始指南
 
-本指南将帮助您在几分钟内启动并运行夏邑缘品荟智能餐饮系统。
+本指南将帮助您在几分钟内启动并运行雨姗AI收银助手智能餐饮系统。
 
 ## 目录
 
@@ -46,8 +46,8 @@ start-demo.bat
 #### Linux / macOS 用户
 ```bash
 # 1. 下载并解压代码
-git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
-cd xiayi-yuanpinhui-catering-skill
+git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
+cd yushan-ai-cashier-assistant
 
 # 2. 安装依赖（仅首次运行）
 cd lambda
@@ -68,8 +68,8 @@ cd ..
 
 ```bash
 # 1. 下载代码
-git clone https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill.git
-cd xiayi-yuanpinhui-catering-skill
+git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
+cd yushan-ai-cashier-assistant
 
 # 2. 启动所有服务
 docker-compose up -d
@@ -196,8 +196,8 @@ start.bat
 
 ## 获取帮助
 
-- **GitHub Issues**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill/issues
-- **完整文档**: https://github.com/370205504-cmyk/xiayi-yuanpinhui-catering-skill/blob/main/docs/DEPLOYMENT.md
+- **GitHub Issues**: https://github.com/370205504-cmyk/yushan-ai-cashier-assistant/issues
+- **完整文档**: https://github.com/370205504-cmyk/yushan-ai-cashier-assistant/blob/main/docs/DEPLOYMENT.md
 
 ---
 

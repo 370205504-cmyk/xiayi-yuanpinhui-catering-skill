@@ -30,14 +30,14 @@ const intentPatterns = {
 };
 
 const storeInfo = stores.restaurant || {
-  name: '夏邑缘品荟创味菜',
-  address: '夏邑县孔祖大道南段',
+  name: '雨姗AI收银助手创味菜',
+  address: '县孔祖大道南段',
   phone: '0370-628-8888',
   hours: '10:00-22:00'
 };
 
 const wifiInfo = stores.wifi?.default || {
-  ssid: '缘品荟免费WiFi',
+  ssid: '雨姗AI收银助手免费WiFi',
   password: '88888888'
 };
 

@@ -1,9 +1,9 @@
 @echo off
 chcp 65001 >nul
-title 夏邑缘品荟智能餐饮系统 - 一键启动
+title 雨姗AI收银助手智能餐饮系统 - 一键启动
 
 echo ========================================
-echo   夏邑缘品荟智能餐饮系统
+echo   雨姗AI收银助手智能餐饮系统
 echo   Windows一键安装启动工具
 echo ========================================
 echo.
@@ -65,7 +65,7 @@ if not exist ".env" (
         echo DB_PATH=.\data\catering.db
         echo.
         echo # JWT密钥
-        echo JWT_SECRET=xiayi-yuanpinhui-local-dev-key
+        echo JWT_SECRET=yushan-ai-cashier-local-dev-key
         echo.
         echo # 日志配置
         echo LOG_LEVEL=info

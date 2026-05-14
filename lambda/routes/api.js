@@ -244,7 +244,7 @@ router.post('/order/:orderId/print', async (req, res, next) => {
 
 router.get('/docs', (req, res) => {
   res.json({
-    title: '夏邑缘品荟创味菜 - API文档',
+    title: '雨姗AI收银助手创味菜 - API文档',
     version: '1.0.0',
     endpoints: [
       { method: 'GET', path: '/api/v1/menu', description: '获取菜单列表' },
