@@ -14,6 +14,11 @@ const { getAdapterManager } = require('./adapters');
 const Detector = require('./services/detector');
 const SyncEngine = require('./services/sync-engine');
 
+// v4.3.0 新增：MCP和AI相关
+const MCPHandler = require('./mcp/handler');
+const WeWorkBot = require('./integrations/wework-bot');
+const AIReport = require('./services/ai-report');
+
 const authRoutes = require('./routes/auth');
 const wechatRoutes = require('./routes/wechat');
 const paymentRoutes = require('./routes/payment');
@@ -205,6 +210,37 @@ app.get('/api/v1/sync/status', async (req, res) => {
   });
 });
 
+// ========== v4.3.0 新增：MCP和AI API ==========
+let mcpHandler;
+let weworkBot;
+let aiReport;
+
+app.post('/api/v1/mcp/message', async (req, res) => {
+  if (!mcpHandler) mcpHandler = new MCPHandler();
+  const { sessionId, customerId, message } = req.body;
+  const result = await mcpHandler.handleMessage(sessionId, customerId, message);
+  res.json({ success: true, data: result });
+});
+
+app.post('/api/v1/wework/callback', async (req, res) => {
+  if (!weworkBot) weworkBot = new WeWorkBot();
+  const result = await weworkBot.handleKouZiCallback(req.body);
+  res.json({ success: true, data: result });
+});
+
+app.get('/api/v1/report/daily', async (req, res) => {
+  if (!aiReport) aiReport = new AIReport();
+  const report = aiReport.generateDailyReport();
+  res.json({ success: true, report });
+});
+
+app.post('/api/v1/report/send', async (req, res) => {
+  if (!aiReport) aiReport = new AIReport();
+  const report = aiReport.generateDailyReport();
+  await aiReport.sendReportToWeChat(report);
+  res.json({ success: true, message: '报告已发送' });
+});
+
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) {
     res.status(404).json({ success: false, code: 1004, message: '接口不存在' });
@@ -293,7 +329,7 @@ async function startServer() {
 
     app.listen(PORT, HOST, () => {
       console.log('═══════════════════════════════════════════════════════════');
-      console.log('🤖  雨姗AI收银助手 - 收银系统智能增强助手 v4.2.0');
+      console.log('🤖  雨姗AI收银助手 - 自然语义智能体 v4.3.0');
       console.log('═══════════════════════════════════════════════════════════');
       console.log(`🚀 服务已启动: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
       console.log(`📱 顾客端: http://localhost:${PORT}/`);
@@ -301,14 +337,16 @@ async function startServer() {
       console.log(`⚙️  管理端: http://localhost:${PORT}/admin`);
       console.log(`🔌 API基础: http://localhost:${PORT}/api/v1`);
       console.log('═══════════════════════════════════════════════════════════');
-      console.log('✅ 可插拔适配器架构: 支持主流收银系统对接');
-      console.log('✅ 美团收银/银豹/哗啦啦/思迅/科脉: 五大主流适配');
-      console.log('✅ 数据库直连模式: MySQL/Access/SQL Server');
-      console.log('✅ 打印旁路兜底: 小票逆向解析，100%兼容所有收银');
-      console.log('✅ 自动扫描一键对接: 自动发现并推荐最佳适配方案');
-      console.log('✅ 双向数据同步: 增量同步，冲突解决，实时一致');
+      console.log('✅ v4.2 可插拔适配器架构: 支持主流收银系统对接');
+      console.log('✅ v4.3 MCP工具扩展: AI Agent可调用收银接口');
+      console.log('✅ v4.3 自然语义理解: 大白话点餐，意图识别');
+      console.log('✅ v4.3 上下文记忆增强: 记住口味、历史订单');
+      console.log('✅ v4.3 AI主动技能: 迎宾、推荐、提醒');
+      console.log('✅ v4.3 企业微信机器人: 扣子平台，语音点餐');
+      console.log('✅ v4.3 自动转人工: 复杂问题自动转人工客服');
+      console.log('✅ v4.3 AI经营简报: 每日自动生成分析报告');
       console.log('═══════════════════════════════════════════════════════════');
-      logger.info('服务启动成功', { port: PORT, host: HOST, version: '4.2.0' });
+      logger.info('服务启动成功', { port: PORT, host: HOST, version: '4.3.0' });
     });
   } catch (error) {
     logger.error('服务启动失败:', error);
