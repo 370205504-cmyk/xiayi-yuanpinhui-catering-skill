@@ -5,403 +5,726 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>雨姗AI收银助手 - 点餐</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-            padding-bottom: 70px;
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
         }
-        .header {
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            color: white;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 16px 20px;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
-        .header h1 { font-size: 20px; font-weight: 600; }
-        .header p { font-size: 12px; opacity: 0.9; margin-top: 5px; }
         
-        .category-nav {
-            background: white;
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .header-title h1 {
+            font-size: 18px;
+            color: #1f2937;
+            font-weight: 700;
+        }
+        
+        .header-title p {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+        
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 18px 12px 44px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #f3f4f6;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            background: #e5e7eb;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #6b7280;
+        }
+        
+        .categories {
             display: flex;
             overflow-x: auto;
-            padding: 10px 0;
-            position: sticky;
-            top: 75px;
-            z-index: 99;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .category-nav::-webkit-scrollbar { display: none; }
-        .category-item {
-            flex-shrink: 0;
-            padding: 8px 20px;
-            margin: 0 5px;
-            border-radius: 20px;
-            font-size: 14px;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .category-item:first-child { margin-left: 15px; }
-        .category-item:last-child { margin-right: 15px; }
-        .category-item.active {
-            background: #667eea;
-            color: white;
+            padding: 16px 20px;
+            gap: 10px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         
-        .dish-list { padding: 15px; }
-        .dish-card {
+        .categories::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-btn {
+            flex-shrink: 0;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .category-btn.active {
             background: white;
-            border-radius: 10px;
-            padding: 15px;
+            color: #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: scale(1.05);
+        }
+        
+        .dishes-container {
+            padding: 8px 16px;
+        }
+        
+        .dish-item {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
             margin-bottom: 12px;
             display: flex;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
         }
+        
+        .dish-item:active {
+            transform: scale(0.98);
+        }
+        
         .dish-image {
-            width: 90px;
-            height: 90px;
-            border-radius: 8px;
-            background: #f0f0f0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #f5f7fa, #e4e8eb);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #999;
-            font-size: 32px;
+            font-size: 44px;
             flex-shrink: 0;
-            margin-right: 12px;
         }
-        .dish-info { flex: 1; min-width: 0; }
-        .dish-name { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 6px; }
-        .dish-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
-        .tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; }
-        .tag-recommend { background: #fff3cd; color: #856404; }
-        .tag-signature { background: #d4edda; color: #155724; }
-        .tag-spicy { background: #f8d7da; color: #721c24; }
-        .dish-desc { font-size: 12px; color: #999; margin-bottom: 10px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .dish-bottom { display: flex; align-items: center; justify-content: space-between; }
-        .dish-price { font-size: 20px; font-weight: bold; color: #667eea; }
-        .dish-price span { font-size: 14px; }
-        .add-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #667eea;
-            color: white;
-            border: none;
+        
+        .dish-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .dish-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .dish-desc {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .dish-tags {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            font-size: 10px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        
+        .tag-recommend { background: #fef3c7; color: #d97706; }
+        .tag-signature { background: #d1fae5; color: #059669; }
+        .tag-spicy { background: #fee2e2; color: #dc2626; }
+        
+        .dish-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .dish-price {
             font-size: 20px;
+            font-weight: 800;
+            color: #667eea;
+        }
+        
+        .dish-price span {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .add-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .add-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 18px;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
         }
-        .add-btn:active { transform: scale(0.95); }
-        .add-btn:disabled { opacity: 0.5; }
+        
+        .qty-btn:active {
+            background: #e5e7eb;
+        }
+        
+        .qty-display {
+            min-width: 26px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: #1f2937;
+        }
         
         .cart-bar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
             background: white;
-            padding: 10px 15px;
+            border-radius: 16px;
+            padding: 14px 18px;
             display: flex;
             align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
             z-index: 200;
         }
-        .cart-icon {
-            width: 50px;
-            height: 50px;
+        
+        .cart-icon-wrapper {
+            width: 54px;
+            height: 54px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             border-radius: 50%;
-            background: #667eea;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 24px;
+            font-size: 26px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            margin-right: 14px;
             position: relative;
-            margin-right: 15px;
         }
+        
         .cart-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ff4d4f;
+            top: -4px;
+            right: -4px;
+            background: #ef4444;
             color: white;
-            font-size: 12px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 7px;
+            border-radius: 10px;
+            min-width: 22px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
         }
-        .cart-info { flex: 1; }
-        .cart-total { font-size: 20px; font-weight: bold; color: #333; }
-        .cart-delivery { font-size: 12px; color: #999; margin-top: 3px; }
-        .checkout-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 16px;
+        
+        .cart-info {
+            flex: 1;
+        }
+        
+        .cart-total {
+            font-size: 20px;
+            font-weight: 800;
+            color: #667eea;
+        }
+        
+        .cart-total span {
+            font-size: 13px;
             font-weight: 600;
-            cursor: pointer;
         }
-        .checkout-btn:active { background: #5568d3; }
-        .checkout-btn:disabled { background: #ccc; cursor: not-allowed; }
         
-        .loading { text-align: center; padding: 40px; color: #999; }
-        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
-        .empty-state .icon { font-size: 64px; margin-bottom: 15px; }
+        .cart-count {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
         
-        .modal {
-            display: none;
+        .checkout-btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .checkout-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 70px 30px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .empty-state .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+        
+        .empty-state p {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(6px);
             z-index: 300;
-            justify-content: center;
-            align-items: flex-end;
+            display: none;
         }
-        .modal.active { display: flex; }
-        .modal-content {
+        
+        .modal-overlay.active {
+            display: block;
+        }
+        
+        .cart-modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             background: white;
-            width: 100%;
-            border-radius: 15px 15px 0 0;
-            max-height: 80vh;
-            overflow-y: auto;
+            border-radius: 24px 24px 0 0;
+            padding: 0 0 20px 0;
+            max-height: 75vh;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 400;
         }
+        
+        .cart-modal.active {
+            transform: translateY(0);
+        }
+        
         .modal-header {
+            padding: 22px 24px 18px 24px;
+            border-bottom: 1px solid #f3f4f6;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid #f0f0f0;
         }
-        .modal-header h3 { font-size: 18px; color: #333; }
-        .close-btn { font-size: 28px; color: #999; cursor: pointer; border: none; background: none; }
         
-        .cart-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid #f5f5f5;
-        }
-        .cart-item-name { flex: 1; font-size: 15px; color: #333; }
-        .cart-item-price { font-size: 15px; color: #667eea; font-weight: 600; margin: 0 15px; }
-        .quantity-control { display: flex; align-items: center; }
-        .qty-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #f0f0f0;
-            border: none;
+        .modal-header h2 {
             font-size: 18px;
+            color: #1f2937;
+            font-weight: 700;
+        }
+        
+        .close-btn {
+            background: #f3f4f6;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 22px;
+            color: #6b7280;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .qty-btn:disabled { opacity: 0.5; }
-        .qty-num {
-            width: 40px;
-            text-align: center;
-            font-size: 16px;
+        
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 24px;
+        }
+        
+        .cart-item {
+            display: flex;
+            gap: 14px;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .cart-item-name {
+            flex: 1;
             font-weight: 600;
+            font-size: 15px;
+            color: #1f2937;
+        }
+        
+        .cart-item-price {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 15px;
+            margin-right: 14px;
+        }
+        
+        .notes-section {
+            padding: 20px 24px;
+            border-top: 1px solid #f3f4f6;
+        }
+        
+        .notes-section h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+        
+        .notes-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            resize: none;
+            min-height: 70px;
+        }
+        
+        .notes-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .modal-footer {
-            padding: 20px;
-            border-top: 1px solid #f0f0f0;
+            padding: 20px 24px;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            gap: 12px;
         }
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: #667eea;
-            color: white;
+        
+        .btn {
+            padding: 14px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
         }
-        .submit-btn:active { background: #5568d3; }
-        .submit-btn:disabled { background: #ccc; }
         
-        .order-actions {
+        .btn-secondary {
+            flex: 1;
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .btn-primary {
+            flex: 2;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .services-info {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            margin: 0 16px 12px 16px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            color: white;
+            font-size: 13px;
             display: flex;
             gap: 10px;
-            padding: 15px;
+            align-items: flex-start;
         }
-        .order-actions .btn {
+        
+        .services-info .icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .services-info .text {
             flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
+            line-height: 1.6;
         }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-secondary { background: #f0f0f0; color: #333; }
         
-        .success-page {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        .success-icon { font-size: 80px; margin-bottom: 20px; }
-        .success-title { font-size: 24px; color: #333; margin-bottom: 10px; }
-        .success-text { color: #999; font-size: 14px; margin-bottom: 30px; }
-        
-        .form-group { padding: 15px 20px; border-bottom: 1px solid #f5f5f5; }
-        .form-group label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
+        .services-info .text .highlight {
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>雨姗AI收银助手</h1>
-        <p>智能点餐 · 快捷方便</p>
+        <div class="header-top">
+            <div class="logo-title">
+                <div class="logo-icon">🍜</div>
+                <div class="header-title">
+                    <h1>雨姗AI收银助手</h1>
+                    <p>欢迎光临，开始点餐</p>
+                </div>
+            </div>
+        </div>
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="search-input" placeholder="搜索菜品...">
+        </div>
     </div>
     
-    <div class="category-nav" id="category-nav">
-        <div class="category-item active" data-category="all">全部</div>
-        <div class="category-item" data-category="招牌菜">招牌菜</div>
-        <div class="category-item" data-category="特色硬菜">特色硬菜</div>
-        <div class="category-item" data-category="热菜">热菜</div>
-        <div class="category-item" data-category="凉菜">凉菜</div>
-        <div class="category-item" data-category="主食">主食</div>
-        <div class="category-item" data-category="饮品">饮品</div>
+    <div class="categories" id="categories">
+        <button class="category-btn active" data-category="全部">全部</button>
+        <button class="category-btn" data-category="招牌菜">招牌菜</button>
+        <button class="category-btn" data-category="特色硬菜">特色硬菜</button>
+        <button class="category-btn" data-category="热菜">热菜</button>
+        <button class="category-btn" data-category="凉菜">凉菜</button>
+        <button class="category-btn" data-category="主食">主食</button>
+        <button class="category-btn" data-category="饮品">饮品</button>
     </div>
     
-    <div class="dish-list" id="dish-list">
-        <div class="loading">加载中...</div>
+    <div class="services-info">
+        <span class="icon">📶</span>
+        <div class="text">
+            <div><span class="highlight">WiFi密码</span>：88888888</div>
+            <div><span class="highlight">营业时间</span>：09:00 - 22:00</div>
+        </div>
     </div>
     
-    <div class="cart-bar">
-        <div class="cart-icon" onclick="toggleCart()">
+    <div class="dishes-container" id="dishes-container">
+    </div>
+    
+    <div class="cart-bar" id="cart-bar" style="display: none;">
+        <div class="cart-icon-wrapper" onclick="openCart()">
             🛒
-            <span class="cart-badge" id="cart-count">0</span>
+            <span class="cart-badge" id="cart-badge">0</span>
         </div>
         <div class="cart-info">
-            <div class="cart-total">¥<span id="cart-total">0.00</span></div>
-            <div class="cart-delivery">点击查看购物车</div>
+            <div class="cart-total"><span>¥</span><span id="cart-total">0.00</span></div>
+            <div class="cart-count" id="cart-count">共 0 件</div>
         </div>
-        <button class="checkout-btn" id="checkout-btn" onclick="showCheckout()" disabled>去结算</button>
+        <button class="checkout-btn" id="checkout-btn" onclick="submitOrder()">去结算</button>
     </div>
     
-    <div class="modal" id="cart-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>购物车</h3>
-                <button class="close-btn" onclick="toggleCart()">&times;</button>
-            </div>
-            <div id="cart-items"></div>
-            <div class="modal-footer">
-                <button class="submit-btn" onclick="showCheckout()">去结算</button>
-            </div>
+    <div class="modal-overlay" id="modal-overlay" onclick="closeCart()"></div>
+    <div class="cart-modal" id="cart-modal">
+        <div class="modal-header">
+            <h2>购物车</h2>
+            <button class="close-btn" onclick="closeCart()">×</button>
+        </div>
+        <div class="modal-body" id="cart-items">
+        </div>
+        <div class="notes-section">
+            <h3>备注</h3>
+            <textarea class="notes-input" id="order-notes" placeholder="如有特殊要求，请在此填写..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="clearCart()">清空购物车</button>
+            <button class="btn btn-primary" onclick="submitOrder()">提交订单</button>
         </div>
     </div>
     
-    <div class="modal" id="checkout-modal">
-        <div class="modal-content" id="checkout-content"></div>
-    </div>
+    <div class="toast" id="toast"></div>
 
     <script>
-        const API_BASE = '/api/v1';
-        let cart = {};
-        let dishes = [];
-        let currentCategory = 'all';
+        const demoDishes = [
+            { id: 1, name: '招牌鱼头泡饭', category: '招牌菜', price: 88, desc: '招牌菜，桌桌必点', isSignature: true, isRecommend: true, spicyLevel: 1, emoji: '🍲' },
+            { id: 2, name: '招牌烧肉', category: '招牌菜', price: 58, desc: '肥而不腻，软糯香甜', isSignature: true, isRecommend: true, spicyLevel: 0, emoji: '🍖' },
+            { id: 3, name: '酱焖娃娃鱼', category: '特色硬菜', price: 198, desc: '新鲜现杀，肉质鲜嫩', isSignature: false, isRecommend: true, spicyLevel: 2, emoji: '🐟' },
+            { id: 4, name: '酸辣土豆丝', category: '热菜', price: 22, desc: '酸辣爽口', isSignature: false, isRecommend: false, spicyLevel: 2, emoji: '🥔' },
+            { id: 5, name: '蒜蓉西兰花', category: '热菜', price: 26, desc: '健康营养', isSignature: false, isRecommend: false, spicyLevel: 0, emoji: '🥦' },
+            { id: 6, name: '凉拌黄瓜', category: '凉菜', price: 16, desc: '清爽开胃', isSignature: false, isRecommend: false, spicyLevel: 1, emoji: '🥒' },
+            { id: 7, name: '白米饭', category: '主食', price: 2, desc: '粒粒分明', isSignature: false, isRecommend: false, spicyLevel: 0, emoji: '🍚' },
+            { id: 8, name: '柠檬水', category: '饮品', price: 8, desc: '酸甜解渴', isSignature: false, isRecommend: false, spicyLevel: 0, emoji: '🍋' }
+        ];
         
-        document.addEventListener('DOMContentLoaded', () => {
-            loadDishes();
-            document.querySelectorAll('.category-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                    currentCategory = item.dataset.category;
-                    renderDishes();
-                });
-            });
-        });
+        let dishes = demoDishes;
+        let cart = [];
+        let currentCategory = '全部';
         
-        async function loadDishes() {
-            try {
-                const response = await fetch(API_BASE + '/dishes');
-                const data = await response.json();
-                if (data.success && data.dishes && data.dishes.length > 0) {
-                    dishes = data.dishes;
-                } else {
-                    loadDemoDishes();
-                }
-            } catch (error) {
-                console.error('加载菜品失败:', error);
-                loadDemoDishes();
-            }
-        }
-        
-        function loadDemoDishes() {
-            dishes = [
-                { id: 1, name: '招牌大鱼头泡饭', category: '招牌菜', price: 88, description: '招牌菜，桌桌必点', isSignature: true, isRecommend: true, isAvailable: true, spicyLevel: 1 },
-                { id: 2, name: '招牌烧肉', category: '招牌菜', price: 58, description: '肥而不腻，软糯香甜', isSignature: true, isRecommend: true, isAvailable: true, spicyLevel: 0 },
-                { id: 3, name: '酱焖娃娃鱼', category: '特色硬菜', price: 198, description: '新鲜现杀，肉质鲜嫩', isSignature: false, isRecommend: true, isAvailable: true, spicyLevel: 2 },
-                { id: 4, name: '酸辣土豆丝', category: '热菜', price: 22, description: '酸辣爽口', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 2 },
-                { id: 5, name: '蒜蓉西兰花', category: '热菜', price: 26, description: '健康营养', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 0 },
-                { id: 6, name: '凉拌黄瓜', category: '凉菜', price: 16, description: '清爽开胃', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 1 },
-                { id: 7, name: '米饭', category: '主食', price: 2, description: '东北大米', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 0 },
-                { id: 8, name: '酸梅汤', category: '饮品', price: 8, description: '解暑酸梅汤', isSignature: false, isRecommend: false, isAvailable: true, spicyLevel: 0 }
-            ];
-            renderDishes();
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1500);
         }
         
         function renderDishes() {
-            const list = document.getElementById('dish-list');
-            const filtered = currentCategory === 'all' ? dishes : dishes.filter(d => d.category === currentCategory);
+            const container = document.getElementById('dishes-container');
+            const searchText = document.getElementById('search-input').value.toLowerCase();
             
-            if (filtered.length === 0) {
-                list.innerHTML = '<div class="empty-state"><div class="icon">🥢</div><p>暂无菜品</p></div>';
+            let filteredDishes = dishes;
+            if (currentCategory !== '全部') {
+                filteredDishes = filteredDishes.filter(d => d.category === currentCategory);
+            }
+            if (searchText) {
+                filteredDishes = filteredDishes.filter(d => 
+                    d.name.toLowerCase().includes(searchText) || 
+                    d.desc.toLowerCase().includes(searchText)
+                );
+            }
+            
+            if (filteredDishes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🍽️</div>
+                        <p>暂无菜品</p>
+                    </div>
+                `;
                 return;
             }
             
-            list.innerHTML = filtered.map(dish => {
+            container.innerHTML = filteredDishes.map(dish => {
+                const cartItem = cart.find(item => item.id === dish.id);
+                const quantity = cartItem ? cartItem.quantity : 0;
+                
                 const spicyTag = dish.spicyLevel > 0 ? `<span class="tag tag-spicy">${'🌶️'.repeat(Math.min(dish.spicyLevel, 3))}</span>` : '';
                 const recommendTag = dish.isRecommend ? '<span class="tag tag-recommend">推荐</span>' : '';
                 const signatureTag = dish.isSignature ? '<span class="tag tag-signature">招牌</span>' : '';
-                const disabled = dish.isAvailable === false ? 'opacity: 0.5; pointer-events: none;' : '';
-                const qty = cart[dish.id] || 0;
                 
                 return `
-                    <div class="dish-card" style="${disabled}">
-                        <div class="dish-image">${dish.name.charAt(0)}</div>
+                    <div class="dish-item">
+                        <div class="dish-image">${dish.emoji}</div>
                         <div class="dish-info">
                             <div class="dish-name">${dish.name}</div>
+                            <div class="dish-desc">${dish.desc}</div>
                             <div class="dish-tags">${recommendTag}${signatureTag}${spicyTag}</div>
-                            <div class="dish-desc">${dish.description || ''}</div>
                             <div class="dish-bottom">
                                 <div class="dish-price"><span>¥</span>${dish.price}</div>
-                                ${qty > 0 ? `
+                                ${quantity > 0 ? `
                                     <div class="quantity-control">
-                                        <button class="qty-btn" onclick="removeFromCart(${dish.id}, event)">-</button>
-                                        <span class="qty-num">${qty}</span>
-                                        <button class="qty-btn" onclick="addToCart(${dish.id}, event)">+</button>
+                                        <button class="qty-btn" onclick="removeFromCart(${dish.id})">−</button>
+                                        <div class="qty-display">${quantity}</div>
+                                        <button class="qty-btn" onclick="addToCart(${dish.id})">+</button>
                                     </div>
                                 ` : `
-                                    <button class="add-btn" onclick="addToCart(${dish.id}, event)">+</button>
+                                    <button class="add-btn" onclick="addToCart(${dish.id})">+</button>
                                 `}
                             </div>
                         </div>
@@ -410,173 +733,135 @@
             }).join('');
         }
         
-        function addToCart(dishId, e) {
-            e.stopPropagation();
-            cart[dishId] = (cart[dishId] || 0) + 1;
-            updateCartUI();
-            renderDishes();
-        }
-        
-        function removeFromCart(dishId, e) {
-            e.stopPropagation();
-            if (cart[dishId] > 1) {
-                cart[dishId]--;
+        function addToCart(dishId) {
+            const dish = dishes.find(d => d.id === dishId);
+            if (!dish) return;
+            
+            const cartItem = cart.find(item => item.id === dishId);
+            if (cartItem) {
+                cartItem.quantity++;
             } else {
-                delete cart[dishId];
+                cart.push({ id: dishId, name: dish.name, price: dish.price, quantity: 1 });
             }
-            updateCartUI();
+            
+            updateCart();
+            renderDishes();
+            showToast('已添加');
+        }
+        
+        function removeFromCart(dishId) {
+            const cartItem = cart.find(item => item.id === dishId);
+            if (!cartItem) return;
+            
+            if (cartItem.quantity > 1) {
+                cartItem.quantity--;
+            } else {
+                cart = cart.filter(item => item.id !== dishId);
+            }
+            
+            updateCart();
             renderDishes();
         }
         
-        function updateCartUI() {
-            const count = Object.values(cart).reduce((a, b) => a + b, 0);
-            const total = Object.entries(cart).reduce((sum, [id, qty]) => {
-                const dish = dishes.find(d => d.id == id);
-                return sum + (dish ? dish.price * qty : 0);
-            }, 0);
-            document.getElementById('cart-count').textContent = count;
-            document.getElementById('cart-total').textContent = total.toFixed(2);
-            document.getElementById('checkout-btn').disabled = count === 0;
+        function updateCart() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            const cartBar = document.getElementById('cart-bar');
+            const cartBadge = document.getElementById('cart-badge');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('cart-total');
+            
+            if (totalItems > 0) {
+                cartBar.style.display = 'flex';
+                cartBadge.textContent = totalItems;
+                cartCount.textContent = `共 ${totalItems} 件`;
+                cartTotal.textContent = totalPrice.toFixed(2);
+            } else {
+                cartBar.style.display = 'none';
+            }
         }
         
-        function toggleCart() {
-            const modal = document.getElementById('cart-modal');
-            modal.classList.toggle('active');
-            if (modal.classList.contains('active')) {
-                renderCartItems();
-            }
+        function openCart() {
+            document.getElementById('modal-overlay').classList.add('active');
+            document.getElementById('cart-modal').classList.add('active');
+            renderCartItems();
+        }
+        
+        function closeCart() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.getElementById('cart-modal').classList.remove('active');
         }
         
         function renderCartItems() {
             const container = document.getElementById('cart-items');
-            const items = Object.entries(cart);
             
-            if (items.length === 0) {
-                container.innerHTML = '<div class="empty-state" style="padding: 40px;"><div class="icon">🛒</div><p>购物车是空的</p></div>';
-                return;
-            }
-            
-            container.innerHTML = items.map(([id, qty]) => {
-                const dish = dishes.find(d => d.id == id);
-                if (!dish) return '';
-                
-                return `
-                    <div class="cart-item">
-                        <div class="cart-item-name">${dish.name}</div>
-                        <div class="cart-item-price">¥${dish.price}</div>
-                        <div class="quantity-control">
-                            <button class="qty-btn" onclick="removeFromCart(${id}, event); renderCartItems();">-</button>
-                            <span class="qty-num">${qty}</span>
-                            <button class="qty-btn" onclick="addToCart(${id}, event); renderCartItems();">+</button>
-                        </div>
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 40px 20px; color: #6b7280;">
+                        <div class="icon">🛒</div>
+                        <p>购物车是空的</p>
                     </div>
                 `;
-            }).join('');
-        }
-        
-        function showCheckout() {
-            document.getElementById('cart-modal').classList.remove('active');
-            const count = Object.values(cart).reduce((a, b) => a + b, 0);
-            if (count === 0) return;
-            
-            const total = Object.entries(cart).reduce((sum, [id, qty]) => {
-                const dish = dishes.find(d => d.id == id);
-                return sum + (dish ? dish.price * qty : 0);
-            }, 0);
-            
-            document.getElementById('checkout-content').innerHTML = `
-                <div class="modal-header">
-                    <h3>确认订单</h3>
-                    <button class="close-btn" onclick="document.getElementById('checkout-modal').classList.remove('active');">&times;</button>
-                </div>
-                <div class="form-group">
-                    <label>手机号</label>
-                    <input type="tel" id="phone" placeholder="请输入手机号" maxlength="11">
-                </div>
-                <div class="form-group">
-                    <label>用餐人数</label>
-                    <select id="people">
-                        <option value="1">1人</option>
-                        <option value="2">2人</option>
-                        <option value="3">3人</option>
-                        <option value="4">4人</option>
-                        <option value="5">5人</option>
-                        <option value="6">6人及以上</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>备注</label>
-                    <textarea id="note" placeholder="如有口味要求请备注" rows="3"></textarea>
-                </div>
-                <div class="modal-footer">
-                    <div style="margin-bottom: 15px; text-align: right; font-size: 18px;">
-                        合计：<strong style="color: #667eea; font-size: 24px;">¥${total.toFixed(2)}</strong>
-                    </div>
-                    <button class="submit-btn" onclick="submitOrder()">提交订单</button>
-                </div>
-            `;
-            document.getElementById('checkout-modal').classList.add('active');
-        }
-        
-        async function submitOrder() {
-            const phone = document.getElementById('phone').value;
-            const people = document.getElementById('people').value;
-            const note = document.getElementById('note').value;
-            
-            if (!phone) {
-                alert('请输入手机号');
                 return;
             }
             
-            const items = Object.entries(cart).map(([id, qty]) => {
-                const dish = dishes.find(d => d.id == id);
-                return { name: dish.name, quantity: qty, price: dish.price };
-            });
-            
-            try {
-                const response = await fetch(API_BASE + '/order/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone, people, note, items })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showSuccess(data.orderNo || 'ORD001');
-                } else {
-                    alert('下单失败，请重试');
-                }
-            } catch (error) {
-                showSuccess('ORD' + Date.now());
-            }
-        }
-        
-        function showSuccess(orderNo) {
-            cart = {};
-            updateCartUI();
-            document.getElementById('checkout-modal').classList.remove('active');
-            
-            document.getElementById('checkout-content').innerHTML = `
-                <div class="success-page">
-                    <div class="success-icon">✅</div>
-                    <div class="success-title">下单成功！</div>
-                    <div class="success-text">订单号：${orderNo}<br>请等待商家确认</div>
-                    <div class="order-actions">
-                        <button class="btn btn-secondary" onclick="location.reload();">继续点餐</button>
-                        <button class="btn btn-primary" onclick="alert('订单查询功能开发中');">查看订单</button>
+            container.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-price">¥${item.price}</div>
+                    <div class="quantity-control">
+                        <button class="qty-btn" onclick="removeFromCart(${item.id}); renderCartItems();">−</button>
+                        <div class="qty-display">${item.quantity}</div>
+                        <button class="qty-btn" onclick="addToCart(${item.id}); renderCartItems();">+</button>
                     </div>
                 </div>
-            `;
-            document.getElementById('checkout-modal').classList.add('active');
+            `).join('');
         }
         
-        document.getElementById('cart-modal').addEventListener('click', function(e) {
-            if (e.target === this) toggleCart();
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (!confirm('确定要清空购物车吗？')) return;
+            cart = [];
+            updateCart();
+            renderDishes();
+            renderCartItems();
+            showToast('购物车已清空');
+        }
+        
+        function submitOrder() {
+            if (cart.length === 0) {
+                showToast('请先添加菜品');
+                return;
+            }
+            
+            const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const orderNotes = document.getElementById('order-notes').value;
+            
+            showToast('订单提交成功！');
+            
+            cart = [];
+            document.getElementById('order-notes').value = '';
+            closeCart();
+            updateCart();
+            renderDishes();
+        }
+        
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+                renderDishes();
+            });
         });
         
-        document.getElementById('checkout-modal').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('active');
+        document.getElementById('search-input').addEventListener('input', () => {
+            renderDishes();
         });
+        
+        renderDishes();
+        updateCart();
     </script>
 </body>
 </html>
