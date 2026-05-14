@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 const algorithm = 'aes-256-cbc';
-const defaultKey = 'xiayi-foodie-encryption-key-for-production-256-bit';
+const defaultKey = 'yushan-ai-cashier-encryption-key-for-production-256-bit';
 const key = Buffer.from(process.env.ENCRYPTION_KEY || defaultKey, 'utf8').slice(0, 32);
 
 function encrypt(text) {

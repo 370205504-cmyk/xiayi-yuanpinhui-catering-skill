@@ -1,7 +1,7 @@
 FROM node:18.20.2-alpine3.19
 
-LABEL maintainer="xiayi-foodie"
-LABEL description="夏邑缘品荟智能餐饮系统"
+LABEL maintainer="yushan-ai-cashier"
+LABEL description="雨姗AI收银助手 - 智能餐饮系统"
 
 ENV NODE_ENV=production
 ENV PORT=3000

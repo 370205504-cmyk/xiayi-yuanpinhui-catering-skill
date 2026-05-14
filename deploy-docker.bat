@@ -128,7 +128,7 @@ echo   ├─ 管理后台： http://localhost:3000/admin
 echo   └─ 移动端：   http://localhost:3000/mobile
 echo.
 echo   测试账号：
-echo   ├─ 管理员：admin@xiayi.com / admin123
+echo   ├─ 管理员：admin@yushan.com / admin123
 echo   └─ 用户：  13800138000 / 123456
 echo.
 echo   管理命令：

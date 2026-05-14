@@ -10,7 +10,7 @@ const options = {
       description: '雨姗AI收银助手智能餐饮系统 RESTful API 文档',
       contact: {
         name: '技术支持',
-        email: 'support@xiayi.com'
+        email: 'support@yushan.com'
       }
     },
     servers: [

@@ -141,7 +141,7 @@ start.bat
 
 ### 管理后台
 - **URL**: http://localhost:3000/admin
-- **默认账号**: admin@xiayi.com
+- **默认账号**: admin@yushan.com
 - **默认密码**: admin123
 
 **⚠️ 重要：请在首次登录后立即修改默认密码！**

@@ -23,7 +23,7 @@ const options = {
 };
 
 console.log('═══════════════════════════════════════════════════════════');
-console.log('🍽️  夏邑缘品荟创味菜 - API测试工具');
+console.log('🍽️  雨姗AI收银助手创味菜 - API测试工具');
 console.log('═══════════════════════════════════════════════════════════');
 console.log(`测试地址: http://${HOST}:${PORT}`);
 console.log(`请求路径: POST /agent/text`);

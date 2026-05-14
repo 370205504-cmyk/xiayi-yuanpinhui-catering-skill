@@ -60,8 +60,8 @@ mysql --version
 D:
 
 # 创建项目目录
-mkdir xiayi_restaurant
-cd xiayi_restaurant
+mkdir yushan_restaurant
+cd yushan_restaurant
 
 # 克隆项目
 git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
@@ -74,7 +74,7 @@ cd yushan-ai-cashier-assistant
 
 1. 打开浏览器访问 https://github.com/370205504-cmyk/yushan-ai-cashier-assistant
 2. 点击绿色 **Code** 按钮 → **Download ZIP**
-3. 解压到 `D:\xiayi_restaurant\yushan-ai-cashier-assistant`
+3. 解压到 `D:\yushan_restaurant\yushan-ai-cashier-assistant`
 
 ---
 
@@ -83,7 +83,7 @@ cd yushan-ai-cashier-assistant
 ```cmd
 # 进入项目目录
 D:
-cd D:\xiayi_restaurant\yushan-ai-cashier-assistant
+cd D:\yushan_restaurant\yushan-ai-cashier-assistant
 
 # 复制环境变量文件
 copy .env.example .env
@@ -118,7 +118,7 @@ EXIT;
 ### 4.2 导入表结构
 
 ```cmd
-cd D:\xiayi_restaurant\yushan-ai-cashier-assistant\lambda
+cd D:\yushan_restaurant\yushan-ai-cashier-assistant\lambda
 mysql -u root -p catering_system < database\init.sql
 ```
 
@@ -129,7 +129,7 @@ mysql -u root -p catering_system < database\init.sql
 ### 5.1 安装依赖
 
 ```cmd
-cd D:\xiayi_restaurant\yushan-ai-cashier-assistant\lambda
+cd D:\yushan_restaurant\yushan-ai-cashier-assistant\lambda
 npm install
 ```
 
@@ -253,7 +253,7 @@ taskkill /PID 进程ID /F
 ```batch
 @echo off
 title 雨姗AI收银助手餐饮系统
-cd /d D:\xiayi_restaurant\yushan-ai-cashier-assistant\lambda
+cd /d D:\yushan_restaurant\yushan-ai-cashier-assistant\lambda
 echo ========================================
 echo  雨姗AI收银助手餐饮系统 - 正在启动...
 echo ========================================

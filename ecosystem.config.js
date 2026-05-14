@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "xiayi-foodie",
+      "name": "yushan-ai-cashier",
       "script": "lambda/server.js",
       "instances": 1,
       "exec_mode": "cluster",

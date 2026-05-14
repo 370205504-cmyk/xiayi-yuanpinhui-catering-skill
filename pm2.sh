@@ -1,6 +1,6 @@
 #!/bin/bash
 
-APP_NAME="xiayi-foodie-skill"
+APP_NAME="yushan-ai-cashier-skill"
 LOG_DIR="logs"
 
 case "$1" in

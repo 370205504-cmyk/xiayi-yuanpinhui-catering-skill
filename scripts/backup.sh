@@ -20,8 +20,8 @@ fi
 
 DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-3306}"
-DB_USER="${DB_USER:-xiayi_app}"
-DB_NAME="${DB_NAME:-xiayi_restaurant}"
+DB_USER="${DB_USER:-yushan_app}"
+DB_NAME="${DB_NAME:-yushan_restaurant}"
 
 if [ -n "$DB_PASSWORD" ]; then
     export MYSQL_PWD="$DB_PASSWORD"

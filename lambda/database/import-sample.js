@@ -6,7 +6,7 @@ const SAMPLE_DATA = {
     {
       id: 1,
       name: '雨姗AI收银助手创味菜(孔祖店)',
-      name_en: 'Xiayi Youpinhui Restaurant',
+      name_en: 'Yushan AI Cashier Assistant Restaurant',
       address: '县孔祖大道南段188号',
       phone: '0370-6288888',
       business_hours: '10:00-22:00',
@@ -19,7 +19,7 @@ const SAMPLE_DATA = {
     {
       id: 2,
       name: '雨姗AI收银助手创味菜(雪枫路店)',
-      name_en: 'Xiayi Youpinhui Restaurant',
+      name_en: 'Yushan AI Cashier Assistant Restaurant',
       address: '县雪枫路中段66号',
       phone: '0370-6286666',
       business_hours: '10:00-22:00',
@@ -114,7 +114,7 @@ async function importSampleData() {
       port: parseInt(process.env.DB_PORT) || 3306,
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME || 'xiayi_restaurant',
+      database: process.env.DB_NAME || 'yushan_restaurant',
       multipleStatements: true
     });
 

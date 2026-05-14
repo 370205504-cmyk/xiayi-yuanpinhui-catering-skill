@@ -33,7 +33,7 @@ const sampleData = {
     address: '河南省商丘市县',
     phone: '0370-1234567',
     hours: '10:00 - 22:00',
-    wifi: { name: 'Xiayi-Free', password: '88888888' }
+    wifi: { name: 'Yushan-Free', password: '88888888' }
   }
 };
 

@@ -318,9 +318,9 @@ NODE_ENV=production
 # 数据库配置
 DB_HOST=localhost
 DB_PORT=3306
-DB_USER=xiayi_app
+DB_USER=yushan_app
 DB_PASSWORD=your_secure_password
-DB_NAME=xiayi_restaurant
+DB_NAME=yushan_restaurant
 
 # Redis配置
 REDIS_HOST=localhost
@@ -345,9 +345,9 @@ ALIPAY_PRIVATE_KEY=your_alipay_private_key
 
 1. 创建专用数据库用户（不要使用root）
 ```sql
-CREATE USER 'xiayi_app'@'localhost' IDENTIFIED BY 'your_password';
-CREATE DATABASE xiayi_restaurant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-GRANT ALL PRIVILEGES ON xiayi_restaurant.* TO 'xiayi_app'@'localhost';
+CREATE USER 'yushan_app'@'localhost' IDENTIFIED BY 'your_password';
+CREATE DATABASE yushan_restaurant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON yushan_restaurant.* TO 'yushan_app'@'localhost';
 FLUSH PRIVILEGES;
 ```
 

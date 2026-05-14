@@ -12,7 +12,7 @@
 ### 2. 数据库安全 [ ]
 - [ ] MySQL root密码已修改
 - [ ] 数据库用户权限已最小化（只授予必要权限）
-- [ ] 数据库已创建 `xiayi_restaurant` 数据库
+- [ ] 数据库已创建 `yushan_restaurant` 数据库
 - [ ] 数据库迁移脚本已执行 `npm run migrate`
 
 ### 3. HTTPS配置 [ ]
@@ -57,7 +57,7 @@
 # 检查端口占用
 lsof -i:3000
 # 检查PM2日志
-pm2 logs xiayi-foodie-skill --lines 100
+pm2 logs yushan-ai-cashier-skill --lines 100
 # 检查Node进程
 ps aux | grep node
 ```

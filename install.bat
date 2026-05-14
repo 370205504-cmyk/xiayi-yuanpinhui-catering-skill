@@ -76,7 +76,7 @@ echo   1. 双击运行 start.bat 启动系统
 echo   2. 打开浏览器访问 http://localhost:3000
 echo.
 echo   默认账号:
-echo   - 管理员: admin@xiayi.com / admin123
+echo   - 管理员: admin@yushan.com / admin123
 echo   - 测试手机: 13800138000
 echo.
 pause

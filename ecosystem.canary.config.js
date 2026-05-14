@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'xiayi-foodie-canary',
+      name: 'yushan-ai-cashier-canary',
       script: 'lambda/server.js',
       instances: 1,
       exec_mode: 'cluster',
@@ -14,7 +14,7 @@ module.exports = {
       }
     },
     {
-      name: 'xiayi-foodie-primary',
+      name: 'yushan-ai-cashier-primary',
       script: 'lambda/server.js',
       instances: 2,
       exec_mode: 'cluster',

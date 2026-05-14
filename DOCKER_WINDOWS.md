@@ -33,9 +33,9 @@ docker-compose up -d docker-compose up -d
 #### 3. 等待启动
 
 ```
-Starting xiayi-mysql ... done
-Starting xiayi-redis ... done
-Starting xiayi-foodie-app ... done
+Starting yushan-mysql ... done
+Starting yushan-redis ... done
+Starting yushan-ai-cashier-app ... done
 ```
 
 #### 4. 访问系统
@@ -150,12 +150,12 @@ docker-compose restart
 
 ### 备份
 ```powershell
-docker-compose exec mysql mysqldump -uroot -p xiayi_restaurant > backup_$(Get-Date -Format "yyyyMMdd_HHmmss").sql
+docker-compose exec mysql mysqldump -uroot -p yushan_restaurant > backup_$(Get-Date -Format "yyyyMMdd_HHmmss").sql
 ```
 
 ### 恢复
 ```powershell
-docker-compose exec -i mysql mysql -uroot -p xiayi_restaurant < backup_file.sql
+docker-compose exec -i mysql mysql -uroot -p yushan_restaurant < backup_file.sql
 ```
 
 ---
@@ -170,7 +170,7 @@ docker-compose down
 docker-compose down -v
 
 # 删除镜像
-docker rmi $(docker images | grep xiayi)
+docker rmi $(docker images | grep yushan)
 ```
 
 ---

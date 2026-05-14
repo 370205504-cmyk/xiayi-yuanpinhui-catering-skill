@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: xiayi-foodie-app
+    container_name: yushan-ai-cashier-app
     restart: unless-stopped
     ports:
       - "${PORT:-3000}:3000"
@@ -12,8 +12,8 @@ services:
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USER=${DB_USER:-root}
-      - DB_PASSWORD=${DB_PASSWORD:-xiayi2024}
-      - DB_NAME=${DB_NAME:-xiayi_restaurant}
+      - DB_PASSWORD=${DB_PASSWORD:-yushan2024}
+      - DB_NAME=${DB_NAME:-yushan_restaurant}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-}
@@ -33,7 +33,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - xiayi-network
+      - yushan-network
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/v1/health || exit 1"]
       interval: 30s
@@ -43,11 +43,11 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: xiayi-mysql
+    container_name: yushan-mysql
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-xiayi2024}
-      - MYSQL_DATABASE=${DB_NAME:-xiayi_restaurant}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-yushan2024}
+      - MYSQL_DATABASE=${DB_NAME:-yushan_restaurant}
       - TZ=Asia/Shanghai
     volumes:
       - mysql_data:/var/lib/mysql
@@ -55,9 +55,9 @@ services:
     ports:
       - "${DB_PORT:-3306}:3306"
     networks:
-      - xiayi-network
+      - yushan-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD:-xiayi2024}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD:-yushan2024}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -66,7 +66,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: xiayi-redis
+    container_name: yushan-redis
     restart: unless-stopped
     environment:
       - TZ=Asia/Shanghai
@@ -75,7 +75,7 @@ services:
     ports:
       - "${REDIS_PORT:-6379}:6379"
     networks:
-      - xiayi-network
+      - yushan-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -85,7 +85,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: xiayi-nginx
+    container_name: yushan-nginx
     restart: unless-stopped
     ports:
       - "80:80"
@@ -97,12 +97,12 @@ services:
     depends_on:
       - app
     networks:
-      - xiayi-network
+      - yushan-network
     profiles:
       - with-nginx
 
 networks:
-  xiayi-network:
+  yushan-network:
     driver: bridge
 
 volumes:

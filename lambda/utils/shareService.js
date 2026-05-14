@@ -1,6 +1,6 @@
 class ShareService {
   constructor() {
-    this.baseUrl = 'https://xiayi-foodie.example.com/share';
+    this.baseUrl = 'https://yushan-ai-cashier.example.com/share';
   }
 
   /**

@@ -11,7 +11,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-REPO_NAME="xiayi-yuanpinhui-catering-skill"
+REPO_NAME="yushan-ai-cashier-assistant"
 BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "main")
 
 echo -e "${GREEN}═══════════════════════════════════════════════════════${NC}"

@@ -1,6 +1,6 @@
 class SelfOrderService {
   constructor() {
-    this.baseUrl = 'https://xiayi-foodie.example.com/self-order';
+    this.baseUrl = 'https://yushan-ai-cashier.example.com/self-order';
     this.qrCodeExpiration = 300; // 5分钟有效期
   }
 

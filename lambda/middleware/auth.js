@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../database/db');
 const logger = require('../utils/logger');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'xiayi-foodie-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'yushan-ai-cashier-secret-key';
 const TOKEN_EXPIRY = '2h';
 
 const optionalAuth = async (req, res, next) => {

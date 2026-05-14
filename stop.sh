@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# 夏邑缘品荟智能餐饮系统 - 停止脚本
+# 雨姗AI收银助手智能餐饮系统 - 停止脚本
 # 支持: Linux, macOS
 #
 
@@ -40,8 +40,8 @@ fi
 if command -v pm2 &> /dev/null; then
     echo ""
     echo "检查PM2进程..."
-    pm2 stop xiayi-foodie 2>/dev/null || true
-    pm2 delete xiayi-foodie 2>/dev/null || true
+    pm2 stop yushan-ai-cashier 2>/dev/null || true
+    pm2 delete yushan-ai-cashier 2>/dev/null || true
 fi
 
 # 停止Docker容器（如果有）
