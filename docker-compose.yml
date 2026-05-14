@@ -1,7 +1,4 @@
-version: '3.8'
-
 services:
-  # 主应用服务
   app:
     build:
       context: .
@@ -44,7 +41,6 @@ services:
       retries: 3
       start_period: 10s
 
-  # MySQL数据库
   mysql:
     image: mysql:8.0
     container_name: xiayi-mysql
@@ -68,7 +64,6 @@ services:
       start_period: 20s
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
-  # Redis缓存
   redis:
     image: redis:7-alpine
     container_name: xiayi-redis
@@ -88,7 +83,6 @@ services:
       retries: 5
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
 
-  # Nginx反向代理（可选）
   nginx:
     image: nginx:alpine
     container_name: xiayi-nginx
