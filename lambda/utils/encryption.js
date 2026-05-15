@@ -1,8 +1,15 @@
 const crypto = require('crypto');
 
 const algorithm = 'aes-256-cbc';
-const defaultKey = 'yushan-ai-cashier-encryption-key-for-production-256-bit';
+
+// 安全警告：生产环境必须修改默认密钥！
+const defaultKey = 'yushan-ai-cashier-encryption-key-change-this-in-production!';
+const isUsingDefaultKey = !process.env.ENCRYPTION_KEY;
 const key = Buffer.from(process.env.ENCRYPTION_KEY || defaultKey, 'utf8').slice(0, 32);
+
+if (isUsingDefaultKey) {
+  console.warn('⚠️  【安全警告】使用默认加密密钥！生产环境请设置 ENCRYPTION_KEY 环境变量');
+}
 
 function encrypt(text) {
   if (!text) {

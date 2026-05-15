@@ -112,7 +112,7 @@ app.get('/api/v1/health', async (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    version: '3.4.0',
+    version: '5.0.0',
     services: {
       database: 'unknown',
       redis: 'unknown',
@@ -380,7 +380,7 @@ async function startServer() {
 
     app.listen(PORT, HOST, () => {
       console.log('═══════════════════════════════════════════════════════════');
-      console.log('🤖  雨姗AI收银助手 - 自然语义智能体 v4.3.0');
+      console.log('🤖  雨姗AI收银助手 - 自然语义智能体 v5.0.0');
       console.log('═══════════════════════════════════════════════════════════');
       console.log(`🚀 服务已启动: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
       console.log(`📱 顾客端: http://localhost:${PORT}/`);
@@ -396,8 +396,12 @@ async function startServer() {
       console.log('✅ v4.3 企业微信机器人: 扣子平台，语音点餐');
       console.log('✅ v4.3 自动转人工: 复杂问题自动转人工客服');
       console.log('✅ v4.3 AI经营简报: 每日自动生成分析报告');
+      console.log('✅ v5.0 配置向导: 一键配置收银对接');
+      console.log('✅ v5.0 数据安全: AES-256加密存储');
+      console.log('✅ v5.0 绿色部署: Windows绿色版开箱即用');
+      console.log('✅ v5.0 安全增强: 速率限制、XSS/CSRF防护');
       console.log('═══════════════════════════════════════════════════════════');
-      logger.info('服务启动成功', { port: PORT, host: HOST, version: '4.3.0' });
+      logger.info('服务启动成功', { port: PORT, host: HOST, version: '5.0.0' });
     });
   } catch (error) {
     logger.error('服务启动失败:', error);
