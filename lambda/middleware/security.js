@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const { body, param, query, validationResult } = require('express-validator');
 const winston = require('winston');
+const { v4: uuidv4 } = require('uuid');
 
 const logger = winston.createLogger({
   level: 'info',
@@ -86,7 +87,7 @@ const corsConfig = cors({
   origin: isProduction
     ? (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',')
     : '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'HEAD', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Request-ID'],
   credentials: true,
   maxAge: 86400
@@ -95,6 +96,7 @@ const corsConfig = cors({
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    logger.warn('输入验证失败', { errors: errors.array(), ip: req.ip });
     return res.status(400).json({
       success: false,
       message: '输入验证失败',
@@ -104,31 +106,126 @@ const validate = (req, res, next) => {
   next();
 };
 
+const sensitivePatterns = [
+  /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+  /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
+  /on[a-zA-Z]+\s*=\s*["']?[^"'>]+["']?/gi,
+  /javascript:/gi,
+  /vbscript:/gi,
+  /data:/gi,
+  /eval\s*\(/gi,
+  /document\.cookie/gi,
+  /document\.write/gi,
+  /window\.location/gi,
+  /<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi,
+  /<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi,
+  /<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi,
+  /<applet\b[^<]*(?:(?!<\/applet>)<[^<]*)*<\/applet>/gi,
+  /<body\b[^<]*(?:(?!<\/body>)<[^<]*)*<\/body>/gi,
+  /<link\b[^<]*(?:(?!<\/link>)<[^<]*)*<\/link>/gi,
+  /<meta\b[^<]*(?:(?!<\/meta>)<[^<]*)*<\/meta>/gi,
+  /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi,
+  /<form\b[^<]*(?:(?!<\/form>)<[^<]*)*<\/form>/gi,
+  /<input\b[^<]*(?:(?!<\/input>)<[^<]*)*\/?>/gi,
+  /<button\b[^<]*(?:(?!<\/button>)<[^<]*)*<\/button>/gi,
+  /<script/gi,
+  /<\/script/gi,
+  /expression\s*\(/gi,
+  /behaviors/gi,
+  /vbscript/gi,
+  /jscript/gi,
+  /livescript/gi,
+  /mocha:/gi,
+  /about:/gi,
+  /xmlns/gi,
+  /-->/gi,
+  /\]\]>/gi,
+  /<%/gi,
+  /%>/gi,
+  /<\?/gi,
+  /\?>/gi,
+  /<!DOCTYPE/gi
+];
+
+const sanitizeString = (str, options = {}) => {
+  if (typeof str !== 'string') {
+    return str;
+  }
+
+  let result = str.trim();
+
+  if (options.stripHtml !== false) {
+    sensitivePatterns.forEach(pattern => {
+      result = result.replace(pattern, '');
+    });
+  }
+
+  if (options.escapeHtml !== false) {
+    result = result
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+  }
+
+  if (options.maxLength && result.length > options.maxLength) {
+    result = result.substring(0, options.maxLength);
+  }
+
+  result = result.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+
+  return result;
+};
+
+const sanitizeObject = (obj, path = '') => {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item, index) => sanitizeObject(item, `${path}[${index}]`));
+  }
+
+  const sanitized = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const currentPath = path ? `${path}.${key}` : key;
+    
+    if (typeof value === 'string') {
+      const maxLength = getMaxLengthForField(key);
+      sanitized[key] = sanitizeString(value, { maxLength });
+    } else if (Array.isArray(value)) {
+      sanitized[key] = value.map((item, index) => 
+        typeof item === 'string' ? sanitizeString(item) : item
+      );
+    } else if (typeof value === 'object' && value !== null) {
+      sanitized[key] = sanitizeObject(value, currentPath);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+  return sanitized;
+};
+
+const getMaxLengthForField = (fieldName) => {
+  const fieldLimits = {
+    name: 100,
+    phone: 20,
+    email: 255,
+    address: 500,
+    remark: 1000,
+    search: 200,
+    orderNo: 50,
+    userId: 50,
+    password: 128,
+    token: 500,
+    message: 3000
+  };
+  return fieldLimits[fieldName.toLowerCase()] || 500;
+};
+
 const inputSanitize = (req, res, next) => {
-  const sanitizeString = (str) => {
-    if (typeof str !== 'string') {
-      return str;
-    }
-    return str.replace(/[<>\"\'\\/;`]/g, '').trim();
-  };
-
-  const sanitizeObject = (obj) => {
-    if (typeof obj !== 'object' || obj === null) {
-      return obj;
-    }
-    const sanitized = {};
-    for (const [key, value] of Object.entries(obj)) {
-      if (typeof value === 'string') {
-        sanitized[key] = sanitizeString(value);
-      } else if (Array.isArray(value)) {
-        sanitized[key] = value.map(item => typeof item === 'string' ? sanitizeString(item) : item);
-      } else {
-        sanitized[key] = value;
-      }
-    }
-    return sanitized;
-  };
-
   if (req.body) {
     req.body = sanitizeObject(req.body);
   }
@@ -138,7 +235,9 @@ const inputSanitize = (req, res, next) => {
   if (req.params) {
     req.params = sanitizeObject(req.params);
   }
-
+  if (req.headers && typeof req.headers['x-custom-data'] === 'string') {
+    req.headers['x-custom-data'] = sanitizeString(req.headers['x-custom-data']);
+  }
   next();
 };
 
@@ -166,6 +265,8 @@ const ipProtection = (req, res, next) => {
 
   if (count.count > maxRequests) {
     logger.warn(`IP请求超限: ${ip}`);
+    ipBlacklist.add(ip);
+    return res.status(429).json({ success: false, message: '请求过于频繁，请稍后再试' });
   }
 
   next();
@@ -186,21 +287,38 @@ const xssProtection = (req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
   next();
+};
+
+const generateCsrfToken = () => {
+  return uuidv4();
 };
 
 const csrfProtection = (req, res, next) => {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    if (!req.session?.csrfToken) {
+      req.session.csrfToken = generateCsrfToken();
+    }
+    res.setHeader('X-CSRF-Token', req.session.csrfToken);
     return next();
   }
 
-  const token = req.headers['x-csrf-token'] || req.body._csrf;
+  const token = req.headers['x-csrf-token'] || req.body._csrf || req.query._csrf;
   const sessionToken = req.session?.csrfToken;
 
-  if (process.env.NODE_ENV === 'production' && sessionToken && token !== sessionToken) {
-    logger.warn(`CSRF攻击尝试: ${req.ip}`);
+  if (!sessionToken) {
+    logger.warn(`CSRF攻击尝试: 缺少session token, IP: ${req.ip}`);
+    return res.status(403).json({ success: false, message: '会话无效，请重新登录' });
+  }
+
+  if (!token || token !== sessionToken) {
+    logger.warn(`CSRF攻击尝试: Token不匹配, IP: ${req.ip}`);
     return res.status(403).json({ success: false, message: '无效的请求令牌' });
   }
+
+  req.session.csrfToken = generateCsrfToken();
+  res.setHeader('X-CSRF-Token', req.session.csrfToken);
 
   next();
 };
@@ -224,6 +342,16 @@ const validatePasswordStrength = (password) => {
   return { valid: true, message: '密码强度符合要求' };
 };
 
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePhone = (phone) => {
+  const phoneRegex = /^1[3-9]\d{9}$/;
+  return phoneRegex.test(phone);
+};
+
 module.exports = {
   apiLimiter,
   authLimiter,
@@ -238,5 +366,10 @@ module.exports = {
   csrfProtection,
   addToBlacklist,
   removeFromBlacklist,
-  validatePasswordStrength
+  validatePasswordStrength,
+  validateEmail,
+  validatePhone,
+  sanitizeString,
+  sanitizeObject,
+  generateCsrfToken
 };

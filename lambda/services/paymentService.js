@@ -3,6 +3,25 @@ const crypto = require('crypto');
 const db = require('../database/db');
 const logger = require('../utils/logger');
 
+const OrderStatus = {
+  PENDING: 'pending',
+  CONFIRMED: 'confirmed',
+  PAID: 'paid',
+  REFUNDED: 'refunded',
+  CANCELLED: 'cancelled'
+};
+
+const ALLOWED_STATUS_TRANSITIONS = {
+  [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+  [OrderStatus.CONFIRMED]: [OrderStatus.PAID, OrderStatus.CANCELLED],
+  [OrderStatus.PAID]: [OrderStatus.REFUNDED],
+  [OrderStatus.REFUNDED]: [],
+  [OrderStatus.CANCELLED]: []
+};
+
+const MAX_PAYMENT_AMOUNT = 99999.99;
+const MIN_PAYMENT_AMOUNT = 0.01;
+
 /**
  * 支付服务类
  * 负责处理微信支付和支付宝相关的支付逻辑
@@ -23,6 +42,56 @@ class PaymentService {
     };
   }
 
+  validateAmount(amount) {
+    if (typeof amount !== 'number' || isNaN(amount)) {
+      return { valid: false, message: '金额必须是数字' };
+    }
+    if (amount < MIN_PAYMENT_AMOUNT) {
+      return { valid: false, message: `支付金额不能小于${MIN_PAYMENT_AMOUNT}元` };
+    }
+    if (amount > MAX_PAYMENT_AMOUNT) {
+      return { valid: false, message: `支付金额不能超过${MAX_PAYMENT_AMOUNT}元` };
+    }
+    if (amount.toString().split('.')[1]?.length > 2) {
+      return { valid: false, message: '金额最多支持两位小数' };
+    }
+    return { valid: true };
+  }
+
+  async validateOrderForPayment(orderNo, expectedAmount) {
+    const orders = await db.query('SELECT * FROM orders WHERE order_no = ?', [orderNo]);
+    if (orders.length === 0) {
+      return { valid: false, message: '订单不存在' };
+    }
+
+    const order = orders[0];
+
+    const amountValidation = this.validateAmount(order.final_amount);
+    if (!amountValidation.valid) {
+      return amountValidation;
+    }
+
+    if (expectedAmount !== undefined && Math.abs(order.final_amount - expectedAmount) > 0.01) {
+      logger.logSecurity('PAYMENT_AMOUNT_MISMATCH', '支付金额验证失败', {
+        orderNo,
+        expectedAmount,
+        actualAmount: order.final_amount
+      });
+      return { valid: false, message: '支付金额验证失败' };
+    }
+
+    if (order.status !== OrderStatus.PENDING && order.status !== OrderStatus.CONFIRMED) {
+      return { valid: false, message: '订单状态不允许支付' };
+    }
+
+    return { valid: true, order };
+  }
+
+  isValidStatusTransition(currentStatus, newStatus) {
+    const allowed = ALLOWED_STATUS_TRANSITIONS[currentStatus];
+    return allowed && allowed.includes(newStatus);
+  }
+
   /**
    * 创建微信支付订单
    * @param {Object} order - 订单信息对象
@@ -32,6 +101,20 @@ class PaymentService {
    */
   async createWechatPayOrder(order) {
     try {
+      const amountValidation = this.validateAmount(order.finalAmount);
+      if (!amountValidation.valid) {
+        logger.logSecurity('PAYMENT_INVALID_AMOUNT', '无效的支付金额', {
+          orderNo: order.orderNo,
+          amount: order.finalAmount
+        });
+        return { success: false, message: amountValidation.message };
+      }
+
+      const orderValidation = await this.validateOrderForPayment(order.orderNo, order.finalAmount);
+      if (!orderValidation.valid) {
+        return { success: false, message: orderValidation.message };
+      }
+
       logger.logPayment(order.orderNo, '开始创建微信支付订单', {
         amount: order.finalAmount
       });
@@ -80,6 +163,20 @@ class PaymentService {
    */
   async createAlipayOrder(order) {
     try {
+      const amountValidation = this.validateAmount(order.finalAmount);
+      if (!amountValidation.valid) {
+        logger.logSecurity('PAYMENT_INVALID_AMOUNT', '无效的支付金额', {
+          orderNo: order.orderNo,
+          amount: order.finalAmount
+        });
+        return { success: false, message: amountValidation.message };
+      }
+
+      const orderValidation = await this.validateOrderForPayment(order.orderNo, order.finalAmount);
+      if (!orderValidation.valid) {
+        return { success: false, message: orderValidation.message };
+      }
+
       logger.logPayment(order.orderNo, '开始创建支付宝支付订单', {
         amount: order.finalAmount
       });
@@ -104,9 +201,10 @@ class PaymentService {
   /**
    * 处理支付宝支付回调
    * @param {Object} data - 回调数据
+   * @param {string} signature - 签名
    * @returns {Promise<Object>} 处理结果
    */
-  async handleAlipayCallback(data) {
+  async handleAlipayCallback(data, signature) {
     try {
       const { out_trade_no, trade_no, trade_status, total_amount } = data;
 
@@ -114,6 +212,17 @@ class PaymentService {
         tradeStatus: trade_status,
         tradeNo: trade_no
       });
+
+      if (!signature) {
+        logger.logSecurity('ALIPAY_CALLBACK_NO_SIGN', '支付宝回调缺少签名', { orderNo: out_trade_no });
+        return { success: false, message: '签名验证失败' };
+      }
+
+      const isSignValid = this.verifyAlipaySign(data, signature);
+      if (!isSignValid) {
+        logger.logSecurity('ALIPAY_SIGN_VERIFY_FAILED', '支付宝回调签名验证失败', { orderNo: out_trade_no });
+        return { success: false, message: '签名验证失败' };
+      }
 
       const order = await db.query('SELECT * FROM orders WHERE order_no = ?', [out_trade_no]);
 
@@ -124,9 +233,21 @@ class PaymentService {
 
       const orderInfo = order[0];
 
+      if (!this.isValidStatusTransition(orderInfo.status, OrderStatus.PAID)) {
+        logger.logSecurity('INVALID_STATUS_TRANSITION', '订单状态不允许支付', {
+          orderNo: out_trade_no,
+          currentStatus: orderInfo.status
+        });
+        return { success: false, message: '订单状态不允许支付' };
+      }
+
       const expectedTotal = orderInfo.final_amount.toString();
-      if (total_amount && total_amount !== expectedTotal) {
-        logger.warn(`支付宝回调金额不匹配: ${out_trade_no}, 期望: ${expectedTotal}, 实际: ${total_amount}`);
+      if (total_amount && Math.abs(parseFloat(total_amount) - orderInfo.final_amount) > 0.01) {
+        logger.logSecurity('ALIPAY_AMOUNT_MISMATCH', '支付宝回调金额不匹配', {
+          orderNo: out_trade_no,
+          expected: expectedTotal,
+          actual: total_amount
+        });
         return { success: false, message: '金额不匹配' };
       }
 
@@ -139,6 +260,24 @@ class PaymentService {
     } catch (error) {
       logger.error('支付宝回调处理失败:', error);
       return { success: false, message: '处理失败' };
+    }
+  }
+
+  verifyAlipaySign(data, signature) {
+    try {
+      const obj = { ...data };
+      delete obj.sign;
+      delete obj.sign_type;
+
+      const sortedKeys = Object.keys(obj).sort();
+      const signStr = sortedKeys.map(k => `${k}=${obj[k]}`).join('&');
+
+      const verify = crypto.createVerify('RSA-SHA256');
+      verify.update(signStr);
+      return verify.verify(this.alipayConfig.publicKey, signature, 'base64');
+    } catch (error) {
+      logger.error('支付宝签名验证异常:', error);
+      return false;
     }
   }
 
@@ -159,6 +298,11 @@ class PaymentService {
         transactionId: transaction_id
       });
 
+      if (!sign) {
+        logger.logSecurity('WECHAT_CALLBACK_NO_SIGN', '微信回调缺少签名', { orderNo: out_trade_no });
+        return { success: false, message: '签名验证失败' };
+      }
+
       const order = await db.query('SELECT * FROM orders WHERE order_no = ?', [out_trade_no]);
 
       if (order.length === 0) {
@@ -170,18 +314,30 @@ class PaymentService {
 
       const isSignValid = await this.verifyWechatPaySign(body, orderInfo);
       if (!isSignValid) {
-        logger.error(`支付回调签名验证失败: ${out_trade_no}`);
+        logger.logSecurity('WECHAT_SIGN_VERIFY_FAILED', '支付回调签名验证失败', { orderNo: out_trade_no });
         return { success: false, message: '签名验证失败' };
+      }
+
+      if (!this.isValidStatusTransition(orderInfo.status, OrderStatus.PAID)) {
+        logger.logSecurity('INVALID_STATUS_TRANSITION', '订单状态不允许支付', {
+          orderNo: out_trade_no,
+          currentStatus: orderInfo.status
+        });
+        return { success: false, message: '订单状态不允许支付' };
       }
 
       const expectedTotal = Math.round(orderInfo.final_amount * 100);
       if (total !== undefined && total !== expectedTotal) {
-        logger.warn(`支付回调金额不匹配: ${out_trade_no}, 期望: ${expectedTotal}, 实际: ${total}`);
+        logger.logSecurity('WECHAT_AMOUNT_MISMATCH', '支付回调金额不匹配', {
+          orderNo: out_trade_no,
+          expected: expectedTotal,
+          actual: total
+        });
         return { success: false, message: '金额不匹配' };
       }
 
       if (mch_id && mch_id !== this.wechatConfig.mchid) {
-        logger.error(`支付回调商户号不匹配: ${out_trade_no}`);
+        logger.logSecurity('WECHAT_MCH_ID_MISMATCH', '支付回调商户号不匹配', { orderNo: out_trade_no });
         return { success: false, message: '商户号不匹配' };
       }
 
@@ -298,6 +454,29 @@ class PaymentService {
         return { success: false, message: '订单不存在' };
       }
 
+      const order = orders[0];
+
+      if (!this.isValidStatusTransition(order.status, OrderStatus.REFUNDED)) {
+        logger.logSecurity('INVALID_REFUND_TRANSITION', '订单状态不允许退款', {
+          orderNo,
+          currentStatus: order.status
+        });
+        return { success: false, message: '订单状态不允许退款' };
+      }
+
+      if (amount <= 0) {
+        return { success: false, message: '退款金额必须大于0' };
+      }
+
+      if (amount > order.final_amount) {
+        logger.logSecurity('REFUND_AMOUNT_EXCEED', '退款金额超过订单金额', {
+          orderNo,
+          refundAmount: amount,
+          orderAmount: order.final_amount
+        });
+        return { success: false, message: '退款金额不能超过订单金额' };
+      }
+
       await db.transaction(async (connection) => {
         await connection.query(
           'UPDATE orders SET payment_status = ? WHERE order_no = ?',
@@ -305,7 +484,7 @@ class PaymentService {
         );
         await connection.query(
           'INSERT INTO refund_log (order_id, amount, reason, status) VALUES (?, ?, ?, ?)',
-          [orders[0].id, amount, reason, 'pending']
+          [order.id, amount, reason, 'pending']
         );
       });
 

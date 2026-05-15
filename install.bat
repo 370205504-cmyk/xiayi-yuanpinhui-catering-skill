@@ -73,10 +73,12 @@ echo ========================================
 echo.
 echo 下一步:
 echo   1. 双击运行 start.bat 启动系统
-echo   2. 打开浏览器访问 http://localhost:3000
+echo   2. 首次启动时系统将自动创建管理员账号
+echo   3. 管理员初始密码将显示在控制台日志中
+echo   4. 打开浏览器访问 http://localhost:3000/admin
 echo.
-echo   默认账号:
-echo   - 管理员: admin@yushan.com / admin123
-echo   - 测试手机: 13800138000
+echo   ⚠️  安全提示:
+echo   - 首次登录后请立即修改管理员密码
+echo   - 生产环境请修改.env文件中的JWT_SECRET等敏感配置
 echo.
 pause

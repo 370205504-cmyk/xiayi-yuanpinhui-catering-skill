@@ -40,7 +40,9 @@ const exportRoutes = require('./routes/export');
 const userDataRoutes = require('./routes/userData');
 const paymentConfigRoutes = require('./routes/paymentConfig');
 
-const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection } = require('./middleware/security');
+const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection, csrfProtection } = require('./middleware/security');
+const session = require('express-session');
+const RedisStore = require('connect-redis').default;
 
 const isProduction = process.env.NODE_ENV === 'production';
 const forceHttps = process.env.FORCE_HTTPS === 'true';
@@ -68,12 +70,37 @@ app.use(enforceHttps);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET || 'yushan-ai-cashier-session-secret-key-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: isProduction,
+    httpOnly: true,
+    sameSite: 'strict',
+    maxAge: 24 * 60 * 60 * 1000
+  },
+  name: 'yushan.sid'
+};
+
+if (process.env.REDIS_HOST && db.redis) {
+  sessionConfig.store = new RedisStore({
+    client: db.redis,
+    prefix: 'session:',
+    ttl: 24 * 60 * 60
+  });
+}
+
+app.use(session(sessionConfig));
+
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Max-Age', '86400');
   }
   next();
 });
+
+app.use(csrfProtection);
 
 app.use(express.static(path.join(__dirname, 'web'), {
   maxAge: '1d',

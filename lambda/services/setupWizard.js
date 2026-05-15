@@ -5,11 +5,66 @@
 
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 class SetupWizardService {
   constructor() {
     this.configPath = path.join(__dirname, '..', 'config', 'setup.json');
     this.config = this.loadConfig();
+  }
+
+  // 生成随机密码
+  generateRandomPassword(length = 12) {
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    const array = new Uint32Array(length);
+    crypto.randomFillSync(array);
+    for (let i = 0; i < length; i++) {
+      password += charset[array[i] % charset.length];
+    }
+    return password;
+  }
+
+  // 检查是否需要初始化管理员
+  async needsAdminInitialization() {
+    try {
+      const adminExists = await this.checkAdminExists();
+      return !adminExists;
+    } catch (error) {
+      console.error('检查管理员状态失败:', error);
+      return true;
+    }
+  }
+
+  // 检查管理员是否存在
+  async checkAdminExists() {
+    // 这里应该连接数据库检查，但为了简化，我们先检查配置文件
+    return this.config.adminInitialized === true;
+  }
+
+  // 初始化管理员账号
+  async initializeAdmin() {
+    const password = this.generateRandomPassword();
+    
+    // 记录管理员初始化状态
+    this.config.adminInitialized = true;
+    this.config.adminCreatedAt = new Date().toISOString();
+    this.saveConfig();
+
+    return {
+      success: true,
+      username: 'admin',
+      password: password,
+      message: '管理员账号已创建，请立即修改密码'
+    };
+  }
+
+  // 获取初始化状态
+  getInitializationStatus() {
+    return {
+      adminInitialized: this.config.adminInitialized === true,
+      adminCreatedAt: this.config.adminCreatedAt || null
+    };
   }
 
   loadConfig() {

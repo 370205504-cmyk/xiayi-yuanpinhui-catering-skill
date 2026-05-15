@@ -3,11 +3,73 @@
  * 结合历史销量、库存、顾客口味、当前活动，主动推荐菜品/套餐/凑单
  */
 
+const SENSITIVE_KEYWORDS = [
+  '色情', '暴力', '赌博', '毒品', '政治', '反动', '邪教',
+  '诈骗', '违法', '违规', '色情服务', '性服务', '成人'
+];
+
+const VALID_CATEGORIES = ['主食', '菜品', '饮料', '甜点', '套餐', '小吃'];
+
 class RecommendationEngine {
   constructor() {
     this.dishes = [];
     this.salesHistory = [];
     this.activePromotions = [];
+  }
+
+  containsSensitiveContent(text) {
+    if (!text || typeof text !== 'string') {
+      return false;
+    }
+    const lowerText = text.toLowerCase();
+    return SENSITIVE_KEYWORDS.some(keyword => lowerText.includes(keyword.toLowerCase()));
+  }
+
+  validateCustomerProfile(profile) {
+    if (!profile || typeof profile !== 'object') {
+      return { valid: false, message: '顾客信息必须是对象' };
+    }
+
+    if (profile.preferences) {
+      if (typeof profile.preferences !== 'object') {
+        return { valid: false, message: '偏好设置必须是对象' };
+      }
+      if (profile.preferences.tastes && !Array.isArray(profile.preferences.tastes)) {
+        return { valid: false, message: '口味偏好必须是数组' };
+      }
+      if (profile.preferences.dislikes && !Array.isArray(profile.preferences.dislikes)) {
+        return { valid: false, message: '忌口必须是数组' };
+      }
+    }
+
+    if (profile.visitCount !== undefined && typeof profile.visitCount !== 'number') {
+      return { valid: false, message: '访问次数必须是数字' };
+    }
+
+    return { valid: true };
+  }
+
+  filterSensitiveDishes(dishes) {
+    return dishes.filter(dish => {
+      const hasSensitive = this.containsSensitiveContent(dish.name) ||
+                          this.containsSensitiveContent(dish.description) ||
+                          (dish.tags && dish.tags.some(tag => this.containsSensitiveContent(tag)));
+      if (hasSensitive) {
+        console.warn(`过滤敏感菜品: ${dish.name}`);
+      }
+      return !hasSensitive;
+    });
+  }
+
+  sanitizeRecommendationText(text) {
+    if (!text || typeof text !== 'string') {
+      return text;
+    }
+    let sanitized = text;
+    SENSITIVE_KEYWORDS.forEach(keyword => {
+      sanitized = sanitized.replace(new RegExp(keyword, 'gi'), '***');
+    });
+    return sanitized;
   }
 
   /**
@@ -23,6 +85,13 @@ class RecommendationEngine {
         const inv = inventory.find(i => i.dishId === dish.id || i.dishName === dish.name);
         return { ...dish, stock: inv?.stock || 999 };
       });
+
+      // 过滤敏感内容
+      const beforeCount = this.dishes.length;
+      this.dishes = this.filterSensitiveDishes(this.dishes);
+      if (beforeCount > this.dishes.length) {
+        console.log(`⚠️ 过滤了 ${beforeCount - this.dishes.length} 个敏感菜品`);
+      }
 
       // 获取今日销售数据（模拟）
       this.salesHistory = this.getMockSalesHistory();
@@ -62,6 +131,19 @@ class RecommendationEngine {
       promotion: []     // 促销推荐
     };
 
+    // 验证顾客信息
+    const profileValidation = this.validateCustomerProfile(customerProfile);
+    if (!profileValidation.valid) {
+      console.warn(`顾客信息验证失败: ${profileValidation.message}`);
+      return recommendations;
+    }
+
+    // 验证购物车数据
+    if (!Array.isArray(currentCart)) {
+      console.warn('购物车数据必须是数组');
+      return recommendations;
+    }
+
     // 1. 爆款推荐（基于历史销量）
     recommendations.popular = this.getPopularDishes(3);
 
@@ -81,7 +163,34 @@ class RecommendationEngine {
     // 5. 促销推荐
     recommendations.promotion = this.getPromotionRecommendations(2);
 
-    return recommendations;
+    // 过滤所有推荐中的敏感内容
+    return this.filterRecommendations(recommendations);
+  }
+
+  filterRecommendations(recommendations) {
+    const filtered = {};
+    Object.keys(recommendations).forEach(key => {
+      if (Array.isArray(recommendations[key])) {
+        filtered[key] = recommendations[key].map(item => {
+          if (item.name) {
+            item.name = this.sanitizeRecommendationText(item.name);
+          }
+          if (item.reason) {
+            item.reason = this.sanitizeRecommendationText(item.reason);
+          }
+          if (item.title) {
+            item.title = this.sanitizeRecommendationText(item.title);
+          }
+          if (item.description) {
+            item.description = this.sanitizeRecommendationText(item.description);
+          }
+          return item;
+        });
+      } else {
+        filtered[key] = recommendations[key];
+      }
+    });
+    return filtered;
   }
 
   /**
@@ -278,39 +387,51 @@ class RecommendationEngine {
   getRecommendationMessage(recommendations, customerProfile = {}) {
     let message = '';
 
+    // 验证顾客信息
+    const profileValidation = this.validateCustomerProfile(customerProfile);
+    if (!profileValidation.valid) {
+      return '👋 欢迎光临！有什么我可以帮您点的？';
+    }
+
     // 迎宾话术
     if (!customerProfile.visitCount || customerProfile.visitCount === 0) {
       message += '👋 欢迎光临！有什么我可以帮您点的？\n\n';
       if (recommendations.popular?.length > 0) {
-        message += `🔥 今日爆款「${recommendations.popular[0].name}」卖得特别好，要不要来一份？\n`;
+        const dishName = this.sanitizeRecommendationText(recommendations.popular[0].name);
+        message += `🔥 今日爆款「${dishName}」卖得特别好，要不要来一份？\n`;
       }
     } else {
       // 回头客
-      message += `😊 欢迎回来！${customerProfile.preferences?.tastes?.join('、') || ''}对吧？\n\n`;
+      const tastes = customerProfile.preferences?.tastes?.map(t => this.sanitizeRecommendationText(t)) || [];
+      message += `😊 欢迎回来！${tastes.join('、') || ''}对吧？\n\n`;
       if (recommendations.personalized?.length > 0) {
-        message += `✨ 根据您的口味，推荐「${recommendations.personalized[0].name}」\n`;
+        const dishName = this.sanitizeRecommendationText(recommendations.personalized[0].name);
+        message += `✨ 根据您的口味，推荐「${dishName}」\n`;
       }
     }
 
     // 套餐推荐
     if (recommendations.combo?.length > 0) {
       const combo = recommendations.combo[0];
-      message += `\n🍱 套餐推荐：「${combo.name}」原价${combo.originalPrice}元，现在只要${combo.comboPrice}元！省${combo.discount}元！\n`;
+      const comboName = this.sanitizeRecommendationText(combo.name);
+      message += `\n🍱 套餐推荐：「${comboName}」原价${combo.originalPrice}元，现在只要${combo.comboPrice}元！省${combo.discount}元！\n`;
     }
 
     // 凑单推荐
     if (recommendations.凑单?.length > 0) {
       const凑单 = recommendations.凑单[0];
-      message += `\n💰 凑单提示：再来${凑单.toThreshold.toFixed(0)}元就能享受满减优惠啦！「${凑单.name}」只要${凑单.price}元~\n`;
+      const dishName = this.sanitizeRecommendationText(凑单.name);
+      message += `\n💰 凑单提示：再来${凑单.toThreshold.toFixed(0)}元就能享受满减优惠啦！「${dishName}」只要${凑单.price}元~\n`;
     }
 
     // 促销推荐
     if (recommendations.promotion?.length > 0) {
       const promo = recommendations.promotion[0];
-      message += `\n🎁 优惠提醒：${promo.title}，满${promo.minAmount}元可用！\n`;
+      const title = this.sanitizeRecommendationText(promo.title);
+      message += `\n🎁 优惠提醒：${title}，满${promo.minAmount}元可用！\n`;
     }
 
-    return message;
+    return this.sanitizeRecommendationText(message);
   }
 
   /**

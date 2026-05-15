@@ -127,9 +127,9 @@ echo   ├─ 顾客端：   http://localhost:3000
 echo   ├─ 管理后台： http://localhost:3000/admin
 echo   └─ 移动端：   http://localhost:3000/mobile
 echo.
-echo   测试账号：
-echo   ├─ 管理员：admin@yushan.com / admin123
-echo   └─ 用户：  13800138000 / 123456
+echo   管理员账号：
+   ├─ 首次启动时系统自动生成随机密码
+   └─ 密码将显示在控制台日志中
 echo.
 echo   管理命令：
 echo   ├─ 查看日志：docker-compose logs -f

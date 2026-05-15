@@ -3,7 +3,14 @@ set -e
 
 BACKUP_DIR="${BACKUP_PATH:-/workspace/backups}"
 DATE=$(date +%Y%m%d_%H%M%S)
-ENCRYPTION_KEY="${BACKUP_ENCRYPTION_KEY:-default_key_change_in_production}"
+
+# 检查加密密钥是否设置
+if [ -z "${BACKUP_ENCRYPTION_KEY}" ]; then
+    log "错误: 未设置 BACKUP_ENCRYPTION_KEY 环境变量"
+    log "请设置: export BACKUP_ENCRYPTION_KEY='your-32-char-encryption-key'"
+    exit 1
+fi
+ENCRYPTION_KEY="${BACKUP_ENCRYPTION_KEY}"
 
 log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
