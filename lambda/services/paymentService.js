@@ -102,6 +102,47 @@ class PaymentService {
   }
 
   /**
+   * 处理支付宝支付回调
+   * @param {Object} data - 回调数据
+   * @returns {Promise<Object>} 处理结果
+   */
+  async handleAlipayCallback(data) {
+    try {
+      const { out_trade_no, trade_no, trade_status, total_amount } = data;
+
+      logger.logPayment(out_trade_no, '收到支付宝支付回调', {
+        tradeStatus: trade_status,
+        tradeNo: trade_no
+      });
+
+      const order = await db.query('SELECT * FROM orders WHERE order_no = ?', [out_trade_no]);
+
+      if (order.length === 0) {
+        logger.warn(`支付宝回调订单不存在: ${out_trade_no}`);
+        return { success: false, message: '订单不存在' };
+      }
+
+      const orderInfo = order[0];
+
+      const expectedTotal = orderInfo.final_amount.toString();
+      if (total_amount && total_amount !== expectedTotal) {
+        logger.warn(`支付宝回调金额不匹配: ${out_trade_no}, 期望: ${expectedTotal}, 实际: ${total_amount}`);
+        return { success: false, message: '金额不匹配' };
+      }
+
+      if (trade_status === 'TRADE_SUCCESS' || trade_status === 'TRADE_FINISHED') {
+        await this.updatePaymentStatusWithLock(out_trade_no, trade_no, data);
+        return { success: true };
+      }
+
+      return { success: false, message: '支付未成功' };
+    } catch (error) {
+      logger.error('支付宝回调处理失败:', error);
+      return { success: false, message: '处理失败' };
+    }
+  }
+
+  /**
    * 处理微信支付回调
    * @param {Object} req - Express 请求对象
    * @returns {Promise<Object>} 处理结果

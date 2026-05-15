@@ -1,6 +1,5 @@
 const db = require('../database/db');
 const winston = require('winston');
-
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
@@ -8,6 +7,11 @@ const logger = winston.createLogger({
 });
 
 class StockService {
+  constructor() {
+    this.LOCK_TIMEOUT = 10;
+    this.MAX_RETRY_ATTEMPTS = 3;
+  }
+
   async getStock(dishId) {
     const cacheKey = `stock:${dishId}`;
     const cached = await db.cacheGet(cacheKey);
@@ -56,11 +60,29 @@ class StockService {
     return { success: true, items: dishes };
   }
 
-  async deductStock(orderItems) {
-    await db.transaction(async (connection) => {
+  async deductStockWithLock(orderItems, orderId = null) {
+    let attempt = 0;
+    
+    while (attempt < this.MAX_RETRY_ATTEMPTS) {
+      try {
+        return await this._deductStockTransaction(orderItems, orderId);
+      } catch (error) {
+        attempt++;
+        if (error.code === 'ER_LOCK_WAIT_TIMEOUT' && attempt < this.MAX_RETRY_ATTEMPTS) {
+          logger.warn(`库存锁定超时，重试第${attempt}次: orderId=${orderId}`);
+          await new Promise(resolve => setTimeout(resolve, 100 * attempt));
+          continue;
+        }
+        throw error;
+      }
+    }
+  }
+
+  async _deductStockTransaction(orderItems, orderId) {
+    return await db.transaction(async (connection) => {
       for (const item of orderItems) {
         const [dishes] = await connection.query(
-          'SELECT stock FROM dishes WHERE id = ? FOR UPDATE',
+          'SELECT id, stock, name FROM dishes WHERE id = ? FOR UPDATE',
           [item.dishId]
         );
 
@@ -68,21 +90,41 @@ class StockService {
           throw new Error(`菜品不存在: ${item.dishId}`);
         }
 
-        if (dishes[0].stock >= 0 && dishes[0].stock < item.quantity) {
-          throw new Error(`库存不足: ${item.dishName}`);
+        const dish = dishes[0];
+        
+        if (dish.stock === null || dish.stock === undefined) {
+          continue;
         }
 
+        if (dish.stock < item.quantity) {
+          throw new Error(`库存不足: ${dish.name}，剩余${dish.stock}份，需要${item.quantity}份`);
+        }
+
+        const [result] = await connection.query(
+          'UPDATE dishes SET stock = stock - ? WHERE id = ? AND stock >= ?',
+          [item.quantity, item.dishId, item.quantity]
+        );
+
+        if (result.affectedRows === 0) {
+          const [currentStock] = await connection.query(
+            'SELECT stock FROM dishes WHERE id = ?',
+            [item.dishId]
+          );
+          throw new Error(`库存不足: ${dish.name}，下单失败`);
+        }
+      }
+
+      for (const item of orderItems) {
         await connection.query(
-          'UPDATE dishes SET stock = stock - ? WHERE id = ?',
-          [item.quantity, item.dishId]
+          `INSERT INTO stock_deduction_log (dish_id, order_id, quantity, deducted_at) VALUES (?, ?, ?, NOW())`,
+          [item.dishId, orderId, item.quantity]
         );
       }
     });
+  }
 
-    for (const item of orderItems) {
-      await db.cacheDel(`stock:${item.dishId}`);
-    }
-    return { success: true };
+  async deductStock(orderItems) {
+    return await this.deductStockWithLock(orderItems, null);
   }
 
   async getReplenishHistory(dishId, page = 1, pageSize = 50) {
@@ -92,6 +134,44 @@ class StockService {
       [dishId, pageSize, offset]
     );
     return { success: true, history };
+  }
+
+  async getStockDeductionHistory(dishId, page = 1, pageSize = 50) {
+    const offset = (page - 1) * pageSize;
+    const history = await db.query(
+      'SELECT * FROM stock_deduction_log WHERE dish_id = ? ORDER BY deducted_at DESC LIMIT ? OFFSET ?',
+      [dishId, pageSize, offset]
+    );
+    return { success: true, history };
+  }
+
+  async rollbackStock(orderId) {
+    await db.transaction(async (connection) => {
+      const deductions = await connection.query(
+        'SELECT * FROM stock_deduction_log WHERE order_id = ? AND rolled_back = 0',
+        [orderId]
+      );
+
+      if (deductions.length === 0) {
+        return { success: true, message: '没有需要回滚的库存记录' };
+      }
+
+      for (const deduction of deductions) {
+        await connection.query(
+          'UPDATE dishes SET stock = stock + ? WHERE id = ?',
+          [deduction.quantity, deduction.dish_id]
+        );
+        
+        await connection.query(
+          'UPDATE stock_deduction_log SET rolled_back = 1, rolled_back_at = NOW() WHERE id = ?',
+          [deduction.id]
+        );
+      }
+
+      logger.info(`库存回滚成功: orderId=${orderId}, 数量=${deductions.length}条`);
+    });
+
+    return { success: true };
   }
 }
 

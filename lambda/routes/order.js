@@ -9,8 +9,12 @@ const { validate } = require('../middleware/security');
 const inputValidator = require('../services/inputValidator');
 const logger = require('../utils/logger');
 const { logOperation, OPERATION_TYPES } = require('../services/operationLogService');
+const crypto = require('crypto');
 
 const router = express.Router();
+
+const PRICE_TAMPERING_THRESHOLD = 0.01;
+const MAX_PRICE_DEVIATION_RATIO = 0.5;
 
 router.post('/create',
   optionalAuth,
@@ -62,8 +66,10 @@ router.post('/create',
         if (quantity <= 0 || quantity > 99) {
           return res.status(400).json({ success: false, message: '无效的数量' });
         }
+        
         const subtotal = dish.price * quantity;
         totalAmount += subtotal;
+        
         orderItems.push({
           dishId: dish.id,
           dishName: dish.name,
@@ -74,17 +80,23 @@ router.post('/create',
         });
       }
 
+      if (Math.abs(totalAmount - (req.body.clientTotalAmount || 0)) > PRICE_TAMPERING_THRESHOLD) {
+        logger.warn(`订单价格校验: ${orderNo}, 服务端计算=${totalAmount}, 客户端提交=${req.body.clientTotalAmount || 0}`);
+      }
+
       let discountAmount = 0;
       let couponId = null;
+      let couponRecordId = null;
       if (req.body.couponId && userId) {
         const coupons = await db.query(
-          `SELECT uc.*, c.value, c.min_amount, c.max_discount, c.type
+          `SELECT uc.id as record_id, uc.*, c.value, c.min_amount, c.max_discount, c.type
            FROM user_coupons uc JOIN coupons c ON uc.coupon_id = c.id
            WHERE uc.id = ? AND uc.user_id = ? AND uc.status = 'unused'`,
           [req.body.couponId, userId]
         );
         if (coupons.length > 0) {
           const coupon = coupons[0];
+          couponRecordId = coupon.record_id;
           if (totalAmount >= coupon.min_amount) {
             couponId = coupon.id;
             if (coupon.type === 'discount') {
@@ -151,8 +163,8 @@ router.post('/create',
           );
         }
 
-        if (couponId) {
-          await connection.query('UPDATE user_coupons SET status = ? WHERE id = ?', ['used', couponId]);
+        if (couponRecordId) {
+          await connection.query('UPDATE user_coupons SET status = ? WHERE id = ?', ['used', couponRecordId]);
         }
 
         await connection.query('DELETE FROM carts WHERE user_id = ?', [userId]);

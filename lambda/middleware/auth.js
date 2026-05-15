@@ -2,8 +2,9 @@ const jwt = require('jsonwebtoken');
 const db = require('../database/db');
 const logger = require('../utils/logger');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'yushan-ai-cashier-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'yushan-ai-cashier-jwt-secret-key';
 const TOKEN_EXPIRY = '2h';
+const SESSION_EXPIRY_HOURS = 2;
 
 const optionalAuth = async (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -13,15 +14,22 @@ const optionalAuth = async (req, res, next) => {
   }
 
   try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
+      req.userId = null;
+      return next();
+    }
+    
     const isValid = await checkTokenValidity(token);
     if (!isValid) {
       req.userId = null;
       return next();
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.userId;
     req.userRole = decoded.role;
+    req.tokenExpiry = decoded.exp;
   } catch (error) {
     req.userId = null;
   }
@@ -37,14 +45,20 @@ const requireAuth = async (req, res, next) => {
   }
 
   try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
+      return res.status(401).json({ success: false, message: '登录已过期，请重新登录' });
+    }
+
     const isValid = await checkTokenValidity(token);
     if (!isValid) {
       return res.status(401).json({ success: false, message: '令牌已失效，请重新登录' });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.userId;
     req.userRole = decoded.role;
+    req.tokenExpiry = decoded.exp;
     next();
   } catch (error) {
     return res.status(401).json({ success: false, message: '登录已过期' });
@@ -60,14 +74,18 @@ const requireAdmin = async (req, res, next) => {
   }
 
   try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
+      return res.status(401).json({ success: false, message: '登录已过期，请重新登录' });
+    }
+
     const isValid = await checkTokenValidity(token);
     if (!isValid) {
       return res.status(401).json({ success: false, message: '令牌已失效，请重新登录' });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const adminIds = process.env.ADMIN_USER_IDS?.split(',').map(id => parseInt(id)) || [1];
-    if (!adminIds.includes(decoded.userId)) {
+    if (decoded.role !== 'admin' && decoded.role !== 'super_admin') {
       return res.status(403).json({ success: false, message: '需要管理员权限' });
     }
 
@@ -80,6 +98,45 @@ const requireAdmin = async (req, res, next) => {
   }
 };
 
+const requirePermission = (permission) => {
+  return async (req, res, next) => {
+    if (!req.isAdmin) {
+      return res.status(403).json({ success: false, message: '需要管理员权限' });
+    }
+    
+    const userRoles = await db.query(
+      'SELECT role, permissions FROM admin_roles WHERE user_id = ?',
+      [req.userId]
+    );
+    
+    if (userRoles.length === 0) {
+      return res.status(403).json({ success: false, message: '权限不足' });
+    }
+    
+    const userRole = userRoles[0];
+    const superPerms = ['super_admin'];
+    const managerPerms = ['super_admin', 'manager'];
+    
+    let allowedPerms;
+    switch (userRole.role) {
+      case 'super_admin':
+        allowedPerms = superPerms;
+        break;
+      case 'manager':
+        allowedPerms = managerPerms;
+        break;
+      default:
+        allowedPerms = [userRole.role];
+    }
+    
+    if (!allowedPerms.includes(permission)) {
+      return res.status(403).json({ success: false, message: '权限不足' });
+    }
+    
+    next();
+  };
+};
+
 const regenerateSession = async (req, res, next) => {
   if (req.session) {
     req.session.regenerate((err) => {
@@ -88,6 +145,7 @@ const regenerateSession = async (req, res, next) => {
       }
       const { v4: uuidv4 } = require('uuid');
       req.session.id = uuidv4();
+      req.session.createdAt = Date.now();
       next();
     });
   } else {
@@ -113,7 +171,7 @@ async function revokeToken(token) {
     if (db.redis) {
       await db.redis.del(`token:${token}`);
     }
-    logger.info('Token revoked:', `${token.substring(0, 20) }...`);
+    logger.info('Token revoked:', `${token.substring(0, 20)}...`);
     return true;
   } catch (error) {
     logger.error('Failed to revoke token:', error);
@@ -124,7 +182,7 @@ async function revokeToken(token) {
 async function storeToken(token, userId) {
   try {
     if (db.redis) {
-      const ttl = 2 * 60 * 60;
+      const ttl = SESSION_EXPIRY_HOURS * 60 * 60;
       await db.redis.setEx(`token:${token}`, ttl, String(userId));
     }
     return true;
@@ -138,8 +196,11 @@ module.exports = {
   optionalAuth,
   requireAuth,
   requireAdmin,
+  requirePermission,
   regenerateSession,
   revokeToken,
   storeToken,
-  checkTokenValidity
+  checkTokenValidity,
+  TOKEN_EXPIRY,
+  SESSION_EXPIRY_HOURS
 };

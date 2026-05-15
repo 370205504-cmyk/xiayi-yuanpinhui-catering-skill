@@ -45,21 +45,39 @@ const orderLimiter = rateLimit({
 
 const helmetConfig = helmet({
   contentSecurityPolicy: {
+    reportOnly: process.env.CSP_REPORT_ONLY === 'true',
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.bootcdn.net'],
-      scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.bootcdn.net'],
-      imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'", 'data:'],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'none'"],
+      frameSrc: ["'none'"],
       objectSrc: ["'none'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      fontSrc: ["'self'", 'data:'],
+      connectSrc: ["'self'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"]
+      workerSrc: ["'self'"],
+      manifestSrc: ["'self'"],
+      upgradeInsecureRequests: process.env.UPGRADE_INSECURE_REQUESTS === 'true' ? [] : null
     }
   },
-  crossOriginEmbedderPolicy: false,
-  hsts: { maxAge: 31536000, includeSubDomains: true },
-  frameguard: { action: 'deny' }
+  crossOriginEmbedderPolicy: true,
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  crossOriginResourcePolicy: { policy: 'same-origin' },
+  dnsPrefetchControl: { allow: false },
+  expectCt: { maxAge: 86400, enforce: true },
+  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+  ieNoOpen: true,
+  noSniff: true,
+  originAgentCluster: true,
+  originKeyedWorkers: true,
+  permittedCrossDomainPolicies: { permittedPolicies: 'none' },
+  frameguard: { action: 'deny' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  xssFilter: true
 });
 
 const isProduction = process.env.NODE_ENV === 'production';

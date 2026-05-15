@@ -2,6 +2,7 @@ FROM node:18.20.2-alpine3.19
 
 LABEL maintainer="yushan-ai-cashier"
 LABEL description="雨姗AI收银助手 - 智能餐饮系统"
+LABEL node.version=">=18.0.0 <22.0.0"
 
 ENV NODE_ENV=production
 ENV PORT=3000

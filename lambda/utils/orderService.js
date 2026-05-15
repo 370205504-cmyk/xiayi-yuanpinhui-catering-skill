@@ -5,8 +5,68 @@ class OrderService {
   constructor() {
     this.orders = new Map();
     this.orderCounter = 1000;
-    this.deliveryFee = 5; // 配送费
-    this.minFreeDeliveryAmount = 50; // 满免配送费门槛
+    this.deliveryFee = 5;
+    this.minFreeDeliveryAmount = 50;
+  }
+
+  /**
+   * 从数据库获取最新菜品价格
+   * @param {string} dishId - 菜品ID
+   * @returns {Promise<number|null>} 菜品价格
+   */
+  async getDishPriceFromDb(dishId) {
+    try {
+      const db = require('../database/db');
+      const dishes = await db.query('SELECT price FROM dishes WHERE id = ?', [dishId]);
+      if (dishes.length > 0) {
+        return dishes[0].price;
+      }
+      return null;
+    } catch (error) {
+      console.error(`获取菜品价格失败: ${dishId}`, error);
+      return null;
+    }
+  }
+
+  /**
+   * 验证订单价格是否被篡改
+   * @param {Array} orderItems - 订单项
+   * @returns {Promise<Object>} 验证结果
+   */
+  async validateOrderPrices(orderItems) {
+    const validationResults = [];
+    
+    for (const item of orderItems) {
+      const currentPrice = await this.getDishPriceFromDb(item.dishId);
+      
+      if (currentPrice === null) {
+        return {
+          valid: false,
+          error: `菜品不存在: ${item.dishId}`
+        };
+      }
+
+      const expectedSubtotal = currentPrice * item.quantity;
+      if (item.subtotal !== expectedSubtotal) {
+        return {
+          valid: false,
+          error: `价格篡改检测: ${item.dishName} 的小计金额不匹配`,
+          dishId: item.dishId,
+          expectedPrice: currentPrice,
+          receivedPrice: item.unitPrice,
+          expectedSubtotal: expectedSubtotal,
+          receivedSubtotal: item.subtotal
+        };
+      }
+
+      validationResults.push({
+        dishId: item.dishId,
+        unitPrice: currentPrice,
+        subtotal: expectedSubtotal
+      });
+    }
+
+    return { valid: true, validatedItems: validationResults };
   }
 
   /**
@@ -19,11 +79,24 @@ class OrderService {
    * @param {string} orderData.storeId - 门店ID
    * @returns {Object} 订单结果
    */
-  createOrder(orderData) {
+  async createOrder(orderData) {
     const { dish, quantity, address, customerPhone, storeId } = orderData;
 
+    if (!dish || !dish.id) {
+      throw new Error('无效的菜品数据');
+    }
+
+    const currentPrice = await this.getDishPriceFromDb(dish.id);
+    if (currentPrice === null) {
+      throw new Error('菜品不存在');
+    }
+
+    if (dish.price !== currentPrice) {
+      throw new Error('菜品价格已变更，请刷新后重试');
+    }
+
     const orderId = this.generateOrderId();
-    const subtotal = dish.price * quantity;
+    const subtotal = currentPrice * quantity;
     const deliveryFeeFinal = subtotal >= this.minFreeDeliveryAmount ? 0 : this.deliveryFee;
     const totalPrice = subtotal + deliveryFeeFinal;
 

@@ -325,15 +325,21 @@ CREATE TABLE IF NOT EXISTS users (
   balance DECIMAL(10,2) DEFAULT 0.00 COMMENT '余额',
   total_spent DECIMAL(10,2) DEFAULT 0.00 COMMENT '累计消费',
   address TEXT COMMENT '收货地址',
+  password_changed TINYINT(1) DEFAULT 0 COMMENT '是否已修改初始密码',
+  last_password_change TIMESTAMP NULL COMMENT '最后密码修改时间',
+  last_login TIMESTAMP NULL COMMENT '最后登录时间',
+  login_attempts INT DEFAULT 0 COMMENT '连续登录失败次数',
+  locked_until TIMESTAMP NULL COMMENT '账户锁定截止时间',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_phone (phone),
-  INDEX idx_openid (openid)
+  INDEX idx_openid (openid),
+  INDEX idx_locked (locked_until)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 管理员用户（密码: admin123）
-INSERT INTO users (user_id, phone, nickname, role) VALUES
-('admin001', 'E2A9B5F6D4C3E2A1B5F6D4C3E2A1B5F6:E2A9B5F6D4C3E2A1B5F6D4C3E2A1B5F6', '系统管理员', 'admin');
+-- 管理员用户（初始密码随机生成，首次登录必须修改）
+INSERT INTO users (user_id, phone, nickname, role, password_changed) VALUES
+('admin001', NULL, '系统管理员', 'admin', 0);
 
 -- 菜品分类表
 CREATE TABLE IF NOT EXISTS dish_categories (

@@ -42,6 +42,20 @@ const paymentConfigRoutes = require('./routes/paymentConfig');
 
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection } = require('./middleware/security');
 
+const isProduction = process.env.NODE_ENV === 'production';
+const forceHttps = process.env.FORCE_HTTPS === 'true';
+
+const enforceHttps = (req, res, next) => {
+  if (forceHttps && isProduction) {
+    if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+      return next();
+    }
+    const httpsUrl = `https://${req.hostname}${req.url}`;
+    return res.redirect(301, httpsUrl);
+  }
+  next();
+};
+
 const app = express();
 
 app.use(compression());
@@ -50,6 +64,7 @@ app.use(corsConfig);
 app.use(ipProtection);
 app.use(inputSanitize);
 app.use(xssProtection);
+app.use(enforceHttps);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 

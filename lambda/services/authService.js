@@ -10,6 +10,10 @@ const logger = winston.createLogger({
   transports: [new winston.transports.File({ filename: 'logs/auth.log' })]
 });
 
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCK_DURATION_MINUTES = 30;
+const TOKEN_EXPIRY = '2h';
+
 class AuthService {
   async register(phone, password, nickname = '') {
     try {
@@ -20,7 +24,7 @@ class AuthService {
 
       const passwordHash = await bcrypt.hash(password, 10);
       const result = await db.query(
-        'INSERT INTO users (phone, password_hash, nickname) VALUES (?, ?, ?)',
+        'INSERT INTO users (phone, password_hash, nickname, password_changed) VALUES (?, ?, ?, 1)',
         [phone, passwordHash, nickname || `用户${phone.slice(-4)}`]
       );
 
@@ -48,23 +52,71 @@ class AuthService {
       }
 
       const user = users[0];
+      
+      if (user.locked_until && new Date(user.locked_until) > new Date()) {
+        const minutesLeft = Math.ceil((new Date(user.locked_until) - new Date()) / 60000);
+        return { 
+          success: false, 
+          message: `账户已被锁定，请${minutesLeft}分钟后重试`,
+          locked: true,
+          lockedUntil: user.locked_until
+        };
+      }
+
       if (user.status === 'banned') {
         return { success: false, message: '账号已被禁用' };
       }
 
       const validPassword = await bcrypt.compare(password, user.password_hash);
       if (!validPassword) {
-        return { success: false, message: '密码错误' };
+        const attempts = (user.login_attempts || 0) + 1;
+        const lockedUntil = attempts >= MAX_LOGIN_ATTEMPTS 
+          ? new Date(Date.now() + LOCK_DURATION_MINUTES * 60 * 1000) 
+          : null;
+        
+        await db.query(
+          'UPDATE users SET login_attempts = ?, locked_until = ? WHERE id = ?',
+          [attempts, lockedUntil, user.id]
+        );
+
+        logger.warn(`登录失败: ${phone}, 尝试次数: ${attempts}`);
+        
+        if (lockedUntil) {
+          return { 
+            success: false, 
+            message: `密码错误次数过多，账户已锁定${LOCK_DURATION_MINUTES}分钟`,
+            locked: true,
+            lockedUntil
+          };
+        }
+        
+        return { 
+          success: false, 
+          message: `密码错误，剩余${MAX_LOGIN_ATTEMPTS - attempts}次机会` 
+        };
       }
 
-      const token = this.generateToken(user.id);
+      if (user.login_attempts > 0 || user.locked_until) {
+        await db.query(
+          'UPDATE users SET login_attempts = 0, locked_until = NULL WHERE id = ?',
+          [user.id]
+        );
+      }
+      
+      await db.query(
+        'UPDATE users SET last_login = NOW(), login_attempts = 0, locked_until = NULL WHERE id = ?',
+        [user.id]
+      );
+
+      const token = this.generateToken(user.id, user.role);
       logger.info(`用户登录: ${phone}`);
 
       return {
         success: true,
         message: '登录成功',
         token,
-        user: this.sanitizeUser(user)
+        user: this.sanitizeUser(user),
+        requirePasswordChange: user.password_changed === 0
       };
     } catch (error) {
       logger.error('登录失败:', error);
@@ -86,7 +138,7 @@ class AuthService {
       }
 
       const user = users[0];
-      const token = this.generateToken(user.id);
+      const token = this.generateToken(user.id, user.role);
       logger.info(`微信登录: ${openid}`);
 
       return {
@@ -131,19 +183,40 @@ class AuthService {
   }
 
   async changePassword(userId, oldPassword, newPassword) {
-    const users = await db.query('SELECT password_hash FROM users WHERE id = ?', [userId]);
-    if (users.length === 0) {
-      return { success: false, message: '用户不存在' };
-    }
+    try {
+      const users = await db.query('SELECT password_hash, password_changed FROM users WHERE id = ?', [userId]);
+      if (users.length === 0) {
+        return { success: false, message: '用户不存在' };
+      }
 
-    const validPassword = await bcrypt.compare(oldPassword, users[0].password_hash);
-    if (!validPassword) {
-      return { success: false, message: '原密码错误' };
-    }
+      const user = users[0];
+      
+      if (user.password_changed === 0 && oldPassword) {
+        return { 
+          success: false, 
+          message: '首次修改密码不需要验证原密码' 
+        };
+      }
+      
+      if (user.password_changed === 1 || oldPassword) {
+        const validPassword = await bcrypt.compare(oldPassword, user.password_hash);
+        if (!validPassword) {
+          return { success: false, message: '原密码错误' };
+        }
+      }
 
-    const newHash = await bcrypt.hash(newPassword, 10);
-    await db.query('UPDATE users SET password_hash = ? WHERE id = ?', [newHash, userId]);
-    return { success: true, message: '密码修改成功' };
+      const newHash = await bcrypt.hash(newPassword, 10);
+      await db.query(
+        'UPDATE users SET password_hash = ?, password_changed = 1, last_password_change = NOW() WHERE id = ?', 
+        [newHash, userId]
+      );
+      
+      logger.info(`用户修改密码: userId=${userId}`);
+      return { success: true, message: '密码修改成功' };
+    } catch (error) {
+      logger.error('修改密码失败:', error);
+      throw error;
+    }
   }
 
   async addPoints(userId, points, description = '') {
@@ -167,16 +240,21 @@ class AuthService {
     return { success: true, logs, total, page, pageSize };
   }
 
-  generateToken(userId) {
-    return jwt.sign({ userId }, process.env.JWT_SECRET || 'default-secret', {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-    });
+  generateToken(userId, role = 'user') {
+    const secret = process.env.JWT_SECRET || 'yushan-ai-cashier-jwt-secret-key';
+    return jwt.sign(
+      { userId, role, iat: Math.floor(Date.now() / 1000) }, 
+      secret, 
+      { expiresIn: TOKEN_EXPIRY }
+    );
   }
 
   verifyToken(token) {
     try {
-      return jwt.verify(token, process.env.JWT_SECRET || 'default-secret');
+      const secret = process.env.JWT_SECRET || 'yushan-ai-cashier-jwt-secret-key';
+      return jwt.verify(token, secret);
     } catch (error) {
+      logger.warn('Token验证失败:', error.message);
       return null;
     }
   }

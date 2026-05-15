@@ -2,6 +2,7 @@
  * 企业微信机器人对接 - 扣子平台集成
  */
 
+const crypto = require('crypto');
 const MCPHandler = require('../mcp/handler');
 const AIAgent = require('../services/ai-agent');
 const ContextManager = require('../mcp/context');
@@ -11,7 +12,70 @@ class WeWorkBot {
     this.handler = new MCPHandler();
     this.agent = new AIAgent();
     this.context = new ContextManager();
-    this.subscribers = new Set(); // 订单状态订阅用户
+    this.subscribers = new Set();
+    this.token = process.env.WW_WORK_TOKEN || '';
+    this.encodingAesKey = process.env.WW_WORK_ENCODING_AES_KEY || '';
+    this.appId = process.env.WW_WORK_APPID || '';
+  }
+
+  /**
+   * 验证企业微信消息签名
+   */
+  verifySignature(signature, timestamp, nonce, encrypt) {
+    if (!this.token || !this.encodingAesKey) {
+      console.warn('企业微信签名验证配置不完整，跳过签名验证');
+      return true;
+    }
+
+    const sortArr = [this.token, timestamp, nonce, encrypt].sort();
+    const signatureStr = sortArr.join('');
+    const expectedSignature = crypto
+      .createHash('sha1')
+      .update(signatureStr)
+      .digest('hex');
+
+    return signature === expectedSignature;
+  }
+
+  /**
+   * 解密企业微信消息
+   */
+  decryptMessage(encrypt) {
+    if (!this.encodingAesKey) {
+      return null;
+    }
+
+    try {
+      const aesKey = Buffer.from(this.encodingAesKey + '=', 'base64');
+      const iv = aesKey.slice(0, 16);
+
+      const decipher = crypto.createDecipheriv('aes-256-cbc', aesKey, iv);
+      decipher.setAutoPadding(false);
+
+      let decrypted = Buffer.concat([
+        decipher.update(Buffer.from(encrypt, 'base64')),
+        decipher.final()
+      ]);
+
+      const msgLen = decrypted.readUInt32BE(decrypted.length - 4);
+      const msgContent = decrypted.slice(20, 20 + msgLen);
+
+      return msgContent.toString('utf8');
+    } catch (error) {
+      console.error('消息解密失败:', error);
+      return null;
+    }
+  }
+
+  /**
+   * 验证回调URL（用于企业微信配置验证）
+   */
+  verifyCallbackURL(msgSignature, timestamp, nonce, echostr) {
+    if (!this.verifySignature(msgSignature, timestamp, nonce, echostr)) {
+      return null;
+    }
+
+    return this.decryptMessage(echostr);
   }
 
   /**
@@ -133,22 +197,55 @@ class WeWorkBot {
   }
 
   /**
-   * 处理扣子平台的回调
+   * 处理扣子平台的回调（带签名验证）
    */
   async handleKouZiCallback(callbackData) {
-    const { type, userId, message } = callbackData;
-    
+    const { msg_signature, timestamp, nonce, encrypt, type, userId, message } = callbackData;
+
+    if (encrypt) {
+      if (!this.verifySignature(msg_signature, timestamp, nonce, encrypt)) {
+        console.error('企业微信消息签名验证失败');
+        return null;
+      }
+
+      const decryptedXml = this.decryptMessage(encrypt);
+      if (!decryptedXml) {
+        console.error('企业微信消息解密失败');
+        return null;
+      }
+
+      const parsed = this.parseXmlMessage(decryptedXml);
+      return this.handleKouZiCallback(parsed);
+    }
+
     switch (type) {
       case 'friend_add':
         return await this.handleFriendAdd(userId, message);
-      
+
       case 'private_message':
         return await this.handlePrivateMessage(userId, message);
-      
+
       default:
         console.log('未知回调类型:', type);
         return null;
     }
+  }
+
+  /**
+   * 解析企业微信XML消息
+   */
+  parseXmlMessage(xml) {
+    const result = {};
+    const pattern = /<(\w+)><!\[CDATA\[([^\]]*)\]\]><\/\1>|<(\w+)>([^<]*)<\/\3>/g;
+    let match;
+
+    while ((match = pattern.exec(xml)) !== null) {
+      const key = match[1] || match[3];
+      const value = match[2] || match[4];
+      result[key] = value;
+    }
+
+    return result;
   }
 }
 
