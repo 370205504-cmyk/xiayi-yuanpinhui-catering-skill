@@ -1,19 +1,37 @@
-const dishesService = require('./service')
+import dishesService from './service.js'
 
 class DishesController {
   async handleMessage(text) {
     const lowerText = text.toLowerCase().trim()
 
-    if (lowerText.includes('菜单') || lowerText.includes('菜') || lowerText.includes('吃什么')) {
-      return this.handleMenuRequest(lowerText)
-    }
     if (lowerText.includes('推荐') || lowerText.includes('点什么')) {
       return this.handleRecommendation(lowerText)
     }
     if (lowerText.includes('价格') || lowerText.includes('多少钱')) {
       return this.handlePriceRequest(lowerText)
     }
+    if (lowerText.includes('菜单') || lowerText.includes('吃什么')) {
+      return this.handleMenuRequest(lowerText)
+    }
+    const categories = dishesService.getCategories()
+    for (const cat of categories) {
+      if (lowerText.includes(cat.toLowerCase())) {
+        return this.handleCategoryRequest(cat)
+      }
+    }
     return null
+  }
+
+  async handleCategoryRequest(category) {
+    const dishes = dishesService.getMenu({ category })
+    if (!dishes || dishes.dishes.length === 0) {
+      return { type: 'menu', reply: `暂无${category}分类的菜品~` }
+    }
+    let msg = `🍽️ 【${category}】\n\n`
+    dishes.dishes.forEach((d) => {
+      msg += `${d.image} ${d.name} - ¥${d.price}\n`
+    })
+    return { type: 'menu', reply: msg }
   }
 
   async handleMenuRequest(text) {
@@ -84,4 +102,4 @@ class DishesController {
   }
 }
 
-module.exports = new DishesController()
+export default new DishesController()

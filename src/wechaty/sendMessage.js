@@ -17,6 +17,53 @@ const roomWhiteList = env.ROOM_WHITELIST ? env.ROOM_WHITELIST.split(',') : []
 
 import { getServe } from './serve.js'
 
+// 导入本地服务
+const dishesController = await import('../dishes/controller.js').then((m) => m.default)
+const faqService = await import('../faq/service.js').then((m) => m.default)
+const storeService = await import('../store/service.js').then((m) => m.default)
+
+/**
+ * 尝试使用本地服务处理消息
+ * @param content 消息内容
+ * @returns {string|null} 返回处理结果或null（表示需要AI处理）
+ */
+async function tryLocalService(content) {
+  const text = content.toLowerCase().trim()
+
+  // 1. 尝试菜品服务
+  const dishesResult = dishesController.handleMessage(text)
+  if (dishesResult && dishesResult.reply) {
+    return dishesResult.reply
+  }
+
+  // 2. 尝试FAQ服务
+  const faqResult = faqService.answer(text)
+  if (faqResult && faqResult.reply && faqResult.type !== 'transfer_human') {
+    return faqResult.reply
+  }
+
+  // 3. 尝试店铺信息服务（直接匹配关键词）
+  if (text.includes('营业时间') || text.includes('几点开门') || text.includes('几点营业')) {
+    const hours = storeService.getBusinessHours()
+    return `${hours.store_name}的营业时间是：${hours.business_hours}，欢迎光临！`
+  }
+  if (text.includes('wifi') || text.includes('无线网') || text.includes('密码')) {
+    const wifi = storeService.getWifiInfo()
+    return `WiFi账号：${wifi.wifi_name}，密码：${wifi.wifi_password}~`
+  }
+  if (text.includes('停车') || text.includes('停车场')) {
+    const parking = storeService.getParkingInfo()
+    return parking.parking_info
+  }
+  if (text.includes('地址') || text.includes('在哪') || text.includes('位置')) {
+    const contact = storeService.getContactInfo()
+    return `我们位于${contact.address}，联系电话：${contact.phone}~`
+  }
+
+  // 无法处理，返回null让AI处理
+  return null
+}
+
 /**
  * 默认消息发送
  * @param msg
@@ -47,6 +94,15 @@ export async function defaultMessage(msg, bot, ServiceType = 'GPT') {
     if (isRoom && room && content.replace(`${botName}`, '').trimStart().startsWith(`${autoReplyPrefix}`)) {
       const question = (await msg.mentionText()) || content.replace(`${botName}`, '').replace(`${autoReplyPrefix}`, '') // 去掉艾特的消息主体
       console.log('🌸🌸🌸 / question: ', question)
+
+      // 先尝试本地服务
+      const localReply = await tryLocalService(question)
+      if (localReply) {
+        console.log('🌿 使用本地服务回复')
+        await room.say(localReply)
+        return
+      }
+
       const response = await getReply(question)
       await room.say(response)
     }
@@ -55,6 +111,15 @@ export async function defaultMessage(msg, bot, ServiceType = 'GPT') {
     if (isAlias && !room && content.trimStart().startsWith(`${autoReplyPrefix}`)) {
       const question = content.replace(`${autoReplyPrefix}`, '')
       console.log('🌸🌸🌸 / content: ', question)
+
+      // 先尝试本地服务
+      const localReply = await tryLocalService(question)
+      if (localReply) {
+        console.log('🌿 使用本地服务回复')
+        await contact.say(localReply)
+        return
+      }
+
       const response = await getReply(question)
       await contact.say(response)
     }

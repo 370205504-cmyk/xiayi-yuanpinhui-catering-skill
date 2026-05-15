@@ -233,4 +233,4 @@ class FAQService {
   }
 }
 
-module.exports = new FAQService()
+export default new FAQService()

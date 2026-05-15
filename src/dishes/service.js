@@ -1,4 +1,4 @@
-const dishesData = require('./data')
+import dishesData from './data.js'
 
 class DishesService {
   constructor() {
@@ -110,4 +110,4 @@ class DishesService {
   }
 }
 
-module.exports = new DishesService()
+export default new DishesService()

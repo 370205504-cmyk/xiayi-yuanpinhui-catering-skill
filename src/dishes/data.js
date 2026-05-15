@@ -276,4 +276,4 @@ const dishesData = [
   },
 ]
 
-module.exports = dishesData
+export default dishesData
