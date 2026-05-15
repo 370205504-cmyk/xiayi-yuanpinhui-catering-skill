@@ -12,7 +12,13 @@
     "docker:down": "docker-compose down",
     "db:init": "node lambda/database/init.js"
   },
-  "keywords": ["restaurant", "ordering", "cashier", "ai", "yushan"],
+  "keywords": [
+    "restaurant",
+    "ordering",
+    "cashier",
+    "ai",
+    "yushan"
+  ],
   "author": "雨姗科技",
   "license": "Apache-2.0",
   "dependencies": {
@@ -35,7 +41,7 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.2",
-    "pm2": "^5.3.0"
+    "pm2": "^7.0.1"
   },
   "engines": {
     "node": ">=18.0.0"
