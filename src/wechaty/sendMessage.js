@@ -31,7 +31,7 @@ async function tryLocalService(content) {
   const text = content.toLowerCase().trim()
 
   // 1. 尝试菜品服务
-  const dishesResult = dishesController.handleMessage(text)
+  const dishesResult = await dishesController.handleMessage(text)
   if (dishesResult && dishesResult.reply) {
     return dishesResult.reply
   }
