@@ -1,5 +1,5 @@
-const mysql = require('mysql2/promise');
-const Redis = require('redis');
+const path = require('path');
+const fs = require('fs');
 const winston = require('winston');
 
 const logger = winston.createLogger({
@@ -47,12 +47,48 @@ class Database {
   constructor() {
     this.pool = null;
     this.redis = null;
+    this.sqlite = null;
+    this.isSQLite = false;
     this.queryLog = [];
     this.maxLogSize = 100;
   }
 
   async initialize() {
+    const dbHost = process.env.DB_HOST;
+
+    if (!dbHost) {
+      return this.initSQLite();
+    }
+    return this.initMySQL();
+  }
+
+  async initSQLite() {
     try {
+      const Database = require('better-sqlite3');
+      const dbPath = path.join(__dirname, 'data', 'cashier.db');
+      const dataDir = path.join(__dirname, 'data');
+
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+
+      this.sqlite = new Database(dbPath);
+      this.sqlite.pragma('journal_mode = WAL');
+      this.sqlite.pragma('busy_timeout = 5000');
+      this.sqlite.pragma('foreign_keys = ON');
+
+      this.isSQLite = true;
+      logger.info(`SQLite数据库初始化成功: ${dbPath}`);
+      return true;
+    } catch (error) {
+      logger.error('SQLite初始化失败:', error);
+      throw error;
+    }
+  }
+
+  async initMySQL() {
+    try {
+      const mysql = require('mysql2/promise');
       this.pool = mysql.createPool({
         host: process.env.DB_HOST || 'localhost',
         port: parseInt(process.env.DB_PORT) || 3306,
@@ -67,22 +103,75 @@ class Database {
         namedPlaceholders: true
       });
 
-      this.redis = Redis.createClient({
-        socket: {
-          host: process.env.REDIS_HOST || 'localhost',
-          port: parseInt(process.env.REDIS_PORT) || 6379
-        },
-        password: process.env.REDIS_PASSWORD || undefined,
-        database: parseInt(process.env.REDIS_DB) || 0
-      });
+      if (process.env.REDIS_HOST) {
+        const Redis = require('redis');
+        this.redis = Redis.createClient({
+          socket: {
+            host: process.env.REDIS_HOST || 'localhost',
+            port: parseInt(process.env.REDIS_PORT) || 6379
+          },
+          password: process.env.REDIS_PASSWORD || undefined,
+          database: parseInt(process.env.REDIS_DB) || 0
+        });
+        await this.redis.connect();
+      }
 
-      await this.redis.connect();
-      logger.info('数据库连接池初始化成功');
+      logger.info('MySQL数据库连接池初始化成功');
       return true;
     } catch (error) {
-      logger.error('数据库初始化失败:', error);
+      logger.error('MySQL初始化失败:', error);
       throw error;
     }
+  }
+
+  rewriteSQL(sql) {
+    if (!this.isSQLite) return sql;
+
+    let result = sql;
+
+    // DATE_FORMAT -> strftime
+    result = result.replace(
+      /DATE_FORMAT\((\w+),\s*'%Y-%m-%d\s+%H:00'/g,
+      "strftime('%Y-%m-%d %H:00', $1"
+    );
+    result = result.replace(
+      /DATE_FORMAT\((\w+),\s*'%Y-%m-%d'/g,
+      "strftime('%Y-%m-%d', $1"
+    );
+    result = result.replace(
+      /DATE_FORMAT\((\w+),\s*'%Y-W%u'/g,
+      "strftime('%Y-W%u', $1"
+    );
+    result = result.replace(
+      /DATE_FORMAT\((\w+),\s*'%Y-%m'/g,
+      "strftime('%Y-%m', $1"
+    );
+
+    // HOUR() -> CAST(strftime('%H', ...) AS INTEGER)
+    result = result.replace(
+      /HOUR\((\w+)\)/g,
+      "CAST(strftime('%H', $1) AS INTEGER)"
+    );
+
+    // NOW() -> datetime('now', 'localtime')
+    result = result.replace(/\bNOW\(\)/g, "datetime('now', 'localtime')");
+
+    // DATE() -> date()
+    result = result.replace(/\bDATE\(/g, "date(");
+
+    // ON DUPLICATE KEY UPDATE -> INSERT OR REPLACE INTO
+    result = result.replace(
+      /INSERT\s+INTO\s+(\S+)\s*\((.+?)\)\s*VALUES\s*\((.+?)\)\s*ON\s+DUPLICATE\s+KEY\s+UPDATE\s+\w+\s*=\s*\?/gi,
+      'INSERT OR REPLACE INTO $1 ($2) VALUES ($3)'
+    );
+
+    // FOR UPDATE (not supported in SQLite)
+    result = result.replace(/\s+FOR UPDATE/gi, '');
+
+    // Remove backticks
+    result = result.replace(/`/g, '');
+
+    return result;
   }
 
   validateSqlCommand(sql) {
@@ -188,14 +277,104 @@ class Database {
     const sanitizedParams = params.map(p => this.sanitizeParam(p));
 
     try {
-      const [rows] = await this.pool.execute(sql, sanitizedParams);
-      
-      this.logQuery(sql, sanitizedParams, rows.length);
-      
-      return rows;
+      if (this.isSQLite) {
+        return this.sqliteQuery(sql, sanitizedParams);
+      }
+      return this.mysqlQuery(sql, sanitizedParams);
     } catch (error) {
       logger.error('数据库查询失败:', { sql: sql.substring(0, 200), error: error.message });
       throw error;
+    }
+  }
+
+  sqliteQuery(sql, params) {
+    const rewrittenSQL = this.rewriteSQL(sql);
+    const trimmedSQL = rewrittenSQL.trim().toUpperCase();
+
+    // Detect query type
+    if (trimmedSQL.startsWith('SELECT') || trimmedSQL.startsWith('WITH')) {
+      const stmt = this.sqlite.prepare(rewrittenSQL);
+      const rows = stmt.all(...params);
+      this.logQuery(sql, params, rows.length);
+      return rows;
+    }
+
+    if (trimmedSQL.startsWith('INSERT')) {
+      const stmt = this.sqlite.prepare(rewrittenSQL);
+      const result = stmt.run(...params);
+      this.logQuery(sql, params, result.changes);
+      return { insertId: Number(result.lastInsertRowid), affectedRows: result.changes };
+    }
+
+    if (trimmedSQL.startsWith('UPDATE') || trimmedSQL.startsWith('DELETE')) {
+      const stmt = this.sqlite.prepare(rewrittenSQL);
+      const result = stmt.run(...params);
+      this.logQuery(sql, params, result.changes);
+      return { affectedRows: result.changes, changes: result.changes };
+    }
+
+    // Fallback for other statements
+    const stmt = this.sqlite.prepare(rewrittenSQL);
+    const result = stmt.run(...params);
+    this.logQuery(sql, params, result.changes);
+    return { affectedRows: result.changes };
+  }
+
+  async mysqlQuery(sql, params) {
+    const [rows] = await this.pool.execute(sql, params);
+    this.logQuery(sql, params, rows.length || rows.affectedRows || 0);
+    return rows;
+  }
+
+  getConnection() {
+    if (this.isSQLite) {
+      return {
+        query: (sql, params) => this.sqliteQuery(sql, params),
+        release: () => {}
+      };
+    }
+    return this.pool.getConnection();
+  }
+
+  async transaction(callback) {
+    if (this.isSQLite) {
+      const transaction = this.sqlite.transaction((cb) => {
+        const connection = {
+          query: (sql, params) => {
+            const rewrittenSQL = this.rewriteSQL(sql);
+            const trimmedSQL = rewrittenSQL.trim().toUpperCase();
+            
+            if (trimmedSQL.startsWith('SELECT')) {
+              const stmt = this.sqlite.prepare(rewrittenSQL);
+              return stmt.all(...params);
+            }
+            
+            const stmt = this.sqlite.prepare(rewrittenSQL);
+            const result = stmt.run(...params);
+            
+            if (trimmedSQL.startsWith('INSERT')) {
+              return { insertId: Number(result.lastInsertRowid), affectedRows: result.changes };
+            }
+            return { affectedRows: result.changes, changes: result.changes };
+          }
+        };
+        return cb(connection);
+      });
+
+      return transaction(callback);
+    }
+
+    const connection = await this.getConnection();
+    try {
+      await connection.beginTransaction();
+      const result = await callback(connection);
+      await connection.commit();
+      return result;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
     }
   }
 
@@ -211,25 +390,6 @@ class Database {
     this.queryLog.push(logEntry);
     if (this.queryLog.length > this.maxLogSize) {
       this.queryLog.shift();
-    }
-  }
-
-  getConnection() {
-    return this.pool.getConnection();
-  }
-
-  async transaction(callback) {
-    const connection = await this.getConnection();
-    try {
-      await connection.beginTransaction();
-      const result = await callback(connection);
-      await connection.commit();
-      return result;
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
     }
   }
 
@@ -292,6 +452,10 @@ class Database {
   }
 
   async close() {
+    if (this.sqlite) {
+      this.sqlite.close();
+      logger.info('SQLite数据库连接已关闭');
+    }
     if (this.pool) {
       await this.pool.end();
     }

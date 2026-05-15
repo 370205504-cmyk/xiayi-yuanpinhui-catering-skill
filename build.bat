@@ -25,6 +25,7 @@ xcopy "%PROJECT_DIR%lambda" "%RELEASE_DIR%\lambda\" /E /I /Y
 copy "%PROJECT_DIR%package.json" "%RELEASE_DIR%\" >nul
 copy "%PROJECT_DIR%.env.example" "%RELEASE_DIR%\.env" >nul
 copy "%PROJECT_DIR%README.md" "%RELEASE_DIR%\" >nul
+copy "%PROJECT_DIR%部署教程-商家版.md" "%RELEASE_DIR%\" >nul
 echo 项目文件复制完成
 echo.
 

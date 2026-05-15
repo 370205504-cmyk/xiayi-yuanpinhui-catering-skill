@@ -83,7 +83,7 @@ const sessionConfig = {
   name: 'yushan.sid'
 };
 
-if (process.env.REDIS_HOST && db.redis) {
+if (db.redis && db.redis.isOpen) {
   sessionConfig.store = new RedisStore({
     client: db.redis,
     prefix: 'session:',
@@ -163,7 +163,10 @@ app.get('/api/v1/health', async (req, res) => {
   };
 
   try {
-    if (db.pool) {
+    if (db.isSQLite) {
+      const result = db.sqlite.prepare('SELECT 1').get();
+      health.services.database = result ? 'connected' : 'disconnected';
+    } else if (db.pool) {
       await db.pool.query('SELECT 1');
       health.services.database = 'connected';
     }
@@ -391,9 +394,10 @@ async function startServer() {
 
     if (process.env.DB_HOST) {
       await db.initialize();
-      logger.info('数据库连接成功');
+      logger.info('MySQL数据库连接成功');
     } else {
-      logger.warn('未配置数据库，将以离线模式运行');
+      await db.initialize();
+      logger.info('SQLite数据库连接成功（无需安装MySQL，开箱即用）');
     }
 
     try {

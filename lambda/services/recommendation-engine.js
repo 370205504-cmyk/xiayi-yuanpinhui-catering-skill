@@ -157,7 +157,7 @@ class RecommendationEngine {
 
     // 4. 凑单推荐（基于当前购物车）
     if (currentCart.length > 0) {
-      recommendations.凑单 = this.get凑单Recommendations(currentCart, 2);
+      recommendations.fillOrder = this.getFillOrderRecommendations(currentCart, 2);
     }
 
     // 5. 促销推荐
@@ -312,11 +312,10 @@ class RecommendationEngine {
   /**
    * 获取凑单推荐
    */
-  get凑单Recommendations(currentCart = [], limit = 2) {
+  getFillOrderRecommendations(currentCart = [], limit = 2) {
     const cartTotal = currentCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    // 寻找可以凑到下一个满减门槛的菜品
-    const凑单Targets = [
+    const fillTargets = [
       { threshold: 50, recommend: '米饭', message: '再加一碗米饭就能凑满50元啦！' },
       { threshold: 100, recommend: '饮料', message: '再来一瓶饮料，满100减10！' },
       { threshold: 150, recommend: '糖醋里脊', message: '加一份糖醋里脊，满150减20！' },
@@ -324,7 +323,7 @@ class RecommendationEngine {
 
     const recommendations = [];
     
-    for (const target of凑单Targets) {
+    for (const target of fillTargets) {
       if (cartTotal < target.threshold && cartTotal > target.threshold - 30) {
         const dish = this.dishes.find(d => d.name.includes(target.recommend) || d.category === '主食' || d.category === '饮料');
         if (dish) {
@@ -418,10 +417,10 @@ class RecommendationEngine {
     }
 
     // 凑单推荐
-    if (recommendations.凑单?.length > 0) {
-      const凑单 = recommendations.凑单[0];
-      const dishName = this.sanitizeRecommendationText(凑单.name);
-      message += `\n💰 凑单提示：再来${凑单.toThreshold.toFixed(0)}元就能享受满减优惠啦！「${dishName}」只要${凑单.price}元~\n`;
+    if (recommendations.fillOrder?.length > 0) {
+      const fillItem = recommendations.fillOrder[0];
+      const dishName = this.sanitizeRecommendationText(fillItem.name);
+      message += `\n💰 凑单提示：再来${fillItem.toThreshold.toFixed(0)}元就能享受满减优惠啦！「${dishName}」只要${fillItem.price}元~\n`;
     }
 
     // 促销推荐
@@ -456,9 +455,9 @@ class RecommendationEngine {
     }
 
     // 检测是否可以凑单
-    const凑单Target = 100;
-    if (cartTotal <凑单Target && cartTotal >凑单Target - 30) {
-      const diff =凑单Target - cartTotal;
+    const fillTargetAmount = 100;
+    if (cartTotal < fillTargetAmount && cartTotal > fillTargetAmount - 30) {
+      const diff = fillTargetAmount - cartTotal;
       potential += 15; // 满减带来的额外价值
       suggestions.push({
         type: '凑单',
