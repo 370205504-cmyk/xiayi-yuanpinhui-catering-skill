@@ -1,68 +1,62 @@
 {
-  "name": "wechat-bot",
-  "version": "1.0.2",
-  "description": "wechat-bot",
-  "main": "index.js",
-  "type": "module",
+  "name": "yushan-ai-cashier-assistant",
+  "version": "5.0.0",
+  "description": "雨姗AI收银助手 - 不用换收银，一键升级AI智能餐饮系统",
+  "main": "lambda/server.js",
   "scripts": {
-    "dev": "node ./cli.js",
-    "format": "prettier --write ./src",
-    "start": "node ./cli.js",
-    "test": "node ./src/wechaty/testMessage.js",
-    "test-openai": "node ./src/openai/__test__.js",
-    "test-xunfei": "node ./src/xunfei/__test__.js",
-    "test-kimi": "node ./src/kimi/__test__.js",
-    "test-dify": "node ./src/dify/__test__.js",
-    "prepare": "husky"
+    "start": "node lambda/server.js",
+    "start:simple": "node lambda/server-simple.js",
+    "dev": "NODE_ENV=development nodemon lambda/server.js",
+    "prod": "pm2 start ecosystem.config.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "db:init": "node lambda/database/init.js"
   },
-  "lint-staged": {
-    "*.{js,ts,md}": [
-      "prettier --write"
-    ]
-  },
-  "files": [
-    "src",
-    "./.env.example",
-    "./cli.js",
-    "./Dockerfile",
-    "./Dockerfile.alpine",
-    "./LICENSE.md",
-    "./README.md",
-    "./RECORD.md"
+  "keywords": [
+    "restaurant",
+    "ordering",
+    "cashier",
+    "ai",
+    "yushan"
   ],
-  "bin": {
-    "wb": "./cli.js",
-    "wechat-bot": "./cli.js"
-  },
-  "homepage": "https://github.com/wangrongding/wechat-bot/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wangrongding/wechat-bot.git"
-  },
-  "author": "荣顶",
-  "license": "ISC",
+  "author": "雨姗科技",
+  "license": "Apache-2.0",
   "dependencies": {
-    "axios": "^1.6.8",
-    "chatgpt": "^2.5.2",
-    "commander": "^12.0.0",
-    "crypto-js": "^4.2.0",
-    "dotenv": "^16.4.5",
-    "inquirer": "^9.2.16",
-    "openai": "^4.52.0",
-    "p-timeout": "^6.0.0",
-    "qrcode-terminal": "^0.12.0",
-    "remark": "^14.0.2",
-    "strip-markdown": "^5.0.0",
-    "wechaty": "^1.20.2",
-    "wechaty-puppet-wechat": "^1.18.4",
-    "wechaty-puppet-wechat4u": "^1.14.14",
-    "ws": "^8.16.0"
+    "axios": "^1.16.1",
+    "bcryptjs": "2.4.3",
+    "better-sqlite3": "^12.10.0",
+    "compression": "^1.8.1",
+    "connect-redis": "^7.1.1",
+    "cors": "2.8.5",
+    "dompurify": "^3.4.3",
+    "dotenv": "16.4.5",
+    "express": "^4.22.2",
+    "express-rate-limit": "7.1.5",
+    "express-session": "^1.19.0",
+    "express-validator": "7.0.1",
+    "helmet": "7.1.0",
+    "jsonwebtoken": "9.0.2",
+    "multer": "^2.1.1",
+    "mysql2": "^3.22.3",
+    "node-cron": "3.0.3",
+    "nodemailer": "^8.0.7",
+    "opossum": "^9.0.0",
+    "qrcode": "^1.5.4",
+    "redis": "4.6.11",
+    "uuid": "9.0.1",
+    "validator": "^13.15.35",
+    "winston": "3.11.0",
+    "winston-daily-rotate-file": "4.7.1"
   },
   "devDependencies": {
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.7",
-    "prettier": "^3.3.3",
-    "puppeteer": "13.5.1",
-    "puppeteer-core": "13.5.1"
+    "nodemon": "3.0.2",
+    "pm2": "7.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0 <22.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git"
   }
 }

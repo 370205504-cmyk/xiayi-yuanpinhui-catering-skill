@@ -1,0 +1,1200 @@
+[
+  {
+    "id": 1,
+    "name": "招牌大鱼头泡饭",
+    "category": "招牌菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "雨姗AI收银助手头牌菜，桌桌必点，配米饭一份",
+    "isSignature": true,
+    "isRecommend": true
+  },
+  {
+    "id": 2,
+    "name": "招牌烧肉",
+    "category": "招牌菜",
+    "price": 58,
+    "priceUnit": "元/份",
+    "description": "肥而不腻，软糯香甜，特别推荐",
+    "isSignature": true,
+    "isRecommend": true
+  },
+  {
+    "id": 3,
+    "name": "酱焖娃娃鱼",
+    "category": "招牌菜",
+    "price": 198,
+    "priceUnit": "元/份",
+    "description": "新鲜现杀，配米饭一份",
+    "isSignature": true,
+    "isRecommend": true
+  },
+  {
+    "id": 4,
+    "name": "酱爆萝卜糕",
+    "category": "招牌菜",
+    "price": 36,
+    "priceUnit": "元/份",
+    "description": "手工自制，藏着烟火的温暖，松软鲜美，咸香味美",
+    "isSignature": true,
+    "isRecommend": false
+  },
+  {
+    "id": 5,
+    "name": "黄焖大甲鱼",
+    "category": "特色硬菜",
+    "price": 238,
+    "priceUnit": "元/份",
+    "description": "来自中国甲鱼之乡，吃甲鱼有面子，宴请必吃，3斤左右",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 6,
+    "name": "甲鱼焖柴鸡",
+    "category": "特色硬菜",
+    "price": 98,
+    "priceUnit": "元/份",
+    "description": "来自中国甲鱼之乡，吃甲鱼有面子",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 7,
+    "name": "加鲍鱼",
+    "category": "特色硬菜",
+    "price": 8,
+    "priceUnit": "元/只",
+    "description": "可加鲍鱼搭配甲鱼",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 8,
+    "name": "香辣酥排骨",
+    "category": "特色硬菜",
+    "price": 69,
+    "priceUnit": "元/份",
+    "description": "特别推荐，够辣够味够香",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 9,
+    "name": "枣香鳗鱼捞饭",
+    "category": "特色硬菜",
+    "price": 198,
+    "priceUnit": "元/份",
+    "description": "特别推荐，畅销菜",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 10,
+    "name": "秦川辣子牛肉",
+    "category": "特色硬菜",
+    "price": 69,
+    "priceUnit": "元/份",
+    "description": "特别推荐，够辣够味够香",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 11,
+    "name": "地锅馍炒鸡",
+    "category": "特色硬菜",
+    "price": 58,
+    "priceUnit": "元/份",
+    "description": "特别推荐，畅销菜",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 12,
+    "name": "大刀肉炒辣椒",
+    "category": "特色硬菜",
+    "price": 46,
+    "priceUnit": "元/份",
+    "description": "特别推荐，很辣很爽",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 13,
+    "name": "干锅脆笋尖",
+    "category": "特色硬菜",
+    "price": 38,
+    "priceUnit": "元/份",
+    "description": "特别推荐，畅销菜",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 14,
+    "name": "芝麻羊肉酥",
+    "category": "特色硬菜",
+    "price": 58,
+    "priceUnit": "元/份",
+    "description": "特别推荐，香酥美味",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 15,
+    "name": "过把瘾毛肚",
+    "category": "特色硬菜",
+    "price": 78,
+    "priceUnit": "元/份",
+    "description": "特别推荐，麻辣过瘾",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 16,
+    "name": "黄豆辣烧鸡爪",
+    "category": "特色硬菜",
+    "price": 46,
+    "priceUnit": "元/份",
+    "description": "特别推荐，软烂入味",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 17,
+    "name": "腌肉煲春笋",
+    "category": "特色硬菜",
+    "price": 59,
+    "priceUnit": "元/份",
+    "description": "特别推荐，鲜美入味",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 18,
+    "name": "牛三鲜",
+    "category": "特色硬菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "牛肉、牛肚、牛筋一锅端",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 19,
+    "name": "自制养生豆腐",
+    "category": "特色硬菜",
+    "price": 29,
+    "priceUnit": "元/份",
+    "description": "手工自制，健康美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 20,
+    "name": "山椒牛小排",
+    "category": "特色硬菜",
+    "price": 68,
+    "priceUnit": "元/份",
+    "description": "山椒配牛小排，辣而不燥",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 21,
+    "name": "葱烧猴头菇",
+    "category": "特色硬菜",
+    "price": 39,
+    "priceUnit": "元/份",
+    "description": "唇齿留香，回味无穷",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 22,
+    "name": "茶树菇炖柴鸡",
+    "category": "特色硬菜",
+    "price": 69,
+    "priceUnit": "元/份",
+    "description": "特别推荐，鲜美无比",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 23,
+    "name": "干锅大肠",
+    "category": "特色硬菜",
+    "price": 58,
+    "priceUnit": "元/份",
+    "description": "特别推荐，香嫩可口",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 24,
+    "name": "香米炒肉蟹",
+    "category": "特色硬菜",
+    "price": 39,
+    "priceUnit": "元/份",
+    "description": "蟹肉配香米，鲜美无比",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 25,
+    "name": "金汤酸菜鱼",
+    "category": "特色硬菜",
+    "price": 58,
+    "priceUnit": "元/份",
+    "description": "酸辣开胃，人人爱吃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 26,
+    "name": "香油焙金蝉",
+    "category": "宴请首选菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "金蝉经过香油焙制，香酥可口",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 27,
+    "name": "香油焙银蝉",
+    "category": "宴请首选菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "银蝉经过香油焙制，香酥可口",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 28,
+    "name": "蒜蓉粉丝蒸鲍鱼",
+    "category": "宴请首选菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "宴请首选，高端大气",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 29,
+    "name": "滋补鸡腰汤",
+    "category": "宴请首选菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "特别推荐，滋补养生",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 30,
+    "name": "麻辣虾尾",
+    "category": "宴请首选菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "麻辣鲜香，下酒好菜",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 31,
+    "name": "撒椒辣子鸡",
+    "category": "宴请首选菜",
+    "price": 49,
+    "priceUnit": "元/份",
+    "description": "特别推荐，肉质酥脆，香辣入味",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 32,
+    "name": "椒盐小酥肉",
+    "category": "宴请首选菜",
+    "price": 39,
+    "priceUnit": "元/份",
+    "description": "香酥可口，大人小孩都爱吃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 33,
+    "name": "孜然羊肉",
+    "category": "宴请首选菜",
+    "price": 68,
+    "priceUnit": "元/份",
+    "description": "孜然香气四溢，羊肉鲜香",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 34,
+    "name": "小米煨辽参",
+    "category": "宴请首选菜",
+    "price": 48,
+    "priceUnit": "元/位",
+    "description": "小米配辽参，养生滋补",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 35,
+    "name": "糖醋里脊",
+    "category": "宴请首选菜",
+    "price": 39,
+    "priceUnit": "元/份",
+    "description": "酸甜可口，经典美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 36,
+    "name": "蛋黄焗南瓜",
+    "category": "宴请首选菜",
+    "price": 29,
+    "priceUnit": "元/份",
+    "description": "咸香软糯，老少皆宜",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 37,
+    "name": "金汤肥牛",
+    "category": "宴请首选菜",
+    "price": 58,
+    "priceUnit": "元/份",
+    "description": "酸辣开胃，肥牛鲜嫩",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 38,
+    "name": "毛血旺",
+    "category": "宴请首选菜",
+    "price": 48,
+    "priceUnit": "元/份",
+    "description": "麻辣鲜香，川味经典",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 39,
+    "name": "清蒸太湖翘嘴白",
+    "category": "宴请首选菜",
+    "price": 98,
+    "priceUnit": "元/份",
+    "description": "清蒸原味，鲜美无比",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 40,
+    "name": "葱烧牛鞭",
+    "category": "宴请首选菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "葱香浓郁，牛鞭软烂",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 41,
+    "name": "孜然羊外腰",
+    "category": "宴请首选菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "孜然香气，羊腰鲜香",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 42,
+    "name": "鲜花椒牛仔骨",
+    "category": "宴请首选菜",
+    "price": 78,
+    "priceUnit": "元/份",
+    "description": "鲜花椒配牛仔骨，麻香浓郁",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 43,
+    "name": "鲜羊排两吃",
+    "category": "宴请首选菜",
+    "price": 148,
+    "priceUnit": "元/份",
+    "description": "羊排两种吃法，宴请首选",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 44,
+    "name": "清蒸深海鲽鱼",
+    "category": "宴请首选菜",
+    "price": 128,
+    "priceUnit": "元/份",
+    "description": "高蛋白低脂肪，富含DHA，鱼肉细滑，椒香微辣，口感鲜美",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 45,
+    "name": "跳水鱼",
+    "category": "宴请首选菜",
+    "price": 46,
+    "priceUnit": "元/份",
+    "description": "鱼肉细滑，椒香微辣，口感鲜美",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 46,
+    "name": "清炒腰果虾仁",
+    "category": "宴请首选菜",
+    "price": 68,
+    "priceUnit": "元/份",
+    "description": "清炒原味，健康美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 47,
+    "name": "白菜烩羊肉",
+    "category": "宴请首选菜",
+    "price": 78,
+    "priceUnit": "元/份",
+    "description": "白菜配羊肉，鲜美无比",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 48,
+    "name": "烙馍卷肘子",
+    "category": "餐前开胃菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "特别推荐，餐前开胃，酌酒冷盘",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 49,
+    "name": "卤水猪蹄",
+    "category": "餐前开胃菜",
+    "price": 58,
+    "priceUnit": "元/份",
+    "description": "餐前开胃，酌酒冷盘",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 50,
+    "name": "刺身拼盘",
+    "category": "餐前开胃菜",
+    "price": 138,
+    "priceUnit": "元/份",
+    "description": "鲜美刺身，高端大气",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 51,
+    "name": "鲜椒脱骨鸭掌",
+    "category": "餐前开胃菜",
+    "price": 46,
+    "priceUnit": "元/份",
+    "description": "鲜椒配鸭掌，爽口开胃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 52,
+    "name": "卤水鲜牛腱",
+    "category": "餐前开胃菜",
+    "price": 78,
+    "priceUnit": "元/份",
+    "description": "特别推荐，餐前开胃，酌酒冷盘",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 53,
+    "name": "品荟烧鸡",
+    "category": "餐前开胃菜",
+    "price": 48,
+    "priceUnit": "元/份",
+    "description": "品荟特色，餐前开胃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 54,
+    "name": "老醋海蜇头",
+    "category": "餐前开胃菜",
+    "price": 52,
+    "priceUnit": "元/份",
+    "description": "老醋配海蜇头，酸爽开胃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 55,
+    "name": "蓝莓香芋泥",
+    "category": "餐前开胃菜",
+    "price": 26,
+    "priceUnit": "元/份",
+    "description": "香甜软糯，老少皆宜",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 56,
+    "name": "小鱼花生",
+    "category": "餐前开胃菜",
+    "price": 26,
+    "priceUnit": "元/份",
+    "description": "下酒好菜，开胃爽口",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 57,
+    "name": "驴肉双拼",
+    "category": "餐前开胃菜",
+    "price": 88,
+    "priceUnit": "元/份",
+    "description": "天上龙肉，地上驴肉",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 58,
+    "name": "椒麻牛肚",
+    "category": "餐前开胃菜",
+    "price": 58,
+    "priceUnit": "元/份",
+    "description": "椒麻鲜香，爽口开胃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 59,
+    "name": "杭式酱鸭",
+    "category": "餐前开胃菜",
+    "price": 58,
+    "priceUnit": "元/份",
+    "description": "特别推荐，杭式风味",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 60,
+    "name": "花椒狗肉",
+    "category": "餐前开胃菜",
+    "price": 68,
+    "priceUnit": "元/份",
+    "description": "特别推荐，花椒香气浓郁",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 61,
+    "name": "卤水套肠",
+    "category": "餐前开胃菜",
+    "price": 56,
+    "priceUnit": "元/份",
+    "description": "特别推荐，卤香浓郁",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 62,
+    "name": "自制酱鸭头",
+    "category": "餐前开胃菜",
+    "price": 42,
+    "priceUnit": "元/份",
+    "description": "自制酱鸭头，卤香浓郁",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 63,
+    "name": "香肝拌菠菜",
+    "category": "餐前开胃菜",
+    "price": 26,
+    "priceUnit": "元/份",
+    "description": "特别推荐，健康美味",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 64,
+    "name": "拌蒸菜",
+    "category": "餐前开胃菜",
+    "price": 24,
+    "priceUnit": "元/份",
+    "description": "健康美味，清爽开胃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 65,
+    "name": "蒜泥黄瓜",
+    "category": "餐前开胃菜",
+    "price": 18,
+    "priceUnit": "元/份",
+    "description": "清爽开胃，夏日必备",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 66,
+    "name": "黄瓜拼小番茄",
+    "category": "餐前开胃菜",
+    "price": 18,
+    "priceUnit": "元/份",
+    "description": "清爽开胃，夏日必备",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 67,
+    "name": "葱拌猪耳",
+    "category": "餐前开胃菜",
+    "price": 42,
+    "priceUnit": "元/份",
+    "description": "葱香浓郁，猪耳爽脆",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 68,
+    "name": "醋泡七彩花生",
+    "category": "餐前开胃菜",
+    "price": 24,
+    "priceUnit": "元/份",
+    "description": "酸爽开胃，下酒好菜",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 69,
+    "name": "捞汁醉海鲜",
+    "category": "餐前开胃菜",
+    "price": 42,
+    "priceUnit": "元/份",
+    "description": "醉鲜海鲜，捞汁美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 70,
+    "name": "黄豆拌桑叶",
+    "category": "餐前开胃菜",
+    "price": 22,
+    "priceUnit": "元/份",
+    "description": "健康美味，清爽开胃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 71,
+    "name": "捞拌绿豆粉皮",
+    "category": "餐前开胃菜",
+    "price": 22,
+    "priceUnit": "元/份",
+    "description": "捞拌美味，清爽开胃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 72,
+    "name": "麻汁面筋",
+    "category": "餐前开胃菜",
+    "price": 16,
+    "priceUnit": "元/份",
+    "description": "麻酱浓郁，面筋爽滑",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 73,
+    "name": "爽口西芹",
+    "category": "餐前开胃菜",
+    "price": 22,
+    "priceUnit": "元/份",
+    "description": "清爽开胃，西芹爽脆",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 74,
+    "name": "凉拌豆角",
+    "category": "餐前开胃菜",
+    "price": 22,
+    "priceUnit": "元/份",
+    "description": "清爽开胃，豆角脆嫩",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 75,
+    "name": "巧拌石磨豆丝",
+    "category": "餐前开胃菜",
+    "price": 22,
+    "priceUnit": "元/份",
+    "description": "巧拌美味，石磨豆丝",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 76,
+    "name": "蔬菜沙拉",
+    "category": "餐前开胃菜",
+    "price": 22,
+    "priceUnit": "元/份",
+    "description": "健康美味，清爽开胃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 77,
+    "name": "苦菊馓子",
+    "category": "餐前开胃菜",
+    "price": 16,
+    "priceUnit": "元/份",
+    "description": "清爽开胃，苦菊配馓子",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 78,
+    "name": "蒜泥鸡蛋",
+    "category": "餐前开胃菜",
+    "price": 22,
+    "priceUnit": "元/份",
+    "description": "蒜泥配鸡蛋，健康美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 79,
+    "name": "下酒鹿角菜",
+    "category": "餐前开胃菜",
+    "price": 19,
+    "priceUnit": "元/份",
+    "description": "下酒好菜，鹿角菜鲜美",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 80,
+    "name": "窝窝头外婆菜",
+    "category": "家常炒菜",
+    "price": 28,
+    "priceUnit": "元/份",
+    "description": "外婆菜配窝窝头，家常美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 81,
+    "name": "酸辣鱼圆汤",
+    "category": "家常炒菜",
+    "price": 46,
+    "priceUnit": "元/份",
+    "description": "特别推荐，酸辣开胃",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 82,
+    "name": "牛肉辣椒糊",
+    "category": "家常炒菜",
+    "price": 29,
+    "priceUnit": "元/份",
+    "description": "牛肉配辣椒糊，香辣入味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 83,
+    "name": "虾米茼蒿",
+    "category": "家常炒菜",
+    "price": 24,
+    "priceUnit": "元/份",
+    "description": "虾米配茼蒿，鲜美入味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 84,
+    "name": "椒盐大虾",
+    "category": "家常炒菜",
+    "price": 49,
+    "priceUnit": "元/份",
+    "description": "椒盐配大虾，香酥美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 85,
+    "name": "红糖糍粑",
+    "category": "家常炒菜",
+    "price": 24,
+    "priceUnit": "元/份",
+    "description": "香甜软糯，老少皆宜",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 86,
+    "name": "爽口秋葵",
+    "category": "家常炒菜",
+    "price": 28,
+    "priceUnit": "元/份",
+    "description": "清爽开胃，秋葵爽脆",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 87,
+    "name": "麦香开口笑",
+    "category": "家常炒菜",
+    "price": 24,
+    "priceUnit": "元/份",
+    "description": "特别推荐，香酥美味",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 88,
+    "name": "干煸鱿鱼",
+    "category": "家常炒菜",
+    "price": 49,
+    "priceUnit": "元/份",
+    "description": "干煸鱿鱼，香辣入味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 89,
+    "name": "窝窝头炒肉",
+    "category": "家常炒菜",
+    "price": 36,
+    "priceUnit": "元/份",
+    "description": "窝窝头配炒肉，家常美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 90,
+    "name": "松仁玉米",
+    "category": "家常炒菜",
+    "price": 28,
+    "priceUnit": "元/份",
+    "description": "香甜可口，老少皆宜",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 91,
+    "name": "干锅鹿茸菇",
+    "category": "家常炒菜",
+    "price": 36,
+    "priceUnit": "元/份",
+    "description": "干锅鹿茸菇，鲜香入味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 92,
+    "name": "槐花炒鸡蛋",
+    "category": "家常炒菜",
+    "price": 26,
+    "priceUnit": "元/份",
+    "description": "槐花配鸡蛋，鲜美入味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 93,
+    "name": "虾仁蒸水蛋",
+    "category": "家常炒菜",
+    "price": 28,
+    "priceUnit": "元/份",
+    "description": "虾仁配水蛋，嫩滑美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 94,
+    "name": "干煸茶树菇",
+    "category": "家常炒菜",
+    "price": 28,
+    "priceUnit": "元/份",
+    "description": "特别推荐，干煸茶树菇，香辣入味",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 95,
+    "name": "京酱肉丝",
+    "category": "家常炒菜",
+    "price": 39,
+    "priceUnit": "元/份",
+    "description": "京酱肉丝，酱香浓郁",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 96,
+    "name": "烙馍卷素炒",
+    "category": "家常炒菜",
+    "price": 22,
+    "priceUnit": "元/份",
+    "description": "烙馍卷素炒，家常美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 97,
+    "name": "生炒荷兰豆",
+    "category": "家常炒菜",
+    "price": 26,
+    "priceUnit": "元/份",
+    "description": "生炒荷兰豆，脆嫩美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 98,
+    "name": "脆炸鸡柳",
+    "category": "家常炒菜",
+    "price": 32,
+    "priceUnit": "元/份",
+    "description": "脆炸鸡柳，香酥美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 99,
+    "name": "风味茄子",
+    "category": "家常炒菜",
+    "price": 24,
+    "priceUnit": "元/份",
+    "description": "风味茄子，美味可口",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 100,
+    "name": "炒有机花菜",
+    "category": "家常炒菜",
+    "price": 24,
+    "priceUnit": "元/份",
+    "description": "有机花菜，健康美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 101,
+    "name": "虾仁炒饭",
+    "category": "家常炒菜",
+    "price": 26,
+    "priceUnit": "元/份",
+    "description": "虾仁配炒饭，鲜美入味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 102,
+    "name": "牛肉炒饭",
+    "category": "家常炒菜",
+    "price": 36,
+    "priceUnit": "元/份",
+    "description": "牛肉配炒饭，美味可口",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 103,
+    "name": "韭菜丸子",
+    "category": "家常炒菜",
+    "price": 18,
+    "priceUnit": "元/份",
+    "description": "韭菜丸子，家常美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 104,
+    "name": "羊肉糊汤面",
+    "category": "汤羹主食饮品",
+    "price": 10,
+    "priceUnit": "元/碗",
+    "description": "羊肉糊汤面，暖身暖胃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 105,
+    "name": "海鲜疙瘩汤",
+    "category": "汤羹主食饮品",
+    "price": 36,
+    "priceUnit": "元/份",
+    "description": "海鲜疙瘩汤，鲜美无比",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 106,
+    "name": "酸辣肚丝汤",
+    "category": "汤羹主食饮品",
+    "price": 28,
+    "priceUnit": "元/份",
+    "description": "酸辣开胃，肚丝爽脆",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 107,
+    "name": "西湖牛肉羹",
+    "category": "汤羹主食饮品",
+    "price": 24,
+    "priceUnit": "元/份",
+    "description": "西湖牛肉羹，鲜美无比",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 108,
+    "name": "牛肉胡辣汤配油条",
+    "category": "汤羹主食饮品",
+    "price": 39,
+    "priceUnit": "元/份",
+    "description": "特别推荐，牛肉胡辣汤配油条，经典早餐",
+    "isSignature": false,
+    "isRecommend": true
+  },
+  {
+    "id": 109,
+    "name": "红枣莲子银耳羹",
+    "category": "汤羹主食饮品",
+    "price": 26,
+    "priceUnit": "元/份",
+    "description": "红枣莲子银耳羹，滋补养生",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 110,
+    "name": "品荟菌菇汤",
+    "category": "汤羹主食饮品",
+    "price": 38,
+    "priceUnit": "元/份",
+    "description": "品荟菌菇汤，鲜美无比",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 111,
+    "name": "玉米羹",
+    "category": "汤羹主食饮品",
+    "price": 18,
+    "priceUnit": "元/份",
+    "description": "玉米羹，香甜可口",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 112,
+    "name": "素水饺",
+    "category": "汤羹主食饮品",
+    "price": 18,
+    "priceUnit": "元/斤",
+    "description": "素水饺，健康美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 113,
+    "name": "荤水饺",
+    "category": "汤羹主食饮品",
+    "price": 24,
+    "priceUnit": "元/斤",
+    "description": "荤水饺，鲜美无比",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 114,
+    "name": "地锅火烧馍",
+    "category": "汤羹主食饮品",
+    "price": 20,
+    "priceUnit": "元/份",
+    "description": "地锅火烧馍，家常美味",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 115,
+    "name": "慕斯蛋糕",
+    "category": "汤羹主食饮品",
+    "price": 26,
+    "priceUnit": "元/份",
+    "description": "慕斯蛋糕，甜美好吃",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 116,
+    "name": "甘蔗茅根水",
+    "category": "汤羹主食饮品",
+    "price": 28,
+    "priceUnit": "元/扎",
+    "description": "甘蔗茅根水，清热去火",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 117,
+    "name": "金桔柠檬",
+    "category": "汤羹主食饮品",
+    "price": 28,
+    "priceUnit": "元/扎",
+    "description": "金桔柠檬，清爽可口",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 118,
+    "name": "红豆红枣热饮",
+    "category": "汤羹主食饮品",
+    "price": 22,
+    "priceUnit": "元/扎",
+    "description": "红豆红枣热饮，滋补养生",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 119,
+    "name": "奶香玉米汁热饮",
+    "category": "汤羹主食饮品",
+    "price": 22,
+    "priceUnit": "元/扎",
+    "description": "奶香玉米汁热饮，香甜可口",
+    "isSignature": false,
+    "isRecommend": false
+  },
+  {
+    "id": 120,
+    "name": "百香果冷饮",
+    "category": "汤羹主食饮品",
+    "price": 28,
+    "priceUnit": "元/扎",
+    "description": "百香果冷饮，清爽可口"
+  }
+]

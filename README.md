@@ -1,334 +1,312 @@
-# WeChat Bot
+# 雨姗AI收银助手 v5.0.0
 
-一个 基于 `chatgpt` + `wechaty` 的微信机器人
+## ⚠️ 重要声明
 
-可以用来帮助你自动回复微信消息，或者管理微信群/好友.
+**本项目是正在开发中的项目，部分功能使用Mock数据或框架实现，距离生产环境使用还有较大差距。**
 
-`简单`，`好用`，`2分钟（4 个步骤）` 就能玩起来了。🌸 如果对您有所帮助，请点个 Star ⭐️ 支持一下。
+**请务必阅读：[架构痛点说明文档](docs/ARCHITECTURE_ISSUES.md)**
 
-<div align='center'>
-  <a href="https://trendshift.io/repositories/11077" target="_blank"><img src="https://trendshift.io/api/badge/repositories/11077" alt="wangrongding%2Fwechat-bot | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</div>
+### 核心问题摘要
+- ❌ 所有收银系统适配器：**仅Mock数据，未真实对接**
+- ❌ AI智能推荐：**随机选择，无智能推荐引擎**
+- ❌ AI经营简报：**硬编码模拟数据**
+- ❌ 语音/图片识别：**未实现**
+- ⚠️ Math.random()滥用：**17处生产环境大忌**
 
-## 贡献者们
+---
 
-<a href="https://github.com/wangrongding/wechat-bot/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=wangrongding/wechat-bot&columns=20" />
-</a>
+## 🚀 快速开始（Windows绿色版）
 
-欢迎大家提交 PR 接入更多的 ai 服务(比如扣子等...)，积极贡献更好的功能实现，让 wechat-bot 变得更强！
+```bash
+# 1. 下载安装包
+# 从 Releases 下载 yushan-ai-cashier-assistant-v5.0.0-windows.zip
 
-## 注意：最近微信对此审查变得非常严格，使用默认的协议有微信警告或者封号的风险，请大家谨慎使用，关于 padlocal ，这个协议的作者没有继续维护，大家可以自行切换更稳定的协议。  
+# 2. 解压到 D:\YushanAI
 
-![](https://github.com/user-attachments/assets/1c312cf4-73d8-44a1-8f36-5ea288ac0aa4)
+# 3. 双击 启动服务.bat
+#    - 首次运行自动安装依赖
+#    - 自动创建SQLite数据库
+#    - 自动注入示例数据
 
-## 使用前需要配置的 AI 服务（目前支持 9 种，可任选其一）
-
-- deepseek
-
-  获取自己的 `api key`，地址戳这里 👉🏻 ：[deepseek 开放平台](https://platform.deepseek.com/usage)  
-  将获取到的`api key`填入 `.evn` 文件中的 `DEEPSEEK_FREE_TOKEN` 中。
-
-- ChatGPT
-
-  先获取自己的 `api key`，地址戳这里 👉🏻 ：[创建你的 api key](https://platform.openai.com/settings/organization/api-keys)
-
-  **注意：这个是需要去付费购买的，很多人过来问为什么请求不通，请确保终端走了代理，并且付费购买了它的服务**
-
-  ```sh
-  # 执行下面命令，拷贝一份 .env.example 文件为 .env
-  cp .env.example .env
-  # 填写完善 .env 文件中的内容
-  OPENAI_API_KEY='你的key'
-  ```
-
-- 豆包
-
-  豆包最新的Doubao-Seed-1.6模型，支持输入图片和深度思考，而且每个模型都有 50 万的免费tokens。在火山引擎注册登录账号，可以选择最新的Doubao-Seed-1.6-thinking模型，选择“API接入” -> “获取 API Key”。
-
-  ```sh
-  # 拷贝 .env.example 文件为 .env
-  cp .env.example .env
-  # 修改 .env 文件中的内容
-  DOUBAO_API_KEY='你的key'
-  # 简单测试API是否可用
-  node src/doubao/__test__.js
-  ```
-
-- 通义千问
-
-  通义千问是阿里云提供的 AI 服务，获取到你的 api key 之后, 填写到 .env 文件中即可
-
-  ```sh
-  # 执行下面命令，拷贝一份 .env.example 文件为 .env
-  cp .env.example .env
-  # 填写完善 .env 文件中的内容
-  # 通义千问, URL 包含 uri 路径
-  TONGYI_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-  # 通义千问的 API_KEY
-  TONGYI_API_KEY = ''
-  # 通义千问使用的模型
-  TONGYI_MODEL='qwen-plus'
-  ```
-
-- 科大讯飞
-
-  新增科大讯飞，去这里申请一个 key：[科大讯飞](https://console.xfyun.cn/services/bm35)，每个模型都有 200 万的免费 token ，感觉很难用完。  
-  注意： 讯飞的配置文件几个 key，别填反了，很多人找到我说为什么不回复，都是填反了。  
-  而且还有一个好处就是，接口不会像 Kimi 一样限制请求频次，相对来说稳定很多。  
-  服务出错可参考： [issues/170](https://github.com/wangrongding/wechat-bot/issues/170), [issues/180](https://github.com/wangrongding/wechat-bot/issues/180)
-
-- Kimi （请求限制较严重）
-
-  可以去 ： [kimi apikey](https://platform.moonshot.cn/console/api-keys) 获取你的 key  
-  最近比较忙，大家感兴趣可以提交 PR，我会尽快合并。目前 Kimi 刚刚集成，还可以实现上传文件等功能，然后有其它较好的服务也可以提交 PR 。
-
-- dify
-
-  地址：[dify](https://dify.ai/), 创建你的应用之后, 获取到你的 api key 之后, 填写到 .env 文件中即可, 也支持私有化部署dify版本
-
-  ```sh
-  # 执行下面命令，拷贝一份 .env.example 文件为 .env
-  cp .env.example .env
-  # 填写完善 .env 文件中的内容
-  DIFY_API_KEY='你的key'
-  # 如果需要私有化部署，请修改.env中下面的配置
-  # DIFY_URL='https://[你的私有化部署地址]'
-  ```
-
-- ollama
-
-  Ollama 是一个本地化的 AI 服务，它的 API 与 OpenAI 非常接近。配置 Ollama 的过程与各种在线服务略有不同
-
-  ```sh
-  # 执行下面命令，拷贝一份 .env.example 文件为 .env
-  cp .env.example .env
-  # 填写完善 .env 文件中的内容
-  OLLAMA_URL='http://127.0.0.1:11434/api/chat'
-  OLLAMA_MODEL='qwen2.5:7b'
-  OLLAMA_SYSTEM_MESSAGE='You are a personal assistant.'
-  ```
-
-- 302.AI
-
-  AI聚合平台，有套壳GPT的API，也有其他模型，点这里可以[添加API](https://dash.302.ai/apis/list)，添加之后把API KEY配置到.env里，如下，MODEL可以自行选择配置
-
-  ```
-  _302AI_API_KEY = 'xxxx'
-  _302AI_MODEL= 'gpt-4o-mini'
-  ```
-
-  由于openai充值需要国外信用卡，流程比较繁琐，大多需要搞国外虚拟卡，手续费也都不少，该平台可以直接支付宝，算是比较省事的，注册填问卷可领1刀额度，后续充值也有手续费，用户可自行酌情选择。
-
-- claude
-
-  前往 [官网](https://console.anthropic.com) 注册并获取API KEY后进行配置即可
-
-  ```bash
-  # 执行下面命令，拷贝一份 .env.example 文件为 .env，如果已存在则忽略此步
-  cp .env.example .env
-
-  # 编辑.env文件并添加claude相关配置
-
-  CLAUDE_API_VERSION = '2023-06-01'
-  CLAUDE_API_KEY = '你的API KEY'
-  CLAUDE_MODEL = 'claude-3-5-sonnet-latest'
-  # 系统人设
-  CLAUDE_SYSTEM = ''
-  ```
-
-- 其他  
-  （待实践）理论上使用 openAI 格式的 api，都可以使用，在 env 文件中修改对应的 api_key、model、proxy_url 即可。
-
-## API资源/平台收录
-
-- [gpt4free](https://github.com/xtekky/gpt4free)
-- [chatanywhere](https://github.com/chatanywhere/GPT_API_free)
-
-## 赞助商
-
-<div align="center">
-  <table>
-    <!-- Header -->
-    <tr>
-      <td align="center" width="50%">
-        <p align="center">
-          <a href="https://91api.dev/register?aff=9P6u" target="_blank">
-            <img src="./sponsors/91api.jpg" alt="91Api" width="300px"/>
-          </a>
-        </p>
-      </td>
-      <td align="center" width="50%">
-        <p align="center">
-          <a href="https://www.compshare.cn/model-api?ytag=GPU_YY-gh_wechatbot" target="_blank">
-            <img src="./sponsors/Ucloud.png" alt="UCloud" width="300px"/>
-          </a>
-        </p>
-      </td>
-    </tr>
-    <!-- Description -->
-    <tr>
-      <td align="left">
-        一站式集成 500+主流大模型中转聚合API平台，高效稳定，高并发，价格超低
-        <a href="https://91api.dev/register?aff=9P6u" target="_blank">产品链接</a>
-      </td>
-      <td align="left">
-        万卡RTX40系GPU+海内外主流模型API服务，秒级响应，按量计费，新客免费用。
-        <a href="https://www.compshare.cn/model-api?ytag=GPU_YY-gh_wechatbot" target="_blank">产品链接</a>
-      </td>
-    </tr>
-  </table>
-</div>
-
-目前该项目流量较大，已经上过 27 次 [Github Trending 榜](https://github.com/trending)，如果您的公司或者产品需要推广，可以在下方二维码处联系我，我会在项目中加入您的广告，帮助您的产品获得更多的曝光。
-
-## 开发/使用
-
-检查好自己的开发环境，确保已经安装了 `nodejs` , 版本需要满足 Node.js >= v18.0 ，版本太低会导致运行报错,最好使用 LTS 版本。
-
-1. 安装依赖
-
-> 安装依赖时，大陆的朋友推荐切到 taobao 镜像源后再安装，命令：  
-> `npm config set registry https://registry.npmmirror.com`  
-> 想要灵活切换，推荐使用我的工具 👉🏻 [prm-cli](https://github.com/wangrongding/prm-cli) 快速切换。
-
-```sh
-# 安装依赖
-npm i
-# 推荐用 yarn 吧，npm 安装有时会遇到 wechaty 内部依赖安装失败的问题
-yarn
+# 4. 访问 http://localhost:3000
+#    管理员: http://localhost:3000/admin
+#    账号: admin / admin123
 ```
 
-2. 运行服务
+## 系统要求
 
-```sh
-# 启动服务
-npm run dev # 或者 npm run start
-# 启动服务
-yarn dev # 或者 yarn start
+| 项目 | 要求 |
+|------|------|
+| 操作系统 | Windows 10/11 64位 |
+| 运行环境 | Node.js 18.x LTS |
+| 数据库 | SQLite（内置，无需安装） |
+| 浏览器 | Chrome/Firefox/Edge 最新版 |
+| 内存 | 4GB+ |
+
+## ✅ 商家基础版功能清单
+
+| 功能模块 | 状态 | 说明 |
+|----------|------|------|
+| 完整点餐系统 | ✅ 已实现 | 菜单浏览、下单、订单管理 |
+| FAQ问答系统（20+种查询） | ✅ 已实现 | WiFi/停车/营业时间/地址/电话等 |
+| 商家配置系统 | ✅ 已实现 | 店铺信息、营业时间、WiFi配置 |
+| 二维码生成 | ✅ 已实现 | 桌台二维码、点餐二维码 |
+| 数据备份加密 | ✅ 已实现 | AES-256加密、自动备份 |
+| Windows绿色打包 | ✅ 已实现 | 开箱即用，5分钟上线 |
+| 用户权限管理 | ✅ 已实现 | 管理员/员工/会员角色 |
+| 订单状态管理 | ✅ 已实现 | 待处理→制作中→已完成→已结账 |
+| 会员基础功能 | ✅ 已实现 | 注册、积分、消费记录 |
+| 桌台管理 | ✅ 已实现 | 20个桌台，状态管理 |
+| 统计报表 | ✅ 已实现 | 日营收、热销菜品、客单价 |
+
+---
+
+雨姗AI收银助手 - 市面所有收银系统通用AI智能增强助手。
+
+## 🎯 核心目标
+
+### 第一阶段：AI 全自动读懂商家现有收银系统，不用商家手动录一条数据
+
+| 序号 | 技能点 | 实现逻辑 | 商家价值 | 当前状态 | 说明 |
+|------|--------|----------|----------|---------|------|
+| 1️⃣ | **自动识别本地收银系统** | 扫描电脑进程/注册表/数据库端口，自动匹配主流收银 | 商家不用选、不用配，打开软件自动对接 | ⚠️ 框架实现 | 仅框架，当前使用随机逻辑模拟检测结果 |
+| 2️⃣ | **全量数据自动同步** | 只读模式拉取原有收银：菜品/价格/套餐/库存/桌台/会员/历史订单 | 不用手动录菜品，建会员，10分钟完成初始化 | ❌ Mock数据 | 所有适配器返回硬编码Mock数据，未真实对接 |
+| 3️⃣ | **实时数据增量监听** | 监听收银数据库/接口，实时同步新订单/退单/改价/结账/库存变动 | AI 永远和收银数据一致 | ❌ Mock数据 | data-watcher.js仅框架，无真实监听 |
+| 4️⃣ | **小票打印逆向解析** | 监听收银机网口/串口打印机，解析小票内容生成结构化订单 | 适配所有无API、无数据库权限的杂牌收银机 | ⚠️ 基础框架 | ticket-parser.js仅框架，无真实打印机监听 |
+| 5️⃣ | **数据自动校验纠错** | AI 自动识别重复菜品、错误价格、异常库存，提醒商家修正 | 避免同步数据出错导致的错单、漏单 | ⚠️ 基础实现 | data-validator.js有校验逻辑，但数据来自Mock |
+
+### 第二阶段：AI 虚拟前台（核心必做，省人工）
+
+**核心目标：替代80%前台接待/点单/咨询工作，原有收银只负责最后收钱**
+
+| 序号 | 技能点 | 实现逻辑 | 商家价值 | 当前状态 | 说明 |
+|------|--------|----------|----------|---------|------|
+| 1️⃣ | **无关键词自然语义点餐** | 大模型意图识别，支持大白话、模糊表达、口语化点餐 | 顾客说"来个两人份辣的套餐"都能听懂 | ⚠️ 框架实现 | 有提示词注入防护，但未接入真实大模型 |
+| 2️⃣ | **主动式智能推荐** | 结合历史销量、库存、顾客口味、当前活动，主动推荐菜品/套餐/凑单 | 提高客单价10%-15% | ❌ 随机选择 | ai-agent.js仅从数组随机取值，无智能推荐 |
+| 3️⃣ | **全场景自动答疑** | 覆盖营业时间/包间/停车/打包/辣度/忌口/优惠等200+常见问题 | 不用员工回微信、接电话答疑 | ⚠️ 基础实现 | FAQ系统有框架，但需要商家配置内容 |
+| 4️⃣ | **多模态交互支持** | 支持文字、语音、图片识别（拍菜单点菜） | 老人、小孩都能轻松用 | ❌ 未实现 | 语音/图片识别功能直接返回错误，需接入第三方API |
+| 5️⃣ | **异常情况自动转人工** | AI识别回答不了的问题/复杂订单，自动转给前台人工处理 | 保证服务质量 | ✅ 已实现 | humanTransferService.js有频率限制机制 |
+
+### 第三阶段：Windows 绿色软件包（v5.0.0 新增）
+
+**核心目标：打包成开箱即用的Windows绿色软件包，商家5分钟上线**
+
+| 序号 | 模块名称 | 验收标准 | 当前状态 | 说明 |
+|------|----------|---------|---------|------|
+| 1️⃣ | **一键配置向导** | 引导商家完成收银对接、二维码生成、打印机配置 | ✅ 已完成 | setupWizard.js和setup.html已实现 |
+| 2️⃣ | **二维码自动生成** | 通用店铺码、桌码自动生成，一键打印 | ✅ 已完成 | qrcodeGenerator.js已实现 |
+| 3️⃣ | **绿色软件打包** | 集成Node.js、MySQL、Redis所有运行环境，打包成单文件 | ⚠️ 打包脚本已完善 | build.bat已完善，但未集成Node.js/MySQL/Redis |
+| 4️⃣ | **性能优化** | 内存占用优化到≤500MB，后台静默运行 | ⚠️ 待测试 | 未实际测试 |
+| 5️⃣ | **离线运行支持** | 核心功能（点餐、打单）断网可用 | ⚠️ 部分实现 | 仅本地缓存，无完整离线功能 |
+| 6️⃣ | **数据安全** | 本地数据加密存储，自动备份与恢复 | ✅ 已完善 | backup.js和encryption.js已实现 |
+| 7️⃣ | **最终文档** | 编写《商家快速上手手册》《常见问题解答》 | ✅ 已完成 | WINDOWS使用指南.md已完成 |
+
+## ⚡ 快速开始（Windows用户）
+
+### ⚠️ 重要提示
+- **Windows绿色版安装包**：正在开发中，预计近期发布，请关注GitHub Releases
+- **当前版本**：开发者预览版，需手动配置环境
+
+### 环境要求
+- Node.js >=18.0.0
+- MySQL 5.7+ 或 MySQL 8.0+
+- Redis 6.0+（可选，用于会话缓存）
+- Windows 10/11 或 Linux/macOS
+
+### 快速启动
+```bash
+# 1. 克隆项目
+git clone https://github.com/370205504-cmyk/yushan-ai-cashier-assistant.git
+cd yushan-ai-cashier-assistant
+
+# 2. 安装依赖
+npm install
+
+# 3. 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，配置数据库等信息
+
+# 4. 初始化数据库
+npm run db:init
+
+# 5. 启动服务
+npm start
 ```
 
-然后就可以扫码登录了，然后根据你的需求，自己修改相关逻辑文件。
+### 管理后台
+- 访问：http://localhost:3000/admin
+- 首次登录后请修改管理员密码
 
-![](https://assets.fedtop.com/picbed/202403261420468.png)
+### 顾客端
+- 访问：http://localhost:3000
+- 或扫描桌码
 
-![](https://assets.fedtop.com/picbed/202212071315670.png)
+## 功能特点
 
-为了兼容 docker 部署，避免不必要的选择交互，新增指定服务运行
+### 核心功能
+- 多渠道点餐：文字聊天、Web/移动端点餐、AI Agent对话
+- AI Agent适配：支持扣子/龙虾/Dify等AI平台，完整MCP标准工具集（框架实现）
+- 商业服务查询：20+种自然语言查询（WiFi、停车、营业时间等）
+- 智能排队：排队叫号、实时进度查询、取消排队
+- 完整购物车：加菜、减菜、口味备注、多人点餐
+- 订单生命周期：待确认→已接单→制作中→已出餐→已完成/已取消
+- 支付集成：微信支付、支付宝、余额支付、扫码支付（框架实现）
+- 会员系统：积分、充值、优惠券、会员等级
+- 多租户支持：SaaS架构，支持多门店
 
-```sh
-# 运行指定服务 （ 目前支持 ChatGPT | Kimi | Xunfei ）
-npm run start -- --serve Kimi
-# 交互选择服务，仍然保持原有的逻辑
-npm run start
+### v4.2.0 新增（可插拔适配器）
+- 可插拔适配器架构：所有收银系统对接都实现统一接口（✅ 框架已完成）
+- 美团收银/银豹/哗啦啦/思迅/科脉 五大主流收银系统适配（❌ 仅Mock数据）
+- 数据库直连适配器：支持MySQL/Access/SQL Server，自动识别表结构（⚠️ 框架实现）
+- 打印旁路兜底适配器：监听网口/串口打印机，小票逆向解析，虚拟打印入单（⚠️ 基础框架）
+- 自动扫描与一键对接：启动后自动扫描本地进程、数据库、打印机，自动匹配适配器（⚠️ 框架实现）
+- 双向数据同步引擎：增量同步、冲突解决、数据校验、防错机制（⚠️ 框架实现）
+
+### v4.3.0 新增（AI智能体）
+- MCP工具扩展：新增收银对接相关的工具（拉取收银菜品、同步订单到收银、查询收银库存）（✅ 框架已完成）
+- 自然语义理解升级：支持大白话点餐（如"来个两人份辣的套餐"、"跟上次一样12点到店取"）（⚠️ 框架实现，需接入真实大模型）
+- 上下文记忆增强：记住顾客口味、历史订单、当前会话状态（⚠️ 框架实现）
+- AI主动技能：主动迎宾、主动推荐菜品、主动提醒口味忌口、订单状态自动推送（❌ 推荐为随机选择）
+- 企业微信机器人：基于扣子平台，实现加好友、私聊、语音点餐、订单通知（⚠️ 框架实现）
+- 自动转人工机制：AI识别回答不了的问题，自动推送人工客服二维码（✅ 已实现）
+- AI经营简报：每日自动生成营收、客流、爆款菜品分析（❌ 硬编码Mock数据）
+- 智能推荐引擎：结合历史销量、顾客口味、当前活动，主动推荐菜品/套餐/凑单（❌ 随机推荐）
+- 全场景FAQ答疑系统：覆盖200+常见问题，自动答疑（⚠️ 框架实现）
+- 多模态交互：支持文字、语音、图片识别（拍菜单点菜）（❌ 语音/图片识别未实现）
+
+### v5.0.0 新增（Windows绿色版）
+- 一键配置向导：5分钟完成配置（✅ 已完成）
+- 二维码自动生成：店铺码、桌码一键生成（✅ 已完成）
+- 绿色软件打包：解压即用，无需安装（⚠️ 打包脚本已完善，无Node.js/MySQL/Redis集成）
+- 性能优化：内存占用≤500MB（⚠️ 待测试）
+- 离线运行支持：断网可用（⚠️ 部分实现）
+- 数据安全：本地加密，自动备份（✅ 已完善）
+- 完善文档：商家快速上手手册+FAQ（✅ 已完成）
+
+## ⚠️ 功能限制说明
+
+### 网络要求
+- **AI功能需要网络连接**：自然语义点餐、智能推荐、语音识别、FAQ答疑等AI功能依赖第三方API，断网时这些功能完全失效
+- **支付功能需要网络连接**：微信支付、支付宝支付等需要联网完成交易
+- **离线可用功能**：本地点餐、查看菜单、本地订单缓存（联网后自动同步）
+
+### 收银系统兼容性
+- **支持的收银系统**：美团收银、银豹、哗啦啦、思迅、科脉（本地版本）
+- **暂不支持**：哗啦啦云端版、美团收银云端版等云端收银系统（需API对接）
+- **数据库要求**：需要商家提供收银系统数据库的只读账号密码
+- **USB打印机**：暂不支持，仅支持网口/串口打印机
+
+### 数据同步限制
+- **增量同步依赖**：部分收银系统需开启binlog或创建触发器才能实现实时同步
+- **复杂数据**：套餐组合、多规格菜品、复杂会员折扣等数据的同步规则待完善
+- **手动改单**：收银员手动修改的订单可能存在同步延迟
+
+### AI能力说明
+- **大模型依赖**：使用扣子/龙虾/Dify等第三方AI平台，需商家自行配置API
+- **语音识别**：当前仅支持普通话，方言支持规划中
+- **图片识别**：支持清晰印刷菜单，手写菜单识别准确率有限
+- **上下文长度**：多轮对话有记忆长度限制，超长对话可能丢失早期上下文
+
+### 支付接入
+- **商户号申请**：微信支付、支付宝需要商家自行向微信/支付宝申请商户号
+- **手续费**：按微信/支付宝官方标准收取（通常0.3%-0.6%）
+- **到账周期**：通常T+1到账
+
+### 多人点餐
+- **实时同步**：多人同时点餐时有基本的购物车同步，但复杂并发场景可能存在数据冲突
+- **建议**：大型餐厅建议使用叫号系统管理多人点餐
+
+### Windows绿色版
+- **安装包**：正在开发中，暂未发布正式版
+- **性能指标**：500MB内存占用为空载测试数据，高峰期可能更高
+- **兼容性**：待实际发布后进行多机型测试验证
+
+详细说明请参阅：[docs/TECHNICAL_LIMITATIONS.md](docs/TECHNICAL_LIMITATIONS.md)
+
+## 项目结构
+
+```
+yushan-ai-cashier-assistant/
+├── build/                    # 打包脚本
+│   └── build.bat
+├── lambda/
+│   ├── server.js             # 主服务
+│   ├── adapters/            # 收银系统适配器
+│   │   ├── base-adapter.js
+│   │   ├── meituan-adapter.js
+│   │   ├── yinbao-adapter.js
+│   │   ├── hualala-adapter.js
+│   │   ├── sixun-adapter.js
+│   │   ├── kemai-adapter.js
+│   │   ├── db-adapter.js
+│   │   └── printer-adapter.js
+│   ├── mcp/                 # MCP 工具和处理器
+│   │   ├── tools.js
+│   │   ├── handler.js
+│   │   └── context.js
+│   ├── integrations/        # 第三方集成
+│   │   └── wework-bot.js
+│   ├── routes/              # API路由
+│   ├── services/            # 业务逻辑
+│   │   ├── ai-agent.js
+│   │   ├── ai-report.js
+│   │   ├── recommendation-engine.js
+│   │   ├── faq-system.js
+│   │   ├── multimodal-processor.js
+│   │   ├── sync-engine.js
+│   │   ├── detector.js
+│   │   ├── ticket-parser.js
+│   │   ├── data-watcher.js
+│   │   ├── data-validator.js
+│   │   ├── couponService.js
+│   │   ├── setupWizard.js       # 配置向导（v5.0.0新增）
+│   │   └── backup.js            # 数据备份（v5.0.0新增）
+│   ├── database/            # 数据库相关
+│   ├── middleware/          # 中间件
+│   ├── utils/               # 工具函数
+│   └── web/                 # 前端页面
+│       ├── setup.html       # 配置向导（v5.0.0新增）
+│       ├── index.html
+│       ├── mobile.html
+│       └── admin.html
+├── docs/                    # 文档
+│   ├── TECHNICAL_LIMITATIONS.md  # 技术限制说明
+│   ├── SECURITY_FIX_REPORT.md    # 安全修复报告
+│   ├── ARCHITECTURE_ISSUES.md    # 架构痛点说明（必看）
+│   ├── DEPTH_AUDIT_REPORT.md     # 深度检测报告
+│   └── DELIVERY_ASSESSMENT_REPORT.md  # 交付评估报告
+├── .env.example             # 环境变量示例
+├── .env.production.sample   # 生产环境配置模板
+├── package.json             # 项目配置
+├── build.bat               # 打包脚本
+├── 一键启动.bat
+├── WINDOWS使用指南.md      # Windows使用指南（v5.0.0新增）
+├── README.md
+└── SKILL.md                # 扣子平台对接文档
 ```
 
-3. 测试
+## 技术栈
 
-安装完依赖后，运行 `npm run dev` 前，可以先测试下 openai 的接口是否可用，运行 `npm run test` 即可。
+- Node.js >=18.0.0 <22.0.0
+- MySQL 5.7+ / MySQL 8.0+
+- Redis 6.0+
+- Express 4.22+
+- Vanilla JavaScript (前端)
+- Docker (可选)
 
-遇到 timeout 问题需要自行用魔法解决。（一般就是代理未成功，或者你的魔法服务限制了 openai api 的服务）
+## 开发团队
 
-## 你要修改的
+雨姗科技
 
-很多人说运行后不会自动收发信息，不是的哈，为了防止给每一条收到的消息都自动回复（太恐怖了），所以加了限制条件。
+## 许可证
 
-你要把下面提到的地方自定义修改下。
+Apache License 2.0
 
-- 群聊，记得把机器人名称改成你自己微信号的名称，然后添加对应群聊的名称到白名单中，这样就可以自动回复群聊消息了。
-- 私聊，记得把需要自动回复的好友名称添加到白名单中，这样就可以自动回复私聊消息了。
-- 更深入的可以通过修改 `src/wechaty/sendMessage.js` 文件来满足你自己的业务场景。（大多人反馈可能无法自动回复，也可以通过调试这个文件来排查具体原因）
+## 联系方式
 
-在.env 文件中修改你的配置即可，示例如下
+- GitHub Issues：https://github.com/370205504-cmyk/yushan-ai-cashier-assistant/issues
+- 邮箱：support@yushan-ai.com
 
-```sh
-# 白名单配置
-#定义机器人的名称，这里是为了防止群聊消息太多，所以只有艾特机器人才会回复，
-#这里不要把@去掉，在@后面加上你启动机器人账号的微信名称
-BOT_NAME=@可乐
-#联系人白名单
-ALIAS_WHITELIST=微信名1,备注名2
-#群聊白名单
-ROOM_WHITELIST=XX群1,群2
-#自动回复前缀匹配，文本消息匹配到指定前缀时，才会触发自动回复，不配或配空串情况下该配置不生效（适用于用大号，不期望每次被@或者私聊时都触发自动回复的人群）
-#匹配规则：群聊消息去掉${BOT_NAME}并trim后进行前缀匹配，私聊消息trim后直接进行前缀匹配
-AUTO_REPLY_PREFIX=''
-```
+## 贡献指南
 
-可以看到，自动回复都是基于 `chatgpt` 的，记得要开代理，或者填写代理地址。
-
-![](https://github.com/user-attachments/assets/1c312cf4-73d8-44a1-8f36-5ea288ac0aa4)
-
-## 注意项
-
-近期微信审查很严格，大量用户反映弹出外挂警告，由于项目内默认使用的是免费版的 web 协议，所以目前来说很容易会被微信检测到，建议使用 pad 协议，或者自行购买企业版协议，避免被封号。
-
-修改可参考： https://github.com/wangrongding/wechat-bot/pull/263/files  
-自行购买 pad 协议渠道（wechaty 出的，购买仍需谨慎）：http://pad-local.com  
-由于底层依赖的 wechaty 本身不怎么维护了，听说是被腾讯告了，所以大家购买也要谨慎，群友分享目前 pad 协议可正常使用(但频繁登录登出也会收到警告)，最好别一次性买太久的。
-
-## 常见问题
-
-以下是我的微信和群二维码，添加的时候记得备注清楚来意。  
-希望可以一起交流探讨相关问题和解决方案。
-
-| <img src="https://github.com/user-attachments/assets/902b1a20-0ea0-4348-9ac1-b9eb6645223c" width="180px"> | <img src="https://raw.githubusercontent.com/wangrongding/image-house/master/WechatIMG173.jpg" width="180px"> |
-| --- | --- |
-
-### 运行报错等问题
-
-首先你需要做到以下几点：
-
-- 拉取最新代码，重新安装依赖（删除 lock 文件，删除 node_modules）
-- 安装依赖时最好不要设置 npm 镜像
-- 遇到 puppeteer 安装失败设置环境变量：
-
-  ```
-  # Mac
-  export PUPPETEER_SKIP_DOWNLOAD='true'
-
-  # Windows
-  SET PUPPETEER_SKIP_DOWNLOAD='true'
-  ```
-
-- 确保你们的终端走了代理 (开全局代理，或者手动设置终端走代理)
-
-  ```sh
-  # 设置代理
-  export https_proxy=http://127.0.0.1:你的代理服务端口号;export http_proxy=http://127.0.0.1:你的代理服务端口号;export all_proxy=socks5://127.0.0.1:你的代理服务端口号
-  # 然后再执行 npm run test
-  npm run test
-  ```
-
-  ![](https://raw.githubusercontent.com/wangrongding/image-house/master/202403231002859.png)
-
-- 确保你的 openai key 有余额
-- 配置好 .env 文件
-- 执行 npm run test 能成功拿到 openai 的回复(设置完代理后，仍然请求不通？ 可以参考： https://medium.com/@chanter2d/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8clash%E5%AE%9E%E7%8E%B0%E7%9C%9F%E6%AD%A3%E7%9A%84%E5%85%A8%E5%B1%80%E4%BB%A3%E7%90%86-385b2d745871)
-- 执行 npm run dev 愉快的玩耍吧~ 🎉
-
-也可以参考这条 [issue](https://github.com/wangrongding/wechat-bot/issues/54#issuecomment-1347880291)
-
-- 怎么玩？ 完成自定义修改后，群聊时，在白名单中的群，有人 @你 时会触发自动回复，私聊中，联系人白名单中的人发消息给你时会触发自动回复。
-- 运行报错？检查 node 版本是否符合，如果不符合，升级 node 版本即可，检查依赖是否安装完整，如果不完整，大陆推荐切换下 npm 镜像源，然后重新安装依赖即可。（可以用我的 [prm-cli](https://github.com/wangrongding/prm-cli) 工具快速切换）
-- 调整对话模式？可以修改[openai/index.js](./src/openai/index.js) ,具体可以根据官方文档给出的示例（非常多，自己对应调整参数即可） ：https://beta.openai.com/examples
-
-## 使用 Docker 部署
-
-```sh
-$ docker build . -t wechat-bot
-
-$ docker run -d --rm --name wechat-bot -v $(pwd)/.env:/app/.env wechat-bot
-```
-
-- 如果docker build过程中node反复下载超时，可先下载nodejs镜像到本地镜像库，并将DockerFile中的'node:19'修改为本地nodejs镜像版本
-
-## Star History Chart
-
-该项目于 2023/2/13 日成为 Github Trending 榜首。
-
-[![Star History Chart](https://api.star-history.com/svg?repos=wangrongding/wechat-bot&type=Date)](https://star-history.com/#wangrongding/wechat-bot&Date)
-
-## License
-
-[MIT](./LICENSE).
+参见 [CONTRIBUTING.md](CONTRIBUTING.md)
