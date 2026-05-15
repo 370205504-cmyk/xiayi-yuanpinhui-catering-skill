@@ -1,238 +1,757 @@
-# 雨姗AI收银助手创味菜 AI Skill
+# 雨姗AI收银助手 - 扣子平台技能配置指南
 
-## 技能描述
+## 概述
 
-雨姗AI收银助手创味菜官方AI服务，支持查询菜单、智能推荐菜品、在线点餐、购物车管理、提交订单、查询门店信息、WiFi密码、美团排队取号。
+雨姗AI收银助手提供完整的扣子（Coze）平台对接能力，支持企业微信机器人、智能客服、语音点餐等多种场景。通过本技能配置，您可以让扣子机器人具备完整的餐饮点餐能力。
 
 ## 技能信息
 
-- **版本**: 3.1.0
-- **作者**: 石中伟
-- **许可证**: MIT
-- **仓库**: https://github.com/370205504-cmyk/yushan-ai-cashier-assistant
-- **MCP端点**: https://mcp.yushan-ai-cashier.com
+| 项目 | 内容 |
+|------|------|
+| 技能名称 | 雨姗AI收银助手 |
+| 版本 | v4.3.0 |
+| 作者 | 雨姗科技 |
+| 描述 | 餐饮智能点餐助手，支持自然语义点餐、订单管理、会员服务 |
+| 标签 | 餐饮、点餐、会员、AI助手 |
 
-## 触发词
+## MCP 工具配置
 
-### 点餐相关
-- 查看菜单、给我看看菜单、都有什么菜
-- 推荐菜品、有什么好吃的、招牌菜推荐
-- 我要点菜、我要下单、来一份、加菜
-- 查看购物车、购物车有什么
-- 下单、帮我下单、提交订单
-- 取消订单、退单
-
-### 订单相关
-- 查订单、看看我的订单、订单状态
-- 取消订单、不要了、退掉
-
-### 门店相关
-- 门店地址、在哪里、怎么去
-- 门店电话、联系电话
-- 营业时间、几点开门、几点关门
-- wifi密码、WiFi密码、无线网密码
-
-### 排队相关
-- 排队取号、帮我排个队
-- 查看排队、排队进度、还要等多久
-- 取消排队、不排了
-
-### 其他服务
-- 外卖配送、能送外卖吗
-- 打包、带走去、盒饭
-- 停车、停车场、停车费
-- 预约、预订包间、订座
-
-## 使用示例
-
-### 点餐对话
-```
-用户: 给我推荐几道招牌菜
-AI: 今日招牌推荐：
-     1. 招牌大鱼头泡饭 ¥88 - 雨姗AI收银助手头牌菜，桌桌必点
-     2. 招牌烧肉 ¥58 - 肥而不腻，软糯香甜
-     3. 酱焖娃娃鱼 ¥198 - 新鲜现杀，配米饭一份
-     请问您想点哪几道？
-
-用户: 来一份招牌大鱼头泡饭，少辣不要葱
-AI: 已添加到购物车：
-     招牌大鱼头泡饭 x1 (少辣，不要葱) ¥88
-     还需要其他菜吗？
-
-用户: 再来一个糖醋里脊
-AI: 已添加：糖醋里脊 x1 ¥48
-     当前购物车共2件，合计¥136
-     请问现在下单吗？
-
-用户: 是的，下单
-AI: 订单已提交！订单号：ORD20260115XXX
-     厨房已接单，预计15分钟后上菜。
-     请留意叫号或送餐通知。
-```
-
-### 排队取号
-```
-用户: 帮我排个3人桌
-AI: 正在为您取号...
-     取号成功！
-     门店：雨姗AI收银助手(孔祖大道店)
-     排队号：A012
-     当前等待：5桌
-     预计等待时间：约30分钟
-     请留意短信通知，我们会提前提醒您。
-
-用户: 还要等多久？
-AI: 您当前排队号：A012
-     当前叫号：A008
-     还需等待：4桌
-     预计时间：约25分钟
-```
-
-### 门店查询
-```
-用户: 店里的WiFi密码是多少
-AI: WiFi信息：
-     SSID：雨姗AI收银助手免费WiFi
-     密码：88888888
-     免密码连接，欢迎使用！
-
-用户: 门店地址在哪？
-AI: 门店地址：县孔祖大道南段188号
-     营业时间：10:00-22:00
-     联系电话：0370-628-8888
-     停车信息：门店旁有免费停车场
-```
-
-## 工具定义
-
-### MCP标准工具
-
-#### text_chat
-自然语言对话处理所有点餐和查询请求。
+### 基础信息
 
 ```json
 {
-  "name": "text_chat",
-  "description": "自然语言对话处理所有点餐和查询请求",
+  "server_url": "https://your-domain.com/api/v1/mcp/message",
+  "auth_type": "bearer_token",
+  "token": "YOUR_API_TOKEN"
+}
+```
+
+### 工具列表（26个标准工具）
+
+#### 1. 点餐相关工具
+
+##### 1.1 获取菜品列表
+```json
+{
+  "name": "getDishes",
+  "description": "获取收银系统的菜品列表，支持按分类筛选",
   "parameters": {
     "type": "object",
     "properties": {
-      "query": {
+      "category": {
         "type": "string",
-        "description": "用户输入的自然语言"
+        "description": "分类名称（可选），如：招牌菜、热销、主食等"
+      }
+    }
+  },
+  "examples": [
+    "获取招牌菜列表",
+    "看看有什么主食"
+  ]
+}
+```
+
+##### 1.2 添加菜品到购物车
+```json
+{
+  "name": "addToCart",
+  "description": "将菜品添加到购物车",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "dishId": {
+        "type": "string",
+        "description": "菜品ID"
       },
-      "user_id": {
+      "dishName": {
         "type": "string",
-        "description": "用户唯一ID，用于识别用户身份和购物车"
+        "description": "菜品名称"
+      },
+      "quantity": {
+        "type": "integer",
+        "description": "数量，默认1"
+      },
+      "notes": {
+        "type": "string",
+        "description": "口味备注，如：不要香菜、微辣"
       }
     },
-    "required": ["query", "user_id"]
+    "required": ["dishId", "dishName"]
   }
 }
 ```
 
-#### queue_take
-美团排队取号。
-
+##### 1.3 查看购物车
 ```json
 {
-  "name": "queue_take",
-  "description": "美团排队取号",
+  "name": "viewCart",
+  "description": "查看当前购物车内容和总金额",
+  "parameters": {
+    "type": "object",
+    "properties": {}
+  }
+}
+```
+
+##### 1.4 确认下单
+```json
+{
+  "name": "confirmOrder",
+  "description": "确认订单并提交到收银系统",
   "parameters": {
     "type": "object",
     "properties": {
-      "store_id": {
+      "customerId": {
         "type": "string",
-        "description": "门店ID"
+        "description": "顾客ID或手机号"
       },
-      "table_type": {
+      "tableNumber": {
         "type": "string",
-        "enum": ["small", "medium", "large", "包间"],
-        "description": "桌型：小桌(1-3人)、中桌(4-6人)、大桌(7-10人)、包间"
+        "description": "桌号（堂食时填写）"
       },
-      "people": {
+      "deliveryType": {
+        "type": "string",
+        "enum": ["dine_in", "takeout", "delivery"],
+        "description": "用餐方式：dine_in=堂食, takeout=自提, delivery=外卖"
+      },
+      "address": {
+        "type": "string",
+        "description": "配送地址（外卖时填写）"
+      }
+    },
+    "required": ["customerId"]
+  }
+}
+```
+
+##### 1.5 取消订单
+```json
+{
+  "name": "cancelOrder",
+  "description": "取消未支付的订单",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "orderId": {
+        "type": "string",
+        "description": "订单ID"
+      }
+    },
+    "required": ["orderId"]
+  }
+}
+```
+
+##### 1.6 查询订单状态
+```json
+{
+  "name": "getOrderStatus",
+  "description": "查询订单制作状态",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "orderId": {
+        "type": "string",
+        "description": "订单ID"
+      }
+    },
+    "required": ["orderId"]
+  }
+}
+```
+
+#### 2. 库存相关工具
+
+##### 2.1 查询库存
+```json
+{
+  "name": "getInventory",
+  "description": "查询菜品库存",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "dishId": {
+        "type": "string",
+        "description": "菜品ID（可选，不填查询全部）"
+      }
+    }
+  }
+}
+```
+
+#### 3. 会员相关工具
+
+##### 3.1 查询会员信息
+```json
+{
+  "name": "getMemberInfo",
+  "description": "查询会员信息和余额",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "phone": {
+        "type": "string",
+        "description": "会员手机号"
+      }
+    },
+    "required": ["phone"]
+  }
+}
+```
+
+##### 3.2 注册新会员
+```json
+{
+  "name": "registerMember",
+  "description": "注册新会员",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "phone": {
+        "type": "string",
+        "description": "手机号"
+      },
+      "name": {
+        "type": "string",
+        "description": "姓名（可选）"
+      }
+    },
+    "required": ["phone"]
+  }
+}
+```
+
+##### 3.3 会员积分查询
+```json
+{
+  "name": "getMemberPoints",
+  "description": "查询会员积分",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "phone": {
+        "type": "string",
+        "description": "会员手机号"
+      }
+    },
+    "required": ["phone"]
+  }
+}
+```
+
+##### 3.4 积分抵现
+```json
+{
+  "name": "redeemPoints",
+  "description": "使用积分抵扣现金",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "phone": {
+        "type": "string",
+        "description": "会员手机号"
+      },
+      "points": {
+        "type": "integer",
+        "description": "使用的积分数量"
+      }
+    },
+    "required": ["phone", "points"]
+  }
+}
+```
+
+#### 4. 优惠券相关工具
+
+##### 4.1 查询可用优惠券
+```json
+{
+  "name": "getAvailableCoupons",
+  "description": "查询用户可用的优惠券",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "userId": {
+        "type": "string",
+        "description": "用户ID或手机号"
+      },
+      "orderAmount": {
         "type": "number",
-        "description": "用餐人数"
+        "description": "订单金额"
       }
     },
-    "required": ["store_id", "table_type", "people"]
+    "required": ["userId", "orderAmount"]
   }
 }
 ```
 
-#### query_queue
-查询排队进度。
-
+##### 4.2 使用优惠券
 ```json
 {
-  "name": "query_queue",
+  "name": "useCoupon",
+  "description": "使用优惠券",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "userId": {
+        "type": "string",
+        "description": "用户ID或手机号"
+      },
+      "couponId": {
+        "type": "string",
+        "description": "优惠券ID"
+      }
+    },
+    "required": ["userId", "couponId"]
+  }
+}
+```
+
+#### 5. 支付相关工具
+
+##### 5.1 创建支付订单
+```json
+{
+  "name": "createPayment",
+  "description": "创建微信/支付宝支付订单",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "orderId": {
+        "type": "string",
+        "description": "订单ID"
+      },
+      "paymentMethod": {
+        "type": "string",
+        "enum": ["wechat", "alipay", "balance"],
+        "description": "支付方式：wechat=微信, alipay=支付宝, balance=余额"
+      }
+    },
+    "required": ["orderId", "paymentMethod"]
+  }
+}
+```
+
+##### 5.2 查询支付状态
+```json
+{
+  "name": "getPaymentStatus",
+  "description": "查询支付状态",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "orderId": {
+        "type": "string",
+        "description": "订单ID"
+      }
+    },
+    "required": ["orderId"]
+  }
+}
+```
+
+#### 6. 商家信息查询工具
+
+##### 6.1 查询门店信息
+```json
+{
+  "name": "getStoreInfo",
+  "description": "查询门店基本信息",
+  "parameters": {
+    "type": "object",
+    "properties": {}
+  }
+}
+```
+
+##### 6.2 查询营业时间
+```json
+{
+  "name": "getBusinessHours",
+  "description": "查询门店营业时间",
+  "parameters": {
+    "type": "object",
+    "properties": {}
+  }
+}
+```
+
+##### 6.3 WiFi信息查询
+```json
+{
+  "name": "getWifiInfo",
+  "description": "查询门店WiFi信息",
+  "parameters": {
+    "type": "object",
+    "properties": {}
+  }
+}
+```
+
+##### 6.4 停车信息查询
+```json
+{
+  "name": "getParkingInfo",
+  "description": "查询停车信息",
+  "parameters": {
+    "type": "object",
+    "properties": {}
+  }
+}
+```
+
+#### 7. 预约相关工具
+
+##### 7.1 预约座位
+```json
+{
+  "name": "bookTable",
+  "description": "预约座位",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "customerId": {
+        "type": "string",
+        "description": "顾客ID"
+      },
+      "date": {
+        "type": "string",
+        "description": "预约日期，格式：YYYY-MM-DD"
+      },
+      "time": {
+        "type": "string",
+        "description": "预约时间，格式：HH:mm"
+      },
+      "guestCount": {
+        "type": "integer",
+        "description": "用餐人数"
+      },
+      "phone": {
+        "type": "string",
+        "description": "联系电话"
+      },
+      "notes": {
+        "type": "string",
+        "description": "备注（是否需要包间等）"
+      }
+    },
+    "required": ["customerId", "date", "time", "guestCount", "phone"]
+  }
+}
+```
+
+##### 7.2 查询预约
+```json
+{
+  "name": "getBooking",
+  "description": "查询预约信息",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "customerId": {
+        "type": "string",
+        "description": "顾客ID"
+      }
+    },
+    "required": ["customerId"]
+  }
+}
+```
+
+##### 7.3 取消预约
+```json
+{
+  "name": "cancelBooking",
+  "description": "取消预约",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "bookingId": {
+        "type": "string",
+        "description": "预约ID"
+      }
+    },
+    "required": ["bookingId"]
+  }
+}
+```
+
+#### 8. 排队相关工具
+
+##### 8.1 取号排队
+```json
+{
+  "name": "getQueueNumber",
+  "description": "取号排队",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "guestCount": {
+        "type": "integer",
+        "description": "排队人数"
+      },
+      "phone": {
+        "type": "string",
+        "description": "联系电话"
+      }
+    },
+    "required": ["guestCount", "phone"]
+  }
+}
+```
+
+##### 8.2 查询排队进度
+```json
+{
+  "name": "getQueueStatus",
   "description": "查询排队进度",
   "parameters": {
     "type": "object",
     "properties": {
-      "queue_id": {
+      "queueId": {
         "type": "string",
-        "description": "排队ID"
+        "description": "排队号"
       }
     },
-    "required": ["queue_id"]
+    "required": ["queueId"]
   }
 }
 ```
 
-#### cancel_queue
-取消排队。
-
+##### 8.3 取消排队
 ```json
 {
-  "name": "cancel_queue",
+  "name": "cancelQueue",
   "description": "取消排队",
   "parameters": {
     "type": "object",
     "properties": {
-      "queue_id": {
+      "queueId": {
         "type": "string",
-        "description": "排队ID"
+        "description": "排队号"
       }
     },
-    "required": ["queue_id"]
+    "required": ["queueId"]
   }
 }
 ```
 
-## 门店配置
+#### 9. 反馈相关工具
 
-### 默认门店 (store001)
-- **名称**: 雨姗AI收银助手创味菜(孔祖大道店)
-- **地址**: 县孔祖大道南段188号
-- **电话**: 0370-628-8888
-- **营业时间**: 10:00-22:00
-- **WiFi**: SSID=雨姗AI收银助手免费WiFi, 密码=88888888
+##### 9.1 提交投诉建议
+```json
+{
+  "name": "submitFeedback",
+  "description": "提交投诉或建议",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "customerId": {
+        "type": "string",
+        "description": "顾客ID"
+      },
+      "type": {
+        "type": "string",
+        "enum": ["complaint", "suggestion", "praise"],
+        "description": "反馈类型：complaint=投诉, suggestion=建议, praise=表扬"
+      },
+      "content": {
+        "type": "string",
+        "description": "反馈内容"
+      },
+      "orderId": {
+        "type": "string",
+        "description": "关联订单ID（可选）"
+      }
+    },
+    "required": ["customerId", "type", "content"]
+  }
+}
+```
 
-## 订单状态流转
+## 对话模板
+
+### 场景1：自然语义点餐
+
+**用户**: 来个两人份的宫保鸡丁套餐，再加一份鱼香肉丝微辣
+
+**Bot响应**:
+```
+好的，已为您添加到购物车：
+🍱 2人经典套餐 x1 - ¥68
+🥩 鱼香肉丝(微辣) x1 - ¥26
+
+购物车总计：¥94
+
+请问还需要什么吗？确认下单请说"下单"
+```
+
+### 场景2：查询会员
+
+**用户**: 帮我查一下13800138000的会员信息
+
+**Bot响应**:
+```
+查询到会员信息：
+👤 姓名：张三
+📱 手机：138****8000
+💰 余额：¥328.50
+🎫 积分：2,580分
+⭐ 等级：黄金会员
+
+请问需要办理什么业务？
+```
+
+### 场景3：预约座位
+
+**用户**: 我想预约明天晚上6点，4个人
+
+**Bot响应**:
+```
+预约成功！🎉
+
+📅 日期：2024-01-15
+🕕 时间：18:00
+👥 人数：4位
+🔖 预约号：BK20240115001
+
+请按时到店，到店后出示预约号即可入座。
+如有变动请提前取消预约。
+
+请问还有其他需要吗？
+```
+
+### 场景4：排队取号
+
+**用户**: 取个号，我们3个人
+
+**Bot响应**:
+```
+排队成功！🎉
+
+🔢 排队号：A008
+👥 人数：3位
+⏱️ 预计等待：约15分钟
+
+当前叫号：A003
+
+您可以先逛逛，快轮到时会通知您。
+```
+
+### 场景5：优惠券使用
+
+**用户**: 我有优惠券可以用吗
+
+**Bot响应**:
+```
+您有以下可用优惠券：
+🎫 新用户首单立减 - 满50减10
+🎫 满100减20 - 满100可用
+
+建议使用"满100减20"，可节省20元！
+需要我帮您使用吗？
+```
+
+## 扣子平台配置步骤
+
+### 1. 创建Bot
+
+1. 登录扣子平台 (coze.cn)
+2. 点击"创建Bot"
+3. 填写Bot信息：
+   - 名称：雨姗AI点餐助手
+   - 描述：智能餐饮点餐助手
+   - 图标：上传店铺Logo
+
+### 2. 配置MCP工具
+
+1. 在Bot配置页面，点击"添加能力"
+2. 选择"MCP工具"
+3. 点击"添加服务器"
+4. 填写服务器配置：
+   - 服务器名称：雨姗AI收银助手
+   - 服务器URL：https://your-domain.com
+   - 认证方式：Bearer Token
+   - Token：您的API Token
+
+5. 从工具列表中选择需要的工具（建议全选）
+
+### 3. 配置开场白
 
 ```
-待确认 → 已接单 → 制作中 → 已出餐 → 已完成
-   ↓
-  已取消
+👋 您好！我是雨姗AI点餐助手。
+
+我可以帮您：
+🍽️ 点餐下单 - 直接告诉我想吃什么
+📋 查看菜单 - 告诉您今日招牌和推荐
+👤 会员服务 - 查询余额、积分
+🎫 优惠券 - 查券、用券
+📅 预约订座 - 提前预约座位
+🔢 排队取号 - 免等候取号
+❓ 其他问题 - WiFi、停车、营业时间等
+
+请问有什么可以帮您的？
 ```
 
-## 支付方式
+### 4. 配置人设与性格
 
-- 💚 微信支付
-- 💙 支付宝
-- 💳 余额支付
-- 💵 现金支付
+```
+你是雨姗AI收银助手的智能客服，特点：
+- 专业友好，热情主动
+- 善于根据顾客口味推荐菜品
+- 熟悉各类优惠券和会员权益
+- 能够处理点餐、预约、排队等各类需求
+- 遇到无法处理的问题会自动转人工
+```
 
-## 技术架构
+### 5. 发布到企业微信
 
-- **后端**: Node.js + Express.js
-- **数据库**: MySQL + Redis
-- **部署**: Docker + 腾讯云函数
-- **打印**: ESC/POS 热敏打印机
+1. 在Bot配置页面，点击"发布"
+2. 选择"企业微信"渠道
+3. 绑定企业微信群或机器人
+4. 完成发布
 
-## 联系方式
+## 常见问题
 
-- **开发者**: 石中伟
-- **GitHub**: https://github.com/370205504-cmyk/yushan-ai-cashier-assistant
-- **问题反馈**: https://github.com/370205504-cmyk/yushan-ai-cashier-assistant/issues
+### Q1: 如何获取API Token？
+A: 在雨姗AI收银助手管理后台 → 系统设置 → API管理 中创建。
+
+### Q2: 支付如何对接？
+A: 支持微信支付Native模式，需在管理后台配置微信支付商户号和API密钥。
+
+### Q3: 如何支持语音点餐？
+A: 扣子平台支持语音输入，用户可以直接语音说菜名，Bot会自动识别。
+
+### Q4: 如何处理外卖配送？
+A: 配置配送地址后，系统会生成配送订单，可对接第三方配送平台。
+
+### Q5: 会员如何注册？
+A: 支持两种方式：
+1. 用户说"注册会员+手机号"，Bot自动注册
+2. 在管理后台手动添加
+
+## 技术支持
+
+- 官方网站：https://yushan.ai
+- 技术文档：https://docs.yushan.ai
+- 客服热线：400-xxx-xxxx
+- 邮箱：support@yushan.ai
+
+## 更新日志
+
+### v4.3.0 (2024-01)
+- 新增26个MCP标准工具
+- 优化自然语义理解
+- 新增智能推荐引擎
+- 新增全场景FAQ答疑
+- 支持多模态交互
+
+### v4.2.0 (2023-12)
+- 新增可插拔适配器架构
+- 支持美团、银豹、哗啦啦等主流收银系统对接
+- 新增打印旁路兜底方案
+
+### v4.1.0 (2023-11)
+- 基础点餐功能上线
+- 会员系统上线
+- 支付集成上线
