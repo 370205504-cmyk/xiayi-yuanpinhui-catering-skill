@@ -1369,6 +1369,54 @@
             youdao: '📖', qianfan: '🚢', ollama: '🐑', lmstudio: '🎬'
         };
         
+        const providerApiUrls = {
+            openai: 'https://platform.openai.com/api-keys',
+            qwen: 'https://dashscope.console.aliyun.com/apiKey',
+            deepseek: 'https://platform.deepseek.com/api_keys',
+            moonshot: 'https://platform.moonshot.cn/console/api-keys',
+            zhipu: 'https://open.bigmodel.cn/usercenter/apikeys',
+            minimax: 'https://platform.minimax.chat/api-key',
+            volcengine: 'https://console.volcengine.com/ark/region:ark+api-endpoint',
+            youdao: 'https://ai.youdao.com/console/',
+            qianfan: 'https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application',
+            wenxin: 'https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application',
+            anthropic: 'https://console.anthropic.com/settings/keys',
+            ollama: 'https://ollama.com/',
+            lmstudio: 'https://lmstudio.ai/'
+        };
+
+        const providerModelLists = {
+            openai: ['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'],
+            qwen: ['qwen-turbo', 'qwen-plus', 'qwen-max', 'qwen2.5-turbo', 'qwen2.5-plus', 'qwen2.5-max'],
+            deepseek: ['deepseek-chat', 'deepseek-reasoner', 'deepseek-coder'],
+            moonshot: ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k'],
+            zhipu: ['glm-4', 'glm-4-flash', 'glm-3-turbo'],
+            minimax: ['abab6-chat', 'abab5.5-chat'],
+            volcengine: ['Doubao-7B-Chat', 'Doubao-13B-Chat', 'Doubao-Pro-32K'],
+            youdao: ['text-translation'],
+            qianfan: ['ernie-4.0-turbo', 'ernie-3.5', 'llama-3-70b', 'llama-3-8b'],
+            wenxin: ['ernie-4.0-turbo', 'ernie-3.5'],
+            anthropic: ['claude-3-haiku', 'claude-3-sonnet', 'claude-3-opus', 'claude-3.5-sonnet'],
+            ollama: ['llama3', 'llama2', 'mistral', 'phi3', 'gemma', 'qwen2'],
+            lmstudio: ['gpt-4o-mini', 'local-model']
+        };
+
+        const providerCompatibleTypes = {
+            deepseek: ['openai', 'anthropic'],
+            anthropic: ['anthropic'],
+            openai: ['openai'],
+            qwen: ['openai'],
+            moonshot: ['openai'],
+            zhipu: ['openai'],
+            minimax: ['openai'],
+            volcengine: ['openai'],
+            youdao: ['openai'],
+            qianfan: ['wenxin'],
+            wenxin: ['wenxin'],
+            ollama: ['openai'],
+            lmstudio: ['openai']
+        };
+
         const providerInfo = {
             openai: { name: 'OpenAI GPT', defaultModel: 'gpt-4o-mini', defaultUrl: 'https://api.openai.com/v1' },
             qwen: { name: 'Qwen', defaultModel: 'qwen-turbo', defaultUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
@@ -1381,7 +1429,8 @@
             youdao: { name: 'Youdao', defaultModel: 'text-translation', defaultUrl: 'https://ai-api.youdao.com' },
             qianfan: { name: 'Qianfan', defaultModel: 'ernie-4.0-turbo', defaultUrl: 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat' },
             ollama: { name: 'Ollama', defaultModel: 'llama3', defaultUrl: 'http://localhost:11434/v1' },
-            lmstudio: { name: 'LM Studio', defaultModel: 'gpt-4o-mini', defaultUrl: 'http://localhost:1234/v1' }
+            lmstudio: { name: 'LM Studio', defaultModel: 'gpt-4o-mini', defaultUrl: 'http://localhost:1234/v1' },
+            anthropic: { name: 'Anthropic Claude', defaultModel: 'claude-3-haiku', defaultUrl: 'https://api.anthropic.com/v1' }
         };
         
         let currentProvider = null;
@@ -1493,91 +1542,132 @@
         function renderProviderSettings(providerId) {
             const info = providerInfo[providerId];
             const settingsEl = document.getElementById('llm-provider-settings');
-            
+            const compatibleTypes = providerCompatibleTypes[providerId] || ['openai'];
+            const models = providerModelLists[providerId] || [];
+
             settingsEl.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h4 style="font-size: 16px; font-weight: 600; color: #1a1a2e;">${info.name} 提供商设置</h4>
-                    <span style="padding: 4px 12px; background: #ffebee; color: #c62828; border-radius: 12px; font-size: 12px;">${currentProvider ? '已开启' : '未开启'}</span>
+                    <span style="padding: 4px 12px; background: #ffebee; color: #c62828; border-radius: 12px; font-size: 12px;">未配置</span>
                 </div>
                 
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API Key *</label>
                         <div style="display: flex; gap: 10px;">
-                            <input type="password" id="llm-api-key-${providerId}" placeholder="输入您的 API Key" style="flex: 1; padding: 10px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
-                            <a href="${getApiKeyUrl(providerId)}" target="_blank" style="padding: 10px 16px; background: #667eea; color: white; border-radius: 8px; font-size: 13px; text-decoration: none; white-space: nowrap;">获取 API Key →</a>
+                            <input type="password" id="llm-api-key-${providerId}" placeholder="输入您的 API Key" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
+                            <a href="${providerApiUrls[providerId]}" target="_blank" style="padding: 12px 18px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 8px; font-size: 13px; text-decoration: none; white-space: nowrap; display: flex; align-items: center;">获取 API Key →</a>
+                            <button onclick="togglePassword('llm-api-key-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer;">👁️</button>
                         </div>
                     </div>
+                    
+                    ${compatibleTypes.length > 1 ? `
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API 协议格式</label>
+                        <div style="display: flex; gap: 12px;">
+                            ${compatibleTypes.map(type => `
+                                <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 2px solid #e8eaf6; border-radius: 8px; cursor: pointer; background: ${type === 'openai' ? '#eef2ff' : 'white'}; border-color: ${type === 'openai' ? '#667eea' : '#e8eaf6'};">
+                                    <input type="radio" name="api-type-${providerId}" value="${type}" ${type === 'openai' ? 'checked' : ''} onchange="updateApiType('${providerId}', '${type}')">
+                                    <span style="font-size: 14px;">${type === 'openai' ? 'OpenAI 兼容' : type === 'anthropic' ? 'Anthropic 兼容' : type === 'wenxin' ? '文心格式' : type}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
                     
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API Base URL</label>
                         <div style="display: flex; gap: 10px;">
-                            <input type="text" id="llm-url-${providerId}" value="${info.defaultUrl}" style="flex: 1; padding: 10px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
-                            <button onclick="clearUrl('${providerId}')" style="padding: 10px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer; font-size: 14px;">✕</button>
+                            <input type="text" id="llm-url-${providerId}" value="${info.defaultUrl}" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
+                            <button onclick="clearUrl('llm-url-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer; font-size: 14px;">✕</button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">模型</label>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            ${models.map((model, idx) => `
+                                <label style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 2px solid #e8eaf6; border-radius: 8px; cursor: pointer; background: ${idx === 0 ? '#e8f5e9' : 'white'}; border-color: ${idx === 0 ? '#388e3c' : '#e8eaf6'};">
+                                    <input type="radio" name="model-${providerId}" value="${model}" ${idx === 0 ? 'checked' : ''}>
+                                    <span style="font-size: 13px;">${model}</span>
+                                </label>
+                            `).join('')}
                         </div>
                     </div>
                     
                     <div style="padding: 12px; background: #fff8e1; border-radius: 8px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 13px; color: #e65100;">Coding Plan (Beta)</span>
-                            <label class="toggle-switch" style="width: 40px; height: 22px; background: #e0e0e0; border-radius: 11px; position: relative; cursor: pointer; display: inline-block;">
-                                <input type="checkbox" style="display: none;">
-                                <div style="position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: left 0.2s;"></div>
+                            <span style="font-size: 13px; color: #e65100;">高级设置</span>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" id="advanced-${providerId}" onchange="toggleAdvanced('${providerId}')">
+                                <span style="font-size: 12px;">显示</span>
                             </label>
                         </div>
-                        <p style="font-size: 12px; color: #999; margin-top: 4px;">启用后使用专属API端点</p>
-                    </div>
-                    
-                    <button onclick="testProviderConnection('${providerId}')" style="padding: 12px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <span>🔌</span> 测试连接
-                    </button>
-                    
-                    <div style="border-top: 1px solid #e8eaf6; padding-top: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <span style="font-size: 14px; font-weight: 600; color: #333;">可用模型列表</span>
-                            <button style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer;">+ 添加模型</button>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9ff; border-radius: 8px;">
-                                <span>${info.defaultModel}</span>
-                                <span style="padding: 4px 10px; background: #e8f5e9; color: #388e3c; border-radius: 6px; font-size: 11px;">默认</span>
+                        <div id="advanced-settings-${providerId}" style="display: none; margin-top: 12px;">
+                            <div class="form-group">
+                                <label style="font-size: 12px;">温度 (0-2)</label>
+                                <input type="number" id="temp-${providerId}" value="0.7" min="0" max="2" step="0.1" style="width: 100%; padding: 8px 12px; border: 2px solid #e8eaf6; border-radius: 6px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px;">最大 Token 数</label>
+                                <input type="number" id="maxtokens-${providerId}" value="500" min="1" style="width: 100%; padding: 8px 12px; border: 2px solid #e8eaf6; border-radius: 6px;">
                             </div>
                         </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="testProviderConnection('${providerId}')" style="flex: 1; padding: 12px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <span>🔌</span> 测试连接
+                        </button>
                     </div>
                 </div>
                 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e8eaf6;">
                     <button onclick="cancelProviderSettings()" style="padding: 12px 24px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; font-size: 14px; cursor: pointer;">取消</button>
-                    <button onclick="saveProviderSettings('${providerId}')" style="padding: 12px 24px; background: #667eea; border: none; border-radius: 8px; color: white; font-size: 14px; cursor: pointer;">保存</button>
+                    <button onclick="saveProviderSettings('${providerId}')" style="padding: 12px 24px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 8px; color: white; font-size: 14px; cursor: pointer;">保存</button>
                 </div>
             `;
         }
         
-        function getApiKeyUrl(providerId) {
-            const urls = {
-                openai: 'https://platform.openai.com/api-keys',
-                qwen: 'https://dashscope.console.aliyun.com/apiKey',
-                wenxin: 'https://console.bce.baidu.com/wenxin/',
-                deepseek: 'https://platform.deepseek.com/api_keys',
-                moonshot: 'https://platform.moonshot.cn/console/api-keys',
-                zhipu: 'https://open.bigmodel.cn/usercenter/apikeys',
-                minimax: 'https://platform.minimax.chat/api-key',
-                volcengine: 'https://console.bytedance.net/ark',
-                youdao: 'https://ai.youdao.com/console/',
-                qianfan: 'https://cloud.baidu.com/product/wenxinworkshop',
-                ollama: 'https://ollama.com/',
-                lmstudio: 'https://lmstudio.ai/'
-            };
-            return urls[providerId] || '#';
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
         }
         
-        function clearUrl(providerId) {
-            document.getElementById(`llm-url-${providerId}`).value = '';
+        function toggleAdvanced(providerId) {
+            const settings = document.getElementById(`advanced-settings-${providerId}`);
+            settings.style.display = settings.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function updateApiType(providerId, type) {
+            const labels = document.querySelectorAll(`input[name="api-type-${providerId}"]`);
+            labels.forEach(label => {
+                const wrapper = label.closest('label');
+                if (label.value === type) {
+                    wrapper.style.background = '#eef2ff';
+                    wrapper.style.borderColor = '#667eea';
+                } else {
+                    wrapper.style.background = 'white';
+                    wrapper.style.borderColor = '#e8eaf6';
+                }
+            });
+        }
+        
+        function clearUrl(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                const providerId = inputId.replace('llm-url-', '');
+                input.value = providerInfo[providerId]?.defaultUrl || '';
+            }
         }
         
         async function testProviderConnection(providerId) {
             const apiKey = document.getElementById(`llm-api-key-${providerId}`)?.value;
             const url = document.getElementById(`llm-url-${providerId}`)?.value;
+            const modelRadio = document.querySelector(`input[name="model-${providerId}"]:checked`);
+            const model = modelRadio?.value || providerInfo[providerId].defaultModel;
+            const apiTypeRadio = document.querySelector(`input[name="api-type-${providerId}"]:checked`);
+            const apiType = apiTypeRadio?.value || 'openai';
             
             if (!apiKey) {
                 showToast('请输入API Key', 'error');
@@ -1585,20 +1675,24 @@
             }
             
             try {
+                showToast('正在测试连接...', 'info');
+                
                 const response = await fetch('/api/v1/llm-config/test', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         provider: providerId,
                         apiKey,
-                        baseUrl: url || null
+                        baseUrl: url || null,
+                        model,
+                        apiType
                     })
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
-                    showToast('✅ 连接成功！', 'success');
+                    showToast('✅ 连接成功！AI回复: ' + (result.data?.reply?.substring(0, 30) || ''), 'success');
                 } else {
                     showToast('❌ ' + (result.message || '连接失败'), 'error');
                 }
@@ -1631,6 +1725,10 @@
         async function saveProviderSettings(providerId) {
             const apiKey = document.getElementById(`llm-api-key-${providerId}`)?.value;
             const url = document.getElementById(`llm-url-${providerId}`)?.value;
+            const modelRadio = document.querySelector(`input[name="model-${providerId}"]:checked`);
+            const model = modelRadio?.value || providerInfo[providerId].defaultModel;
+            const apiTypeRadio = document.querySelector(`input[name="api-type-${providerId}"]:checked`);
+            const apiType = apiTypeRadio?.value || 'openai';
             
             if (!apiKey) {
                 showToast('请输入API Key', 'error');
@@ -1644,7 +1742,9 @@
                     body: JSON.stringify({
                         provider: providerId,
                         apiKey,
-                        baseUrl: url || null
+                        baseUrl: url || null,
+                        model,
+                        apiType
                     })
                 });
                 

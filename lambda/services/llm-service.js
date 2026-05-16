@@ -275,27 +275,36 @@ ${menuText}
     const messages = [
       ...conversationHistory.map(h => ({
         role: h.role === 'user' ? 'user' : 'assistant',
-        content: h.content,
+        content: h.content
       })),
-      { role: 'user', content: userMessage },
+      { role: 'user', content: userMessage }
     ];
 
+    const isDeepseekAnthropic = provider.baseUrl?.includes('deepseek');
+    
     const response = await axios.post(
       `${provider.baseUrl}/messages`,
       {
-        model: provider.model,
+        model: provider.model || (isDeepseekAnthropic ? 'deepseek-chat' : 'claude-3-haiku'),
         messages,
         system: systemPrompt,
         temperature: 0.7,
         max_tokens: 500,
+        stream: false
       },
       {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${provider.apiKey}`,
-          'x-api-key': provider.apiKey
-        },
-        timeout: 15000,
+        headers: isDeepseekAnthropic
+          ? {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${provider.apiKey}`,
+              'api-key': provider.apiKey
+            }
+          : {
+              'Content-Type': 'application/json',
+              'x-api-key': provider.apiKey,
+              'anthropic-version': '2023-06-01'
+            },
+        timeout: 15000
       }
     );
     return response.data.content[0].text;
