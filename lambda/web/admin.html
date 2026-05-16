@@ -629,6 +629,25 @@
             cursor: pointer;
             margin: 0;
         }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
     </style>
 </head>
 <body>
@@ -678,7 +697,7 @@
         </div>
         
         <div class="stats-grid">
-            <div class="stat-card" onclick="window.location.href='/llm-config.html'" style="cursor: pointer;">
+            <div class="stat-card" onclick="goToSettings()" style="cursor: pointer;">
                 <div class="stat-icon blue" style="background: linear-gradient(135deg, #667eea, #764ba2);">🤖</div>
                 <div class="stat-info">
                     <div class="stat-label">LLM大模型</div>
@@ -908,6 +927,57 @@
                         </div>
                         <button class="btn btn-primary" onclick="saveOrderSettings()">💾 保存设置</button>
                     </div>
+                    
+                    <div class="card">
+                        <h3>🤖 AI智能助手设置</h3>
+                        <div id="llm-status-display" style="margin-bottom: 16px; padding: 12px; border-radius: 8px; background: #f0f4ff;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span id="llm-status-icon">⚙️</span>
+                                <span id="llm-status-text" style="font-weight: 600; color: #667eea;">加载中...</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>大模型提供商</label>
+                            <select id="llm-provider" onchange="onProviderChange()">
+                                <option value="">请选择...</option>
+                                <option value="deepseek">DeepSeek</option>
+                                <option value="moonshot">Moonshot (Kimi)</option>
+                                <option value="qwen">通义千问 (Qwen)</option>
+                                <option value="zhipu">智谱AI (GLM)</option>
+                                <option value="anthropic">Anthropic (Claude)</option>
+                                <option value="openai">OpenAI (GPT)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>API Key</label>
+                            <div style="position: relative;">
+                                <input type="password" id="llm-api-key" placeholder="请输入API Key" style="padding-right: 40px;">
+                                <button type="button" onclick="toggleApiKeyVisibility()" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>API Base URL（可选）</label>
+                            <input type="text" id="llm-base-url" placeholder="留空则使用默认地址">
+                        </div>
+                        <div class="form-group">
+                            <label>API协议格式</label>
+                            <select id="llm-api-type">
+                                <option value="openai">OpenAI兼容</option>
+                                <option value="anthropic">Anthropic兼容</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>模型</label>
+                            <select id="llm-model">
+                                <option value="">请先选择提供商</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="saveLLMSettings()">💾 保存配置</button>
+                            <button class="btn btn-success" onclick="testLLMConnection()">🔗 测试连接</button>
+                        </div>
+                        <div id="llm-test-result" style="margin-top: 12px; display: none;" class="alert"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1013,6 +1083,146 @@
         const API_BASE = '/api/v1';
         let currentMemberId = null;
         
+        const LLM_PROVIDERS = {
+            deepseek: { name: 'DeepSeek', models: ['deepseek-chat', 'deepseek-coder'], url: 'https://platform.deepseek.com/' },
+            moonshot: { name: 'Moonshot (Kimi)', models: ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k'], url: 'https://platform.moonshot.cn/' },
+            qwen: { name: '通义千问 (Qwen)', models: ['qwen-turbo', 'qwen-plus', 'qwen-max'], url: 'https://bailian.console.aliyun.com/' },
+            zhipu: { name: '智谱AI (GLM)', models: ['glm-4', 'glm-4-flash', 'glm-3-turbo'], url: 'https://open.bigmodel.cn/' },
+            anthropic: { name: 'Anthropic (Claude)', models: ['claude-3-5-sonnet', 'claude-3-opus', 'claude-3-haiku'], url: 'https://console.anthropic.com/' },
+            openai: { name: 'OpenAI (GPT)', models: ['gpt-4o', 'gpt-4', 'gpt-3.5-turbo'], url: 'https://platform.openai.com/' }
+        };
+        
+        async function loadLLMSettings() {
+            try {
+                const res = await fetch('/api/v1/llm-config/status');
+                const data = await res.json();
+                const statusIcon = document.getElementById('llm-status-icon');
+                const statusText = document.getElementById('llm-status-text');
+                
+                if (data.success && data.data && data.data.enabled && data.data.provider) {
+                    statusIcon.textContent = '✅';
+                    statusText.textContent = `已配置：${LLM_PROVIDERS[data.data.provider]?.name || data.data.provider}`;
+                    statusText.style.color = '#155724';
+                    document.getElementById('llm-provider').value = data.data.provider;
+                    onProviderChange(data.data.provider);
+                    if (data.data.model) {
+                        document.getElementById('llm-model').value = data.data.model;
+                    }
+                    if (data.data.apiType) {
+                        document.getElementById('llm-api-type').value = data.data.apiType;
+                    }
+                    if (data.data.baseUrl) {
+                        document.getElementById('llm-base-url').value = data.data.baseUrl;
+                    }
+                } else {
+                    statusIcon.textContent = '⚙️';
+                    statusText.textContent = '未配置';
+                    statusText.style.color = '#667eea';
+                }
+            } catch (e) {
+                console.error('加载LLM配置失败:', e);
+            }
+        }
+        
+        function onProviderChange(provider) {
+            const providerSelect = document.getElementById('llm-provider');
+            const modelSelect = document.getElementById('llm-model');
+            provider = provider || providerSelect.value;
+            
+            if (provider && LLM_PROVIDERS[provider]) {
+                const models = LLM_PROVIDERS[provider].models;
+                modelSelect.innerHTML = models.map(m => `<option value="${m}">${m}</option>`).join('');
+                modelSelect.disabled = false;
+            } else {
+                modelSelect.innerHTML = '<option value="">请先选择提供商</option>';
+                modelSelect.disabled = true;
+            }
+        }
+        
+        function toggleApiKeyVisibility() {
+            const input = document.getElementById('llm-api-key');
+            const btn = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+        
+        async function saveLLMSettings() {
+            const provider = document.getElementById('llm-provider').value;
+            const apiKey = document.getElementById('llm-api-key').value;
+            const baseUrl = document.getElementById('llm-base-url').value;
+            const apiType = document.getElementById('llm-api-type').value;
+            const model = document.getElementById('llm-model').value;
+            
+            if (!provider) {
+                showToast('请选择大模型提供商', 'error');
+                return;
+            }
+            
+            if (!apiKey || apiKey.length < 10) {
+                showToast('请输入有效的API Key', 'error');
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/v1/llm-config/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ provider, apiKey, baseUrl, apiType, model })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast('LLM配置已保存', 'success');
+                    loadLLMSettings();
+                    loadLLMStatus();
+                } else {
+                    showToast('保存失败: ' + (data.message || '未知错误'), 'error');
+                }
+            } catch (e) {
+                console.error('保存LLM配置失败:', e);
+                showToast('保存失败，请检查网络连接', 'error');
+            }
+        }
+        
+        async function testLLMConnection() {
+            const provider = document.getElementById('llm-provider').value;
+            const apiKey = document.getElementById('llm-api-key').value;
+            const baseUrl = document.getElementById('llm-base-url').value;
+            const apiType = document.getElementById('llm-api-type').value;
+            const model = document.getElementById('llm-model').value;
+            
+            const resultDiv = document.getElementById('llm-test-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '正在测试连接...';
+            resultDiv.className = 'alert';
+            
+            try {
+                const res = await fetch('/api/v1/llm-config/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ provider, apiKey, baseUrl, apiType, model })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    resultDiv.textContent = '✅ 连接成功！' + (data.message || 'API Key有效');
+                    resultDiv.className = 'alert success';
+                } else {
+                    resultDiv.textContent = '❌ 连接失败：' + (data.message || '请检查配置');
+                    resultDiv.className = 'alert error';
+                }
+            } catch (e) {
+                console.error('测试连接失败:', e);
+                resultDiv.textContent = '❌ 测试失败：' + e.message;
+                resultDiv.className = 'alert error';
+            }
+        }
+        
         function updateTime() {
             const now = new Date();
             document.getElementById('currentTime').textContent = 
@@ -1060,7 +1270,25 @@
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
-            event.target.classList.add('active');
+            const buttons = document.querySelectorAll('.tab-btn');
+            const tabNames = ['orders', 'dishes', 'queue', 'members', 'payments', 'settings'];
+            const index = tabNames.indexOf(tabName);
+            if (index >= 0 && buttons[index]) {
+                buttons[index].classList.add('active');
+            }
+            if (tabName !== 'settings') {
+                event && event.target && event.target.classList.add('active');
+            }
+        }
+        
+        function goToSettings() {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-settings').classList.add('active');
+            const buttons = document.querySelectorAll('.tab-btn');
+            if (buttons[5]) {
+                buttons[5].classList.add('active');
+            }
         }
         
         function openModal(modalId) {
@@ -1384,6 +1612,7 @@
             loadQueue();
             loadMembers();
             loadSettings();
+            loadLLMSettings();
             setInterval(() => {
                 loadStats();
                 loadOrders();
