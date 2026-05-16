@@ -696,16 +696,6 @@
             </div>
         </div>
         
-        <div class="stats-grid">
-            <div class="stat-card" onclick="goToSettings()" style="cursor: pointer;">
-                <div class="stat-icon blue" style="background: linear-gradient(135deg, #667eea, #764ba2);">🤖</div>
-                <div class="stat-info">
-                    <div class="stat-label">LLM大模型</div>
-                    <div class="stat-value" id="stat-llm-status" style="font-size: 20px;">配置</div>
-                </div>
-            </div>
-        </div>
-        
         <div class="main-content">
             <div class="tab-buttons">
                 <button class="tab-btn active" onclick="showTab('orders')">订单管理</button>
@@ -1084,12 +1074,12 @@
         let currentMemberId = null;
         
         const LLM_PROVIDERS = {
-            deepseek: { name: 'DeepSeek', models: ['deepseek-chat', 'deepseek-coder'], url: 'https://platform.deepseek.com/' },
-            moonshot: { name: 'Moonshot (Kimi)', models: ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k'], url: 'https://platform.moonshot.cn/' },
-            qwen: { name: '通义千问 (Qwen)', models: ['qwen-turbo', 'qwen-plus', 'qwen-max'], url: 'https://bailian.console.aliyun.com/' },
-            zhipu: { name: '智谱AI (GLM)', models: ['glm-4', 'glm-4-flash', 'glm-3-turbo'], url: 'https://open.bigmodel.cn/' },
-            anthropic: { name: 'Anthropic (Claude)', models: ['claude-3-5-sonnet', 'claude-3-opus', 'claude-3-haiku'], url: 'https://console.anthropic.com/' },
-            openai: { name: 'OpenAI (GPT)', models: ['gpt-4o', 'gpt-4', 'gpt-3.5-turbo'], url: 'https://platform.openai.com/' }
+            deepseek: { name: 'DeepSeek', models: ['DeepSeek-V4-Pro', 'DeepSeek-V4-Flash', 'deepseek-chat', 'deepseek-coder'], url: 'https://platform.deepseek.com/' },
+            moonshot: { name: 'Moonshot (Kimi)', models: ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k', 'moonshot-v1-256k'], url: 'https://platform.moonshot.cn/' },
+            qwen: { name: '通义千问 (Qwen)', models: ['qwen-turbo', 'qwen-plus', 'qwen-max', 'qwen-max-longcontext'], url: 'https://bailian.console.aliyun.com/' },
+            zhipu: { name: '智谱AI (GLM)', models: ['glm-4', 'glm-4-flash', 'glm-3-turbo', 'glm-4-air'], url: 'https://open.bigmodel.cn/' },
+            anthropic: { name: 'Anthropic (Claude)', models: ['claude-3-5-sonnet', 'claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku'], url: 'https://console.anthropic.com/' },
+            openai: { name: 'OpenAI (GPT)', models: ['gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'], url: 'https://platform.openai.com/' }
         };
         
         async function loadLLMSettings() {
