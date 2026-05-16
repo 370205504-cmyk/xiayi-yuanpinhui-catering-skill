@@ -79,6 +79,7 @@ router.get('/status', (req, res) => {
         model: config[`${prefix}_MODEL`] || 'default',
         requiresSecret: p.requiresSecret,
         configuredSecret: p.requiresSecret ? !!(config[`${prefix}_SECRET_KEY`]) : true,
+        apiType: config[`${prefix}_API_TYPE`] || 'openai'
       };
     });
     
@@ -103,7 +104,7 @@ router.get('/status', (req, res) => {
 
 router.post('/config', (req, res) => {
   try {
-    const { provider, apiKey, model, secretKey, baseUrl } = req.body;
+    const { provider, apiKey, model, secretKey, baseUrl, apiType } = req.body;
     
     if (!provider || !apiKey) {
       return res.status(400).json({
@@ -132,6 +133,10 @@ router.post('/config', (req, res) => {
       newConfig[`${prefix}_MODEL`] = model;
     }
     
+    if (apiType) {
+      newConfig[`${prefix}_API_TYPE`] = apiType;
+    }
+    
     if (secretKey && providerInfo.requiresSecret) {
       newConfig[`${prefix}_SECRET_KEY`] = secretKey;
     }
@@ -154,7 +159,8 @@ router.post('/config', (req, res) => {
         message: '配置成功！商家端已启用智能AI回复功能',
         data: {
           provider,
-          model: model || 'default'
+          model: model || 'default',
+          apiType: apiType || 'openai'
         }
       });
     } else {
@@ -203,7 +209,7 @@ router.post('/disable', (req, res) => {
 
 router.post('/test', async (req, res) => {
   try {
-    const { provider, apiKey, model, secretKey, baseUrl } = req.body;
+    const { provider, apiKey, model, secretKey, baseUrl, apiType } = req.body;
     
     const llmService = require('../services/llm-service');
     const providerInfo = llmService.getProviderConfig(provider);
@@ -214,14 +220,6 @@ router.post('/test', async (req, res) => {
         message: '不支持的提供商'
       });
     }
-    
-    const tempProvider = {
-      ...providerInfo,
-      apiKey: apiKey,
-      model: model || providerInfo.model,
-      baseUrl: baseUrl || providerInfo.baseUrl,
-      secretKey: secretKey || providerInfo.secretKey,
-    };
     
     const mockStoreInfo = {
       name: '雨姗AI收银助手创味菜',
@@ -234,43 +232,29 @@ router.post('/test', async (req, res) => {
       { name: '黄焖大甲鱼', price: 238 },
     ];
     
-    const systemPrompt = llmService.buildSystemPrompt(mockStoreInfo, mockDishes);
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: '你好，我想点餐' },
-    ];
+    const options = {
+      provider,
+      apiKey,
+      model: model || providerInfo.model,
+      baseUrl: baseUrl || providerInfo.baseUrl,
+      apiType: apiType || 'openai'
+    };
     
-    let response;
-    switch (tempProvider.apiType) {
-      case 'openai':
-        response = await llmService.callOpenAICompatible(tempProvider, messages);
-        break;
-      case 'wenxin':
-        response = await llmService.callWenxin(tempProvider, messages);
-        break;
-      case 'minimax':
-        response = await llmService.callMiniMax(tempProvider, messages);
-        break;
-      case 'volcengine':
-        response = await llmService.callVolcengine(tempProvider, messages);
-        break;
-      case 'youdao':
-        response = await llmService.callYoudao(tempProvider, messages);
-        break;
-      case 'xiaomi':
-        response = await llmService.callXiaomi(tempProvider, messages);
-        break;
-      default:
-        response = await llmService.callOpenAICompatible(tempProvider, messages);
-    }
+    const response = await llmService.generateResponse(
+      '你好，请介绍一下自己', 
+      [], 
+      mockStoreInfo, 
+      mockDishes, 
+      options
+    );
     
-    if (response) {
+    if (response && response.success) {
       res.json({
         success: true,
         message: '连接成功！AI回复测试通过',
         data: {
-          reply: response,
-          intent: llmService.detectIntent('你好，我想点餐')
+          reply: response.content,
+          intent: response.intent
         }
       });
     } else {
