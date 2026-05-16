@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM配置 - 雨姗AI收银助手</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        h1 { color: #1a1a2e; text-align: center; margin-bottom: 30px; }
+        .section { margin-bottom: 30px; padding: 20px; background: #f8f9ff; border-radius: 12px; }
+        h2 { color: #667eea; margin-bottom: 15px; }
+        .provider-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .provider { padding: 15px; background: white; border-radius: 10px; text-align: center; border: 2px solid #e8eaf6; }
+        .provider:hover { border-color: #667eea; cursor: pointer; }
+        .provider-icon { font-size: 24px; margin-bottom: 8px; }
+        .provider-name { font-weight: 600; color: #1f2937; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #374151; font-weight: 600; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; }
+        input:focus, select:focus { outline: none; border-color: #667eea; }
+        .btn { padding: 12px 24px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-right: 10px; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-success { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .preview { background: #e0f2fe; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .preview h3 { color: #0891b2; margin-bottom: 10px; }
+        .feature-list { list-style: none; padding: 0; }
+        .feature-list li { padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list li:before { content: "✅ "; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 LLM大模型配置 - 雨姗AI收银助手</h1>
+        
+        <div class="preview">
+            <h3>📋 功能预览（静态演示版）</h3>
+            <p>这是LLM配置的静态演示版本。实际功能请访问：<code>http://localhost:3000/admin.html</code> → 系统设置</p>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 支持的大模型提供商</h2>
+            <div class="provider-list">
+                <div class="provider">
+                    <div class="provider-icon">🔵</div>
+                    <div class="provider-name">DeepSeek</div>
+                </div>
+                <div class="provider">
+                    <div class="provider-icon">🟠</div>
+                    <div class="provider-name">Moonshot (Kimi)</div>
+                </div>
+                <div class="provider">
+                    <div class="provider-icon">🔷</div>
+                    <div class="provider-name">通义千问 (Qwen)</div>
+                </div>
+                <div class="provider">
+                    <div class="provider-icon">🟢</div>
+                    <div class="provider-name">智谱AI (GLM)</div>
+                </div>
+                <div class="provider">
+                    <div class="provider-icon">🟤</div>
+                    <div class="provider-name">Anthropic (Claude)</div>
+                </div>
+                <div class="provider">
+                    <div class="provider-icon">🟩</div>
+                    <div class="provider-name">OpenAI (GPT)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>⚙️ 配置表单</h2>
+            <form>
+                <div class="form-group">
+                    <label>大模型提供商</label>
+                    <select>
+                        <option value="">请选择...</option>
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="moonshot">Moonshot (Kimi)</option>
+                        <option value="qwen">通义千问 (Qwen)</option>
+                        <option value="zhipu">智谱AI (GLM)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="openai">OpenAI (GPT)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>API Key</label>
+                    <input type="password" placeholder="请输入API Key">
+                </div>
+                
+                <div class="form-group">
+                    <label>API Base URL（可选）</label>
+                    <input type="text" placeholder="留空则使用默认地址">
+                </div>
+                
+                <div class="form-group">
+                    <label>API协议格式</label>
+                    <select>
+                        <option value="openai">OpenAI兼容</option>
+                        <option value="anthropic">Anthropic兼容</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>模型</label>
+                    <select>
+                        <option value="">请先选择提供商</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn btn-primary">💾 保存配置</button>
+                <button type="button" class="btn btn-success">🔗 测试连接</button>
+            </form>
+        </div>
+        
+        <div class="section">
+            <h2>✨ 核心功能</h2>
+            <ul class="feature-list">
+                <li>支持6个主流大模型提供商</li>
+                <li>API Key安全输入（密码模式）</li>
+                <li>自定义API Base URL</li>
+                <li>支持OpenAI和Anthropic两种协议</li>
+                <li>智能模型选择</li>
+                <li>一键测试连接</li>
+                <li>配置持久化保存</li>
+                <li>一键获取API Key链接</li>
+            </ul>
+        </div>
+        
+        <div class="section" style="background: #fef3c7;">
+            <h2>📍 访问路径</h2>
+            <p><strong>管理后台首页</strong> → 点击"LLM大模型"卡片 → <strong>系统设置</strong>标签 → <strong>AI智能助手设置</strong></p>
+        </div>
+    </div>
+</body>
+</html>
