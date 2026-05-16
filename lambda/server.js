@@ -39,6 +39,7 @@ const monitorRoutes = require('./routes/monitor');
 const exportRoutes = require('./routes/export');
 const userDataRoutes = require('./routes/userData');
 const paymentConfigRoutes = require('./routes/paymentConfig');
+const llmConfigRoutes = require('./routes/llm-config');
 
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection, csrfProtection } = require('./middleware/security');
 const session = require('express-session');
@@ -136,6 +137,7 @@ app.use('/admin', adminRoutes);
 app.use('/monitor', monitorRoutes);
 app.use('/api/v1/export', exportRoutes);
 app.use('/api/v1/user', userDataRoutes);
+app.use('/api/v1/llm-config', llmConfigRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'web', 'index.html'));

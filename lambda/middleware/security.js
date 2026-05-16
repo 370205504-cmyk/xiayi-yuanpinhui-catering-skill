@@ -295,7 +295,13 @@ const generateCsrfToken = () => {
   return uuidv4();
 };
 
+const csrfWhitelist = ['/api/v1/llm-config/config', '/api/v1/llm-config/test'];
+
 const csrfProtection = (req, res, next) => {
+  if (csrfWhitelist.includes(req.path)) {
+    return next();
+  }
+
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
     if (!req.session?.csrfToken) {
       req.session.csrfToken = generateCsrfToken();
