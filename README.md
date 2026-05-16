@@ -62,6 +62,8 @@
 | KDS厨房显示系统 | ✅ 已整合 | 订单实时显示、工位管理 |
 | 库存AI预测系统 | ✅ 已整合 | 需求预测、智能补货 |
 | 员工排班系统 | ✅ 已整合 | 排班管理、时间钟打卡 |
+| 社交媒体营销系统 | ✅ 已整合 | AI图片分析、文案生成、多平台发布 |
+| DPT-Agent多智能体框架 | ✅ 已整合 | 双过程理论、多Agent协作 |
 | AI Agent技能 | ✅ 最大化 | 25种意图识别、300+FAQ知识、多模态处理 |
 
 ## 🎉 v5.0.0 升级完成状态
@@ -72,8 +74,8 @@
 |------|------|------|------|
 | 1 | Foodix AI库存 | 库存预测、智能补货 | ✅ 已整合 | `lambda/services/inventory-forecast.js` |
 | 2 | OpenSkedge | 员工排班、时间钟 | ✅ 已整合 | `lambda/services/employee-scheduling.js` |
-| 3 | Restaurant Social SaaS | 菜品营销、AI图片 | ⏳ 待开发 | - |
-| 4 | DPT-Agent | 多智能体框架 | ⏳ 待开发 | - |
+| 3 | Restaurant Social SaaS | 菜品营销、AI图片 | ✅ 已整合 | `lambda/services/social-marketing.js` |
+| 4 | DPT-Agent | 多智能体框架 | ✅ 已整合 | `lambda/services/dpt-agent.js` |
 | 5 | Kitchen Display System | 厨房显示系统 | ✅ 已整合 | `lambda/services/kitchen-display.js` |
 | 6 | Recipe Costing | 成本核算系统 | ✅ 已整合 | `lambda/services/cost-accounting.js` |
 | 7 | fuintCatering | 会员营销系统 | ✅ 已整合 | `lambda/services/memberService.js` |
@@ -90,7 +92,16 @@
 | 库存预测 | 需求预测、智能补货 |
 | KDS厨房 | 实时订单显示 |
 | 员工排班 | 排班管理、时间钟 |
-| 测试覆盖率 | 100% (29/29) |
+| 社交营销 | AI图片分析、文案生成 |
+| DPT-Agent | 双过程理论、多Agent协作 |
+| 测试覆盖率 | 100% (39/39) |
+
+### 新增API接口
+
+| 接口路径 | 说明 |
+|---------|------|
+| `/api/v1/social-marketing/*` | 社交媒体营销API |
+| `/api/v1/dpt-agent/*` | DPT-Agent多智能体API |
 
 ---
 

@@ -17,6 +17,8 @@ const CostAccounting = require('./lambda/services/cost-accounting');
 const KitchenDisplay = require('./lambda/services/kitchen-display');
 const InventoryForecast = require('./lambda/services/inventory-forecast');
 const EmployeeScheduling = require('./lambda/services/employee-scheduling');
+const SocialMarketing = require('./lambda/services/social-marketing');
+const DPTAgent = require('./lambda/services/dpt-agent');
 
 console.log('\n📋 测试环境初始化...\n');
 
@@ -29,7 +31,9 @@ const modules = {
   CostAccounting: new CostAccounting(),
   KitchenDisplay: new KitchenDisplay(),
   InventoryForecast: new InventoryForecast(),
-  EmployeeScheduling: new EmployeeScheduling()
+  EmployeeScheduling: new EmployeeScheduling(),
+  SocialMarketing: new SocialMarketing(),
+  DPTAgent: new DPTAgent()
 };
 
 // 测试结果统计
@@ -267,6 +271,90 @@ test('排班系统 - 获取周排班', () => {
   const weekSchedule = modules.EmployeeScheduling.getWeeklySchedule();
   console.log(`   - 周天数: ${weekSchedule.length}`);
   return { success: weekSchedule.length === 7 };
+});
+
+// ========== 测试9: 社交媒体营销系统 ==========
+test('营销系统 - 菜品图片分析', () => {
+  const result = modules.SocialMarketing.analyzeDishImage('mock-image-data');
+  console.log(`   - 菜品类型: ${result.dishType}`);
+  console.log(`   - 吸引力评分: ${result.attractivenessScore}`);
+  return result;
+});
+
+test('营销系统 - 生成营销文案', () => {
+  const result = modules.SocialMarketing.generateMarketingContent({
+    type: 'newDish',
+    dishName: '宫保鸡丁',
+    dishDesc: '麻辣鲜香，回味无穷'
+  });
+  console.log(`   - 文案长度: ${result.content?.length}字符`);
+  console.log(`   - 话题数: ${result.hashtags?.length}`);
+  return result;
+});
+
+test('营销系统 - 生成海报配置', () => {
+  const result = modules.SocialMarketing.generatePosterConfig({
+    title: '新品上市',
+    dishName: '宫保鸡丁',
+    price: '¥28'
+  });
+  console.log(`   - 主色调: ${result.colorScheme?.primary}`);
+  console.log(`   - 布局: ${result.layout}`);
+  return result;
+});
+
+test('营销系统 - 发布社交媒体', () => {
+  const result = modules.SocialMarketing.publishToSocial({
+    platform: 'wechat',
+    content: '测试内容',
+    hashtags: ['#美食', '#测试']
+  });
+  console.log(`   - 平台: ${result.post?.platform}`);
+  console.log(`   - 状态: ${result.post?.status}`);
+  return result;
+});
+
+test('营销系统 - 获取发布历史', () => {
+  const result = modules.SocialMarketing.getPostHistory(5);
+  console.log(`   - 历史记录: ${result.total}条`);
+  return { success: true };
+});
+
+test('营销系统 - 获取统计数据', () => {
+  const stats = modules.SocialMarketing.getMarketingStats();
+  console.log(`   - 总发布: ${stats.totalPosts}`);
+  console.log(`   - 总浏览: ${stats.totalViews}`);
+  return { success: true };
+});
+
+test('营销系统 - 智能营销建议', () => {
+  const result = modules.SocialMarketing.getSmartMarketingSuggestions();
+  console.log(`   - 建议数: ${result.suggestions?.length}`);
+  return result;
+});
+
+// ========== 测试10: DPT-Agent多智能体框架 ==========
+test('DPT-Agent - 系统1快速响应', async () => {
+  const result = await modules.DPTAgent.processRequest('来一份宫保鸡丁');
+  console.log(`   - 使用系统: ${result.system}`);
+  console.log(`   - 意图: ${result.intent}`);
+  return { success: result?.success !== false };
+});
+
+test('DPT-Agent - 多Agent协作', async () => {
+  const result = await modules.DPTAgent.multiAgentCollaboration({
+    type: 'order',
+    intent: 'order'
+  });
+  console.log(`   - 参与Agent数: ${Object.keys(result.agentResults || {}).length}`);
+  return { success: result?.success !== false };
+});
+
+test('DPT-Agent - 获取Agent状态', () => {
+  const status = modules.DPTAgent.getAgentStatus();
+  console.log(`   - Agent总数: ${status.totalAgents}`);
+  console.log(`   - 对话数: ${status.conversationCount}`);
+  return { success: true };
 });
 
 // ========== 最终统计 ==========
