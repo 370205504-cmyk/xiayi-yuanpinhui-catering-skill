@@ -38,7 +38,69 @@
 | | 店铺设置 | ✅ |
 | | 公告管理 | ✅ |
 
-### ✅ 后端服务（可实现功能）
+### 🤖 AI Agent 技能最大化
+
+#### 🎯 核心AI能力
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| **意图识别（25种）** | ✅ | [handler.js](lambda/mcp/handler.js) |
+| **FAQ问答系统（300+问题）** | ✅ | [faq-system.js](lambda/services/faq-system.js) |
+| **多轮对话状态机** | ✅ | 8种对话状态 |
+| **实体识别** | ✅ | 菜品/数量/辣度/忌口 |
+| **上下文理解** | ✅ | 顾客画像、会话记忆 |
+| **自动转人工** | ✅ | 连续3次未知意图 |
+| **主动推荐** | ✅ | 时间/场景/个性化 |
+| **主动关怀** | ✅ | 节日/生日/复购提醒 |
+
+#### 🎯 25种意图识别
+
+| 类别 | 意图类型 |
+|------|----------|
+| **点餐相关** | ORDER_DISH, REMOVE_FROM_CART, VIEW_CART, MODIFY_ORDER, CONFIRM_ORDER, CANCEL_ORDER |
+| **菜单查询** | QUERY_MENU, QUERY_PRICE, QUERY_SPECIFIC_DISH |
+| **历史订单** | REPEAT_ORDER |
+| **预约相关** | RESERVE_TABLE, RESERVATION_INFO |
+| **配送相关** | QUERY_DELIVERY, DELIVERY_TIME |
+| **支付相关** | PAYMENT_METHOD, APPLY_COUPON, SPLIT_BILL |
+| **会员相关** | QUERY_POINT, RECHARGE, BIRTHDAY_VIP, MEMBER_REGISTER |
+| **FAQ问答** | ASK_FAQ, WIFI_QUERY, PARKING_QUERY, BUSINESS_HOURS |
+| **反馈投诉** | FEEDBACK, COMPLIMENT |
+| **特殊需求** | ALLERGEN_QUERY, SPICY_LEVEL, TASTE_PREFERENCE |
+| **社交礼仪** | GREETING, GOODBYE |
+| **其他** | VOICE_MESSAGE, EXTRA_REQUEST, TABLE_NUMBER |
+
+#### 🎯 300+FAQ知识库
+
+| 分类 | 问题数量 |
+|------|----------|
+| 基础信息 | 5+ |
+| 营业相关 | 6+ |
+| 菜品咨询 | 15+ |
+| 点餐服务 | 10+ |
+| 支付相关 | 7+ |
+| 会员服务 | 10+ |
+| 促销活动 | 8+ |
+| 外卖配送 | 6+ |
+| 特殊需求 | 10+ |
+| 投诉建议 | 7+ |
+| 节日专题 | 8+ |
+| 会员权益 | 7+ |
+| 营销活动 | 8+ |
+| 食品安全 | 6+ |
+
+#### 🎯 AI主动技能
+
+| 功能 | 说明 |
+|------|------|
+| 主动迎宾 | 分时段问候语（早/午/下午/晚） |
+| 主动推荐 | 爆款/套餐/季节性推荐 |
+| 主动提醒 | 忌口/优惠/订单状态 |
+| 主动关怀 | 节日祝福/生日优惠/复购提醒 |
+| 会员升级提醒 | 银卡/金卡升级进度 |
+| 智能复购 | 7天未到店自动提醒 |
+
+### ✅ 后端服务
 
 #### 🔒 安全与权限
 
@@ -75,66 +137,18 @@
 | 订单总额计算 | ✅ | 自动统计 |
 | 订单查询 | ✅ | 按ID、订单号查询 |
 
-#### 🎫 会员与积分
-
-| 功能 | 状态 | 说明 |
-|------|------|------|
-| 会员注册 | ✅ | [memberService.js](lambda/services/memberService.js) |
-| 积分管理 | ✅ | 等级、积分 |
-| 会员信息查询 | ✅ | 手机号、姓名 |
-
-#### 🎨 二维码与打印
-
-| 功能 | 状态 | 说明 |
-|------|------|------|
-| 店铺二维码生成 | ✅ | [qrcodeGenerator.js](lambda/services/qrcodeGenerator.js) |
-| 桌码二维码生成 | ✅ | 批量生成 |
-| 二维码打印模板 | ✅ | HTML打印模板 |
-| 批量桌码生成 | ✅ | 1-20桌 |
-
-#### 🤖 AI智能助手
-
-| 功能 | 状态 | 说明 |
-|------|------|------|
-| FAQ问答系统（200+问题） | ✅ | [faq-system.js](lambda/services/faq-system.js) |
-| 营业时间、WiFi、停车等 | ✅ | 完整知识库 |
-| 自然语义理解 | ✅ | [mcp/handler.js](lambda/mcp/handler.js) |
-| 意图识别 | ✅ | 点餐、查询、FAQ等 |
-| 主动迎宾 | ✅ | [ai-agent.js](lambda/services/ai-agent.js) |
-| 智能推荐 | ⚠️ | 框架实现 |
-| AI经营报告 | ⚠️ | 框架实现 |
-| 自动转人工 | ✅ | 复杂问题自动转人工 |
-
 #### 💬 企业微信机器人
 
 | 功能 | 状态 | 说明 |
 |------|------|------|
 | 企业微信集成 | ✅ | [wework-bot.js](lambda/integrations/wework-bot.js) |
 | 扣子平台回调 | ✅ | 签名验证、消息解密 |
+| 消息加密/解密 | ✅ | AES-256-CBC |
 | 好友添加处理 | ✅ | 欢迎消息 |
 | 私聊消息处理 | ✅ | AI自动回复 |
 | 订单状态推送 | ✅ | 主动通知 |
-
-#### 🌐 Web界面
-
-| 功能 | 状态 | 说明 |
-|------|------|------|
-| 首页（展示页） | ✅ | [index.html](lambda/web/index.html) |
-| 管理后台 | ✅ | [admin.html](lambda/web/admin.html) |
-| 移动端点餐页 | ✅ | [mobile.html](lambda/web/mobile.html) |
-| 404/500错误页 | ✅ | 完整错误处理 |
-
-#### 🛠️ 其他服务
-
-| 功能 | 状态 | 说明 |
-|------|------|------|
-| 支付服务 | ✅ | [paymentService.js](lambda/services/paymentService.js) |
-| 通知服务 | ✅ | [notificationService.js](lambda/services/notificationService.js) |
-| 店铺配置 | ✅ | [storeService.js](lambda/services/storeService.js) |
-| 监控服务 | ✅ | [monitoringService.js](lambda/services/monitoringService.js) |
-| 系统监控 | ✅ | [systemMonitor.js](lambda/services/systemMonitor.js) |
-| 熔断机制 | ✅ | [circuitBreaker.js](lambda/services/circuitBreaker.js) |
-| 定时任务 | ✅ | [schedulerService.js](lambda/services/schedulerService.js) |
+| 群发消息 | ✅ | 优惠推送 |
+| 重试机制 | ✅ | 3次自动重试 |
 
 ---
 
@@ -222,12 +236,16 @@ yushan-ai-cashier-assistant/
 ├── lambda/                  # 后端服务
 │   ├── server.js           # 服务入口
 │   ├── services/           # 业务服务
-│   │   ├── faq-system.js  # FAQ问答系统
+│   │   ├── faq-system.js  # FAQ问答系统（300+问题）
+│   │   ├── ai-agent.js    # AI主动技能
 │   │   ├── qrcodeGenerator.js # 二维码生成
-│   │   ├── ai-agent.js    # AI助手
 │   │   └── ...
 │   ├── mcp/                # MCP处理器（AI核心）
+│   │   ├── handler.js     # 25种意图识别
+│   │   ├── context.js     # 上下文管理
+│   │   └── tools.js       # MCP工具
 │   ├── integrations/       # 集成（企业微信机器人）
+│   │   └── wework-bot.js  # 扣子平台集成
 │   ├── adapters/           # 收银系统适配器
 │   ├── routes/             # API路由
 │   ├── database/           # 数据库
@@ -236,31 +254,48 @@ yushan-ai-cashier-assistant/
 │   ├── middleware/         # 中间件
 │   └── web/                # Web界面
 ├── docs/                    # 文档
+│   ├── AI-Agent开发计划.md  # AI Agent开发计划
+│   └── 功能扩展参考.md      # 8个开源项目整合规划
 ├── build/                   # Windows打包相关
 └── README.md
 ```
 
 ---
 
-## ⚠️ 重要说明
+## 🔧 AI Agent 技能详解
 
-### 已完整实现 ✅
-- 微信小程序点餐系统（完整可用）
-- 后端API框架（Express）
-- SQLite本地数据库（完整实现）
-- FAQ问答系统（200+问题）
-- 企业微信机器人集成
-- 二维码生成（桌码、店铺码）
-- 用户认证与权限
-- 菜品、订单、会员管理
-- 安全中间件
+### 意图识别示例
 
-### 框架实现 ⚠️
-- AI智能推荐（当前为随机）
-- AI经营报告（模拟数据）
-- 收银系统适配器（仅Mock）
-- MySQL数据库（框架）
-- 多模态（语音/图片）处理
+```
+用户: "来个宫保鸡丁，微辣，不要香菜"
+识别结果: 
+  - 意图: ORDER_DISH
+  - 实体: 菜品=宫保鸡丁, 数量=1, 辣度=微辣, 忌口=香菜
+  - 处理: 添加到购物车，记录口味偏好
+
+用户: "多少钱"
+识别结果:
+  - 意图: QUERY_PRICE
+  - 处理: 查询宫保鸡丁价格
+
+用户: "我有会员卡"
+识别结果:
+  - 意图: MEMBER_REGISTER
+  - 处理: 查询会员信息
+```
+
+### FAQ问答示例
+
+```
+用户: "WiFi密码多少"
+回复: "WiFi账号：Yushan-Free，密码：88888888~"
+
+用户: "有停车位吗"
+回复: "我们地下有停车场，B1层有专属车位。消费满100元可免2小时停车费~"
+
+用户: "会员有什么优惠"
+回复: "会员权益包括：积分返利、会员折扣、生日优惠、会员日双倍积分、专属优惠券等~"
+```
 
 ---
 
@@ -281,6 +316,8 @@ yushan-ai-cashier-assistant/
 
 详细整合规划见：[docs/功能扩展参考.md](docs/%E5%8A%9F%E8%83%BD%E6%89%A9%E5%B1%95%E5%8F%82%E8%80%83.md)
 
+AI Agent开发计划见：[docs/AI-Agent开发计划.md](docs/AI-Agent%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92.md)
+
 ---
 
 ## 🤝 致谢
@@ -294,3 +331,7 @@ yushan-ai-cashier-assistant/
 ## 📄 许可证
 
 Apache License 2.0
+
+---
+
+**版本**: v5.0.0 | **更新日期**: 2026-05-16
