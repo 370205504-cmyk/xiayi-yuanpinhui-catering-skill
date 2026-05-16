@@ -1434,15 +1434,31 @@
         };
         
         let currentProvider = null;
-        
+        let llmConfigStatus = null;
+
         async function loadLLMSettings() {
             try {
-                const response = await fetch('/api/v1/llm-config/providers');
-                const result = await response.json();
+                const [providersResponse, statusResponse] = await Promise.all([
+                    fetch('/api/v1/llm-config/providers'),
+                    fetch('/api/v1/llm-config/status')
+                ]);
                 
-                if (result.success) {
-                    renderProvidersList(result.providers);
+                const providersResult = await providersResponse.json();
+                const statusResult = await statusResponse.json();
+                
+                if (providersResult.success) {
+                    renderProvidersList(providersResult.providers);
+                }
+                
+                if (statusResult.success) {
+                    llmConfigStatus = statusResult.data;
                     loadStatus();
+                    
+                    if (statusResult.data.provider) {
+                        setTimeout(() => {
+                            selectProvider(statusResult.data.provider);
+                        }, 100);
+                    }
                 }
             } catch (error) {
                 console.error('加载LLM配置失败:', error);
@@ -1564,18 +1580,23 @@
             const compatibleTypes = providerCompatibleTypes[providerId] || ['openai'];
             const models = providerModelLists[providerId] || [];
             const apiKeyUrl = getApiKeyUrl(providerId);
+            
+            const isConfigured = llmConfigStatus?.providers?.[providerId]?.configured || false;
+            const savedApiType = llmConfigStatus?.providers?.[providerId]?.apiType || 'openai';
+            const savedModel = llmConfigStatus?.providers?.[providerId]?.model || info.defaultModel;
+            const savedBaseUrl = llmConfigStatus?.providers?.[providerId]?.baseUrl || info.defaultUrl;
 
             settingsEl.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h4 style="font-size: 16px; font-weight: 600; color: #1a1a2e;">${info.name} 提供商设置</h4>
-                    <span style="padding: 4px 12px; background: #ffebee; color: #c62828; border-radius: 12px; font-size: 12px;">未配置</span>
+                    <span style="padding: 4px 12px; background: ${isConfigured ? '#e8f5e9' : '#ffebee'}; color: ${isConfigured ? '#2e7d32' : '#c62828'}; border-radius: 12px; font-size: 12px;">${isConfigured ? '已配置' : '未配置'}</span>
                 </div>
                 
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API Key *</label>
                         <div style="display: flex; gap: 10px;">
-                            <input type="password" id="llm-api-key-${providerId}" placeholder="输入您的 API Key" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
+                            <input type="password" id="llm-api-key-${providerId}" placeholder="输入您的 API Key" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;" ${isConfigured ? 'value="******"' : ''}>
                             <a href="${apiKeyUrl}" target="_blank"><button type="button" style="padding: 12px 18px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap;">获取 API Key →</button></a>
                             <button type="button" onclick="togglePassword('llm-api-key-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer;">👁️</button>
                         </div>
@@ -1586,8 +1607,8 @@
                         <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API 协议格式</label>
                         <div style="display: flex; gap: 12px;">
                             ${compatibleTypes.map(type => `
-                                <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 2px solid #e8eaf6; border-radius: 8px; cursor: pointer; background: ${type === 'openai' ? '#eef2ff' : 'white'}; border-color: ${type === 'openai' ? '#667eea' : '#e8eaf6'};">
-                                    <input type="radio" name="api-type-${providerId}" value="${type}" ${type === 'openai' ? 'checked' : ''} onchange="updateApiType('${providerId}', '${type}')">
+                                <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 2px solid #e8eaf6; border-radius: 8px; cursor: pointer; background: ${type === savedApiType ? '#eef2ff' : 'white'}; border-color: ${type === savedApiType ? '#667eea' : '#e8eaf6'};">
+                                    <input type="radio" name="api-type-${providerId}" value="${type}" ${type === savedApiType ? 'checked' : ''} onchange="updateApiType('${providerId}', '${type}')">
                                     <span style="font-size: 14px;">${type === 'openai' ? 'OpenAI 兼容' : type === 'anthropic' ? 'Anthropic 兼容' : type === 'wenxin' ? '文心格式' : type}</span>
                                 </label>
                             `).join('')}
@@ -1598,7 +1619,7 @@
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API Base URL</label>
                         <div style="display: flex; gap: 10px;">
-                            <input type="text" id="llm-url-${providerId}" value="${info.defaultUrl}" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
+                            <input type="text" id="llm-url-${providerId}" value="${savedBaseUrl}" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
                             <button onclick="clearUrl('llm-url-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer; font-size: 14px;">✕</button>
                         </div>
                     </div>
@@ -1606,12 +1627,15 @@
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">模型</label>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            ${models.map((model, idx) => `
-                                <label style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 2px solid #e8eaf6; border-radius: 8px; cursor: pointer; background: ${idx === 0 ? '#e8f5e9' : 'white'}; border-color: ${idx === 0 ? '#388e3c' : '#e8eaf6'};">
-                                    <input type="radio" name="model-${providerId}" value="${model}" ${idx === 0 ? 'checked' : ''}>
+                            ${models.map((model) => {
+                                const isSelected = model === savedModel;
+                                return `
+                                <label style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 2px solid #e8eaf6; border-radius: 8px; cursor: pointer; background: ${isSelected ? '#e8f5e9' : 'white'}; border-color: ${isSelected ? '#388e3c' : '#e8eaf6'};">
+                                    <input type="radio" name="model-${providerId}" value="${model}" ${isSelected ? 'checked' : ''}>
                                     <span style="font-size: 13px;">${model}</span>
                                 </label>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                     
@@ -1772,7 +1796,22 @@
                 
                 if (result.success) {
                     showToast('✅ AI配置已保存！', 'success');
+                    
+                    if (!llmConfigStatus) {
+                        llmConfigStatus = { providers: {} };
+                    }
+                    llmConfigStatus.provider = providerId;
+                    llmConfigStatus.enabled = true;
+                    if (!llmConfigStatus.providers[providerId]) {
+                        llmConfigStatus.providers[providerId] = {};
+                    }
+                    llmConfigStatus.providers[providerId].configured = true;
+                    llmConfigStatus.providers[providerId].model = model;
+                    llmConfigStatus.providers[providerId].apiType = apiType;
+                    
                     loadStatus();
+                    
+                    renderProviderSettings(providerId);
                 } else {
                     showToast('❌ ' + (result.message || '保存失败'), 'error');
                 }

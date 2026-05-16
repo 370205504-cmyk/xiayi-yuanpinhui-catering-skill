@@ -79,7 +79,8 @@ router.get('/status', (req, res) => {
         model: config[`${prefix}_MODEL`] || 'default',
         requiresSecret: p.requiresSecret,
         configuredSecret: p.requiresSecret ? !!(config[`${prefix}_SECRET_KEY`]) : true,
-        apiType: config[`${prefix}_API_TYPE`] || 'openai'
+        apiType: config[`${prefix}_API_TYPE`] || 'openai',
+        baseUrl: config[`${prefix}_BASE_URL`] || null
       };
     });
     
