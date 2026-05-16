@@ -107,10 +107,10 @@ router.post('/config', (req, res) => {
   try {
     const { provider, apiKey, model, secretKey, baseUrl, apiType } = req.body;
     
-    if (!provider || !apiKey) {
+    if (!provider) {
       return res.status(400).json({
         success: false,
-        message: '请提供完整的配置信息'
+        message: '请提供提供商信息'
       });
     }
     
@@ -124,11 +124,25 @@ router.post('/config', (req, res) => {
       });
     }
     
+    const envContent = readEnv();
+    const existingConfig = parseEnv(envContent);
     const prefix = provider.toUpperCase();
+    const existingApiKey = existingConfig[`${prefix}_API_KEY`];
+    
+    if (!apiKey && !existingApiKey) {
+      return res.status(400).json({
+        success: false,
+        message: '请提供 API Key'
+      });
+    }
+    
     const newConfig = {
       'LLM_PROVIDER': provider,
-      [`${prefix}_API_KEY`]: apiKey,
     };
+    
+    if (apiKey && apiKey.length >= 10) {
+      newConfig[`${prefix}_API_KEY`] = apiKey;
+    }
     
     if (model) {
       newConfig[`${prefix}_MODEL`] = model;

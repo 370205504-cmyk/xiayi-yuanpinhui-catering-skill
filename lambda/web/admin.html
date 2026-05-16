@@ -1596,9 +1596,21 @@
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API Key *</label>
                         <div style="display: flex; gap: 10px;">
-                            <input type="password" id="llm-api-key-${providerId}" placeholder="输入您的 API Key" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;" ${isConfigured ? 'value="******"' : ''}>
+                            ${isConfigured ? `
+                                <div id="api-key-display-${providerId}" style="flex: 1; padding: 12px 14px; background: #f5f5f5; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px; color: #666; display: flex; align-items: center; gap: 8px;">
+                                    <span style="color: #2e7d32; font-weight: 600;">✓</span>
+                                    <span>已配置 (如需修改请重新输入)</span>
+                                </div>
+                                <input type="password" id="llm-api-key-${providerId}" placeholder="请输入新的 API Key" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px; display: none;">
+                            ` : `
+                                <input type="password" id="llm-api-key-${providerId}" placeholder="输入您的 API Key" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
+                            `}
                             <a href="${apiKeyUrl}" target="_blank"><button type="button" style="padding: 12px 18px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap;">获取 API Key →</button></a>
-                            <button type="button" onclick="togglePassword('llm-api-key-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer;">👁️</button>
+                            ${isConfigured ? `
+                                <button type="button" id="toggle-api-key-btn-${providerId}" onclick="toggleApiKeyEdit('${providerId}')" style="padding: 12px 14px; background: #fff3e0; border: none; border-radius: 8px; color: #e65100; cursor: pointer;">✏️</button>
+                            ` : `
+                                <button type="button" onclick="togglePassword('llm-api-key-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer;">👁️</button>
+                            `}
                         </div>
                     </div>
                     
@@ -1671,6 +1683,29 @@
                     <button onclick="saveProviderSettings('${providerId}')" style="padding: 12px 24px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 8px; color: white; font-size: 14px; cursor: pointer;">保存</button>
                 </div>
             `;
+        }
+        
+        function toggleApiKeyEdit(providerId) {
+            const displayEl = document.getElementById(`api-key-display-${providerId}`);
+            const inputEl = document.getElementById(`llm-api-key-${providerId}`);
+            const toggleBtn = document.getElementById(`toggle-api-key-btn-${providerId}`);
+            
+            if (displayEl && inputEl && toggleBtn) {
+                if (inputEl.style.display === 'none') {
+                    inputEl.style.display = 'block';
+                    displayEl.style.display = 'none';
+                    toggleBtn.textContent = '👁️';
+                    toggleBtn.style.background = '#f0f4ff';
+                    toggleBtn.style.color = '#667eea';
+                } else {
+                    inputEl.style.display = 'none';
+                    displayEl.style.display = 'flex';
+                    toggleBtn.textContent = '✏️';
+                    toggleBtn.style.background = '#fff3e0';
+                    toggleBtn.style.color = '#e65100';
+                    inputEl.value = '';
+                }
+            }
         }
         
         function togglePassword(inputId) {
@@ -1767,29 +1802,42 @@
         }
         
         async function saveProviderSettings(providerId) {
-            const apiKey = document.getElementById(`llm-api-key-${providerId}`)?.value;
-            const url = document.getElementById(`llm-url-${providerId}`)?.value;
+            const apiKeyInput = document.getElementById(`llm-api-key-${providerId}`);
+            const apiKey = apiKeyInput?.value?.trim();
+            const url = document.getElementById(`llm-url-${providerId}`)?.value?.trim();
             const modelRadio = document.querySelector(`input[name="model-${providerId}"]:checked`);
             const model = modelRadio?.value || providerInfo[providerId].defaultModel;
             const apiTypeRadio = document.querySelector(`input[name="api-type-${providerId}"]:checked`);
             const apiType = apiTypeRadio?.value || 'openai';
             
-            if (!apiKey) {
+            const isConfigured = llmConfigStatus?.providers?.[providerId]?.configured || false;
+            
+            if (!apiKey && !isConfigured) {
                 showToast('请输入API Key', 'error');
                 return;
             }
             
+            if (apiKey && apiKey.length < 10) {
+                showToast('API Key格式不正确', 'error');
+                return;
+            }
+            
             try {
+                const requestBody = {
+                    provider: providerId,
+                    baseUrl: url || null,
+                    model,
+                    apiType
+                };
+                
+                if (apiKey && apiKey.length >= 10) {
+                    requestBody.apiKey = apiKey;
+                }
+                
                 const response = await fetch('/api/v1/llm-config/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        provider: providerId,
-                        apiKey,
-                        baseUrl: url || null,
-                        model,
-                        apiType
-                    })
+                    body: JSON.stringify(requestBody)
                 });
                 
                 const result = await response.json();
