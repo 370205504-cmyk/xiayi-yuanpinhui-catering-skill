@@ -1,0 +1,21 @@
+{
+  "name": "yushan-ai-cashier",
+  "outputfilename": "雨姗AI收银助手",
+  "version": "5.0.1",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "author": {
+    "name": "雨姗科技",
+    "email": "contact@yushan.cn"
+  },
+  "windows": {
+    "certificate": "",
+    "digestAlgorithm": "sha256",
+    "timestampUrl": "",
+    "webviewInstallMode": {
+      "type": "embedBootstrapper",
+      "silent": true
+    }
+  }
+}
