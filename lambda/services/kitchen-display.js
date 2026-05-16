@@ -12,6 +12,7 @@ class KitchenDisplayService {
     this.orderQueue = [];
     this.completedOrders = [];
     this.averageCookingTime = new Map();
+    this.wsClients = new Set();
   }
 
   initializeKDS(stationId, stationName, stationType = 'main') {
@@ -146,15 +147,17 @@ class KitchenDisplayService {
   }
 
   notifyWebSocketClients(data) {
-    const message = JSON.stringify({
+    const message = {
       type: 'kds_update',
       data,
       timestamp: new Date().toISOString()
-    });
+    };
     
     for (const client of this.wsClients) {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
+      try {
+        client.send(JSON.stringify(message));
+      } catch (e) {
+        // 忽略发送失败
       }
     }
   }

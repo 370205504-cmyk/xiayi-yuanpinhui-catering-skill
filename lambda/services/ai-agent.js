@@ -80,6 +80,26 @@ class AIAgent {
     }
     return '来份小吃或饮品放松一下吧！';
   }
+
+  /**
+   * 获取节日祝福
+   */
+  getHolidayGreeting() {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    
+    const holidays = {
+      '1-1': '元旦快乐！祝您新年万事如意！',
+      '2-14': '情人节快乐！',
+      '5-1': '五一劳动节快乐！',
+      '10-1': '国庆节快乐！',
+      '12-25': '圣诞节快乐！'
+    };
+    
+    const key = `${month}-${day}`;
+    return holidays[key] || null;
+  }
 }
 
 module.exports = AIAgent;
