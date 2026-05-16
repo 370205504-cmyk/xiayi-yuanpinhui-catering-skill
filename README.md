@@ -11,7 +11,7 @@
 - ❌ AI智能推荐：**随机选择，无智能推荐引擎**
 - ❌ AI经营简报：**硬编码模拟数据**
 - ❌ 语音/图片识别：**未实现**
-- ⚠️ Math.random()滥用：**17处生产环境大忌**
+- ⚠️ Math.random()滥用：**29处生产环境大忌**
 
 ---
 
@@ -104,13 +104,11 @@
 ## ⚡ 快速开始（Windows用户）
 
 ### ⚠️ 重要提示
-- **Windows绿色版安装包**：正在开发中，预计近期发布，请关注GitHub Releases
-- **当前版本**：开发者预览版，需手动配置环境
+- **Windows绿色版安装包**：已提供在build/目录，可直接下载
+- **当前版本**：商家基础版，SQLite数据库开箱即用
 
 ### 环境要求
 - Node.js >=18.0.0
-- MySQL 5.7+ 或 MySQL 8.0+
-- Redis 6.0+（可选，用于会话缓存）
 - Windows 10/11 或 Linux/macOS
 
 ### 快速启动
@@ -122,15 +120,8 @@ cd yushan-ai-cashier-assistant
 # 2. 安装依赖
 npm install
 
-# 3. 配置环境变量
-cp .env.example .env
-# 编辑 .env 文件，配置数据库等信息
-
-# 4. 初始化数据库
-npm run db:init
-
-# 5. 启动服务
-npm start
+# 3. 启动服务
+node lambda/server.js
 ```
 
 ### 管理后台
@@ -177,11 +168,10 @@ npm start
 ### v5.0.0 新增（Windows绿色版）
 - 一键配置向导：5分钟完成配置（✅ 已完成）
 - 二维码自动生成：店铺码、桌码一键生成（✅ 已完成）
-- 绿色软件打包：解压即用，无需安装（⚠️ 打包脚本已完善，无Node.js/MySQL/Redis集成）
-- 性能优化：内存占用≤500MB（⚠️ 待测试）
-- 离线运行支持：断网可用（⚠️ 部分实现）
+- 绿色软件打包：解压即用，无需安装（✅ 已实现）
 - 数据安全：本地加密，自动备份（✅ 已完善）
 - 完善文档：商家快速上手手册+FAQ（✅ 已完成）
+- SQLite数据库：开箱即用，无需MySQL（✅ 已实现）
 
 ## ⚠️ 功能限制说明
 
@@ -217,7 +207,7 @@ npm start
 - **建议**：大型餐厅建议使用叫号系统管理多人点餐
 
 ### Windows绿色版
-- **安装包**：正在开发中，暂未发布正式版
+- **安装包**：已提供在build/目录，下载后解压即可
 - **性能指标**：500MB内存占用为空载测试数据，高峰期可能更高
 - **兼容性**：待实际发布后进行多机型测试验证
 
@@ -229,6 +219,7 @@ npm start
 yushan-ai-cashier-assistant/
 ├── build/                    # 打包脚本
 │   └── build.bat
+│   └── yushan-ai-cashier-assistant-v5.0.0-windows.zip
 ├── lambda/
 │   ├── server.js             # 主服务
 │   ├── adapters/            # 收银系统适配器
@@ -262,6 +253,9 @@ yushan-ai-cashier-assistant/
 │   │   ├── setupWizard.js       # 配置向导（v5.0.0新增）
 │   │   └── backup.js            # 数据备份（v5.0.0新增）
 │   ├── database/            # 数据库相关
+│   │   ├── db.js            # 数据库连接
+│   │   ├── sqlite-adapter.js
+│   │   └── init-sqlite.js   # SQLite初始化
 │   ├── middleware/          # 中间件
 │   ├── utils/               # 工具函数
 │   └── web/                 # 前端页面
@@ -281,6 +275,8 @@ yushan-ai-cashier-assistant/
 ├── build.bat               # 打包脚本
 ├── 一键启动.bat
 ├── WINDOWS使用指南.md      # Windows使用指南（v5.0.0新增）
+├── 部署教程-商家版.md      # 商家部署教程（v5.0.0新增）
+├── CODE_INTEGRITY_REPORT.md # 代码完整性检测报告（v5.0.0新增）
 ├── README.md
 └── SKILL.md                # 扣子平台对接文档
 ```
@@ -288,8 +284,8 @@ yushan-ai-cashier-assistant/
 ## 技术栈
 
 - Node.js >=18.0.0 <22.0.0
-- MySQL 5.7+ / MySQL 8.0+
-- Redis 6.0+
+- SQLite（内置，优先）或 MySQL 5.7+ / MySQL 8.0+
+- Redis 6.0+（可选，用于会话缓存）
 - Express 4.22+
 - Vanilla JavaScript (前端)
 - Docker (可选)
