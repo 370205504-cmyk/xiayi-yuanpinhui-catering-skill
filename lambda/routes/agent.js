@@ -448,9 +448,9 @@ async function handleWifiQuery(context) {
   const result = await storeService.getWifiInfo();
   if (result.success) {
     const wifi = result;
-    if (wifi.hasWifi) {
+    if (wifi.has_wifi) {
       return {
-        response: `📶 WiFi信息\n\n名称：${wifi.wifiName || '雨姗AI收银助手免费WiFi'}\n密码：${wifi.wifiPassword || '88888888'}\n\n免密码连接，祝您用餐愉快！`,
+        response: `📶 WiFi信息\n\n名称：${wifi.wifi_name || '雨姗AI收银助手免费WiFi'}\n密码：${wifi.wifi_password || '88888888'}\n\n免密码连接，祝您用餐愉快！`,
         actions: [{ type: 'show_wifi', data: wifi }],
         data: { wifi },
         context: context
@@ -538,7 +538,7 @@ async function handleContactQuery(query, context) {
     const result = await storeService.getPhone();
     if (result.success) {
       return {
-        response: `📞 联系电话\n\n${result.phone}\n\n门店：${result.storeName}`,
+        response: `📞 联系电话\n\n${result.phone}\n\n门店：${result.store_name}`,
         actions: [{ type: 'show_phone', data: result }],
         data: result,
         context: context
@@ -556,7 +556,7 @@ async function handleContactQuery(query, context) {
     const result = await storeService.getBusinessHours();
     if (result.success) {
       return {
-        response: `🕐 营业时间\n\n${result.businessHours}\n\n门店：${result.storeName}`,
+        response: `🕐 营业时间\n\n${result.business_hours}\n\n门店：${result.store_name}`,
         actions: [{ type: 'show_business_hours', data: result }],
         data: result,
         context: context
@@ -573,9 +573,9 @@ async function handleContactQuery(query, context) {
   if (query.includes('停车') || query.includes('车位')) {
     const result = await storeService.getParkingInfo();
     if (result.success) {
-      const parkingInfo = result.hasParking ? `提供停车位\n${result.parkingInfo || ''}` : '暂无停车场';
+      const parkingInfo = result.has_parking ? `提供停车位\n${result.parking_info || ''}` : '暂无停车场';
       return {
-        response: `🅿️ 停车信息\n\n${parkingInfo}\n\n门店：${result.storeName}`,
+        response: `🅿️ 停车信息\n\n${parkingInfo}\n\n门店：${result.store_name}`,
         actions: [{ type: 'show_parking', data: result }],
         data: result,
         context: context
@@ -693,6 +693,12 @@ async function handleHelpQuery(context) {
     data: {},
     context: context
   };
+}
+
+function extractDishInfo(query) {
+  const name = extractDishName(query);
+  const quantity = extractQuantity(query);
+  return { name, quantity };
 }
 
 function extractDishName(query) {
