@@ -677,6 +677,16 @@
             </div>
         </div>
         
+        <div class="stats-grid">
+            <div class="stat-card" onclick="window.location.href='/llm-config.html'" style="cursor: pointer;">
+                <div class="stat-icon blue" style="background: linear-gradient(135deg, #667eea, #764ba2);">🤖</div>
+                <div class="stat-info">
+                    <div class="stat-label">LLM大模型</div>
+                    <div class="stat-value" id="stat-llm-status" style="font-size: 20px;">配置</div>
+                </div>
+            </div>
+        </div>
+        
         <div class="main-content">
             <div class="tab-buttons">
                 <button class="tab-btn active" onclick="showTab('orders')">订单管理</button>
@@ -1014,6 +1024,26 @@
         }
         updateTime();
         setInterval(updateTime, 1000);
+        
+        async function loadLLMStatus() {
+            try {
+                const res = await fetch('/api/v1/llm-config/status');
+                const data = await res.json();
+                const el = document.getElementById('stat-llm-status');
+                if (data.success && data.data) {
+                    if (data.data.enabled && data.data.provider) {
+                        el.textContent = '✅ 已配置';
+                        el.style.color = '#155724';
+                    } else {
+                        el.textContent = '⚙️ 配置';
+                        el.style.color = '#667eea';
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        loadLLMStatus();
         
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
