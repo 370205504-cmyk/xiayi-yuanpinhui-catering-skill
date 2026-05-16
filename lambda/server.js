@@ -39,6 +39,10 @@ const monitorRoutes = require('./routes/monitor');
 const exportRoutes = require('./routes/export');
 const userDataRoutes = require('./routes/userData');
 const paymentConfigRoutes = require('./routes/paymentConfig');
+const costAccountingRoutes = require('./routes/cost-accounting');
+const kitchenDisplayRoutes = require('./routes/kitchen-display');
+const inventoryForecastRoutes = require('./routes/inventory-forecast');
+const employeeSchedulingRoutes = require('./routes/employee-scheduling');
 
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection, csrfProtection } = require('./middleware/security');
 const session = require('express-session');
@@ -136,6 +140,10 @@ app.use('/admin', adminRoutes);
 app.use('/monitor', monitorRoutes);
 app.use('/api/v1/export', exportRoutes);
 app.use('/api/v1/user', userDataRoutes);
+app.use('/api/v1/cost-accounting', costAccountingRoutes);
+app.use('/api/v1/kitchen-display', kitchenDisplayRoutes);
+app.use('/api/v1/inventory-forecast', inventoryForecastRoutes);
+app.use('/api/v1/employee-scheduling', employeeSchedulingRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'web', 'index.html'));
