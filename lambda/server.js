@@ -110,7 +110,10 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api/v1/agent') || req.path.startsWith('/mobile') || req.path.startsWith('/api/v1/menu')) {
+  if (req.path.startsWith('/api/v1/agent') || 
+      req.path.startsWith('/mobile') || 
+      req.path.startsWith('/api/v1/menu') ||
+      req.path.startsWith('/api/v1/llm-config')) {
     return next();
   }
   csrfProtection(req, res, next);
