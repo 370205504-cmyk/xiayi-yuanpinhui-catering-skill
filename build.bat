@@ -1,16 +1,16 @@
 @echo off
 chcp 65001 >nul
-title 雨姗AI收银助手 v5.0.0 - 绿色版打包工具
+title 雨姗AI收银助手 v5.0.1 - 绿色版打包工具
 
 echo ============================================
-echo 雨姗AI收银助手 v5.0.0 绿色版打包工具
+echo 雨姗AI收银助手 v5.0.1 绿色版打包工具
 echo ============================================
 echo.
 
 set PROJECT_DIR=%~dp0
 set BUILD_DIR=%PROJECT_DIR%build
 set RELEASE_DIR=%BUILD_DIR%release
-set PACKAGE_NAME=yushan-ai-cashier-assistant-v5.0.0-windows
+set PACKAGE_NAME=yushan-ai-cashier-assistant-v5.0.1-windows
 set PACKAGE_PATH=%BUILD_DIR%\%PACKAGE_NAME%.zip
 
 echo [1/9] 清理旧的构建文件...
