@@ -5,6 +5,7 @@ const orderService = require('../services/orderServiceV2');
 const inputValidator = require('../services/inputValidator');
 const logger = require('../utils/logger');
 const storeService = require('../services/storeService');
+const llmService = require('../services/llm-service');
 
 const PROMPT_INJECTION_PATTERNS = [
   /ignore\s+(previous|all|your)/i,
@@ -91,6 +92,92 @@ async function processAgentQuery(query, userId, sessionId, context) {
   const lowerQuery = query.toLowerCase();
   context = context || {};
   context.lastQuery = query;
+
+  // 获取对话历史
+  let conversationHistory = context.conversationHistory || [];
+
+  // 获取门店信息和菜单数据
+  let storeInfo = null;
+  let dishes = [];
+  try {
+    const storeResult = await storeService.getDefaultStore();
+    if (storeResult?.success) {
+      storeInfo = storeResult.store;
+    }
+    dishes = dishesService.getAllDishes();
+  } catch (error) {
+    logger.error('Failed to get store info or dishes for LLM:', error);
+  }
+
+  // 优先尝试使用大模型生成智能回复
+  if (llmService.isEnabled) {
+    try {
+      const llmResponse = await llmService.generateResponse(
+        query,
+        conversationHistory,
+        storeInfo,
+        dishes
+      );
+
+      if (llmResponse?.success) {
+        // 更新对话历史
+        conversationHistory.push({ role: 'user', content: query });
+        conversationHistory.push({ role: 'assistant', content: llmResponse.content });
+        context.conversationHistory = conversationHistory.slice(-10); // 保留最近10条对话
+
+        // 根据意图决定是否执行具体的业务操作
+        const intent = llmResponse.intent;
+        let actionResult = null;
+
+        // 对于关键操作，仍然走原来的业务逻辑，确保数据准确性
+        if (intent === 'ADD_TO_CART') {
+          actionResult = await handleOrderQuery(query, userId, context);
+        } else if (intent === 'SHOW_MENU') {
+          actionResult = await handleMenuQuery(query, userId, context);
+        } else if (intent === 'RECOMMEND') {
+          actionResult = await handleRecommendQuery(query, userId, context);
+        } else if (intent === 'SHOW_CART') {
+          actionResult = await handleCartQuery(userId, context);
+        } else if (intent === 'CHECKOUT') {
+          actionResult = await handleCheckoutQuery(query, userId, context);
+        } else if (intent === 'SHOW_WIFI') {
+          actionResult = await handleWifiQuery(context);
+        } else if (intent === 'SHOW_HOURS' || intent === 'SHOW_ADDRESS' || intent === 'SHOW_PHONE') {
+          actionResult = await handleContactQuery(query, context);
+        }
+
+        // 如果是业务操作，用业务逻辑的结果；否则用大模型回复
+        if (actionResult) {
+          // 混合模式：用大模型回复 + 业务逻辑的数据
+          return {
+            ...actionResult,
+            response: llmResponse.content, // 使用大模型的友好回复
+            context: context
+          };
+        }
+
+        // 纯对话回复
+        return {
+          response: llmResponse.content,
+          actions: [],
+          data: {},
+          context: context
+        };
+      }
+    } catch (error) {
+      logger.error('LLM processing failed, falling back to rule-based:', error);
+    }
+  }
+
+  // 大模型不可用或失败时，使用原来的规则引擎作为fallback
+  return await processWithRules(query, userId, sessionId, context);
+}
+
+/**
+ * 规则引擎处理（fallback方案）
+ */
+async function processWithRules(query, userId, sessionId, context) {
+  const lowerQuery = query.toLowerCase();
 
   if (lowerQuery.includes('菜单') || lowerQuery.includes('有什么菜') || lowerQuery.includes('看看菜')) {
     return await handleMenuQuery(query, userId, context);
