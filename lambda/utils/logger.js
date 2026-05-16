@@ -20,7 +20,22 @@ const consoleFormat = format.combine(
   format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   format.printf(info => {
     const { timestamp, level, message, ...meta } = info;
-    const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
+    const safeStringify = (obj) => {
+      const seen = new WeakSet();
+      return JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+          if (seen.has(value)) {
+            return '[Circular]';
+          }
+          seen.add(value);
+        }
+        if (value instanceof Error) {
+          return { message: value.message, stack: value.stack };
+        }
+        return value;
+      }, 2);
+    };
+    const metaStr = Object.keys(meta).length ? safeStringify(meta) : '';
     return `${timestamp} [${level}]: ${message} ${metaStr}`;
   })
 );
