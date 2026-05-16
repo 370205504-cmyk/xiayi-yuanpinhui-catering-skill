@@ -1153,16 +1153,11 @@
                 return;
             }
             
-            if (!apiKey || apiKey.length < 10) {
-                showToast('请输入有效的API Key', 'error');
-                return;
-            }
-            
             try {
                 const res = await fetch('/api/v1/llm-config/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ provider, apiKey, baseUrl, apiType, model })
+                    body: JSON.stringify({ provider, apiKey: apiKey || undefined, baseUrl, apiType, model })
                 });
                 const data = await res.json();
                 

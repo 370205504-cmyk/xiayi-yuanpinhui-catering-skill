@@ -117,23 +117,104 @@ router.get('/status', (req, res) => {
 });
 
 router.post('/config', (req, res) => {
+    try {
+        const { provider, apiKey, model, secretKey, baseUrl, apiType } = req.body;
+        
+        if (!provider) {
+            return res.status(400).json({
+                success: false,
+                message: '请提供提供商信息'
+            });
+        }
+        
+        const llmService = require('../services/llm-service');
+        const providerInfo = llmService.getProviderConfig(provider);
+        
+        if (!providerInfo) {
+            return res.status(400).json({
+                success: false,
+                message: '不支持的大模型提供商'
+            });
+        }
+        
+        const envContent = readEnv();
+        const existingConfig = parseEnv(envContent);
+        const prefix = provider.toUpperCase();
+        const existingApiKey = existingConfig[`${prefix}_API_KEY`];
+        
+        // 如果没有提供API Key，但是已经有保存的，则允许只更新其他配置
+        if (!apiKey && !existingApiKey) {
+            return res.status(400).json({
+                success: false,
+                message: '请提供 API Key'
+            });
+        }
+        
+        const newConfig = {
+            'LLM_PROVIDER': provider,
+        };
+        
+        if (apiKey && apiKey.length >= 10) {
+            newConfig[`${prefix}_API_KEY`] = apiKey;
+        }
+        
+        if (model) {
+            newConfig[`${prefix}_MODEL`] = model;
+        }
+        
+        if (apiType) {
+            newConfig[`${prefix}_API_TYPE`] = apiType;
+        }
+        
+        if (secretKey && providerInfo.requiresSecret) {
+            newConfig[`${prefix}_SECRET_KEY`] = secretKey;
+        }
+        
+        if (baseUrl) {
+            newConfig[`${prefix}_BASE_URL`] = baseUrl;
+        }
+        
+        const success = updateEnvFile(newConfig);
+        
+        if (success) {
+            logger.info(`LLM configuration updated: provider=${provider}`);
+            
+            setTimeout(() => {
+                logger.info('LLM config updated, service will use new config on next request');
+            }, 100);
+            
+            res.json({
+                success: true,
+                message: '配置成功！商家端已启用智能AI回复功能',
+                data: {
+                    provider,
+                    model: model || 'default',
+                    apiType: apiType || 'openai'
+                }
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: '配置保存失败，请检查文件权限'
+            });
+        }
+    } catch (error) {
+        logger.error('Save LLM config failed:', error);
+        res.status(500).json({
+            success: false,
+            message: '配置保存失败'
+        });
+    }
+});
+
+router.post('/test', async (req, res) => {
   try {
-    const { provider, apiKey, model, secretKey, baseUrl, apiType } = req.body;
+    const { provider, apiKey, baseUrl, apiType, model } = req.body;
     
     if (!provider) {
       return res.status(400).json({
         success: false,
-        message: '请提供提供商信息'
-      });
-    }
-    
-    const llmService = require('../services/llm-service');
-    const providerInfo = llmService.getProviderConfig(provider);
-    
-    if (!providerInfo) {
-      return res.status(400).json({
-        success: false,
-        message: '不支持的大模型提供商'
+        message: '请提供提供商'
       });
     }
     
@@ -141,79 +222,15 @@ router.post('/config', (req, res) => {
     const existingConfig = parseEnv(envContent);
     const prefix = provider.toUpperCase();
     const existingApiKey = existingConfig[`${prefix}_API_KEY`];
+    const existingBaseUrl = existingConfig[`${prefix}_BASE_URL`];
+    const existingApiType = existingConfig[`${prefix}_API_TYPE`];
+    const existingModel = existingConfig[`${prefix}_MODEL`];
     
-    if (!apiKey && !existingApiKey) {
+    const finalApiKey = apiKey || existingApiKey;
+    if (!finalApiKey) {
       return res.status(400).json({
         success: false,
-        message: '请提供 API Key'
-      });
-    }
-    
-    const newConfig = {
-      'LLM_PROVIDER': provider,
-    };
-    
-    if (apiKey && apiKey.length >= 10) {
-      newConfig[`${prefix}_API_KEY`] = apiKey;
-    }
-    
-    if (model) {
-      newConfig[`${prefix}_MODEL`] = model;
-    }
-    
-    if (apiType) {
-      newConfig[`${prefix}_API_TYPE`] = apiType;
-    }
-    
-    if (secretKey && providerInfo.requiresSecret) {
-      newConfig[`${prefix}_SECRET_KEY`] = secretKey;
-    }
-    
-    if (baseUrl) {
-      newConfig[`${prefix}_BASE_URL`] = baseUrl;
-    }
-    
-    const success = updateEnvFile(newConfig);
-    
-    if (success) {
-      logger.info(`LLM configuration updated: provider=${provider}`);
-      
-      setTimeout(() => {
-        logger.info('LLM config updated, service will use new config on next request');
-      }, 100);
-      
-      res.json({
-        success: true,
-        message: '配置成功！商家端已启用智能AI回复功能',
-        data: {
-          provider,
-          model: model || 'default',
-          apiType: apiType || 'openai'
-        }
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        message: '配置保存失败，请检查文件权限'
-      });
-    }
-  } catch (error) {
-    logger.error('Save LLM config failed:', error);
-    res.status(500).json({
-      success: false,
-      message: '配置保存失败'
-    });
-  }
-});
-
-router.post('/test', async (req, res) => {
-  try {
-    const { provider, apiKey, baseUrl, apiType, model } = req.body;
-    
-    if (!provider || !apiKey) {
-      return res.status(400).json({
-        success: false,
-        message: '请提供提供商和API Key'
+        message: '请提供API Key'
       });
     }
     
@@ -221,10 +238,10 @@ router.post('/test', async (req, res) => {
     
     const testResult = await llmService.testConnection({
       provider,
-      apiKey,
-      baseUrl,
-      apiType: apiType || 'openai',
-      model: model || 'default'
+      apiKey: finalApiKey,
+      baseUrl: baseUrl || existingBaseUrl,
+      apiType: apiType || existingApiType || 'openai',
+      model: model || existingModel || 'default'
     });
     
     if (testResult.success) {
