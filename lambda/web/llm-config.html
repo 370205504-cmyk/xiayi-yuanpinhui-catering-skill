@@ -12,10 +12,7 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
         .card {
             background: rgba(255, 255, 255, 0.98);
             border-radius: 24px;
@@ -30,6 +27,7 @@
             margin-bottom: 32px;
             padding-bottom: 24px;
             border-bottom: 2px solid #f0f0f0;
+            flex-wrap: wrap;
         }
         .back-btn {
             background: #f0f4ff;
@@ -42,68 +40,43 @@
             font-weight: 600;
             transition: all 0.3s;
         }
-        .back-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-        .header h1 {
-            font-size: 28px;
-            color: #1a1a2e;
-            flex: 1;
-        }
+        .back-btn:hover { background: #667eea; color: white; }
+        .header h1 { font-size: 28px; color: #1a1a2e; flex: 1; }
         .status-badge {
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 14px;
             font-weight: 600;
         }
-        .status-badge.enabled {
-            background: linear-gradient(135deg, #11998e, #38ef7d);
-            color: white;
-        }
-        .status-badge.disabled {
-            background: #e0e0e0;
-            color: #666;
-        }
-        .section {
-            margin-bottom: 32px;
-        }
-        .section-title {
-            font-size: 18px;
-            color: #1a1a2e;
-            margin-bottom: 16px;
-            font-weight: 700;
-        }
+        .status-badge.enabled { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+        .status-badge.disabled { background: #e0e0e0; color: #666; }
+        .section { margin-bottom: 32px; }
+        .section-title { font-size: 18px; color: #1a1a2e; margin-bottom: 16px; font-weight: 700; }
         .provider-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
             margin-bottom: 24px;
         }
         .provider-card {
             background: #f8f9ff;
             border: 3px solid transparent;
             border-radius: 16px;
-            padding: 24px;
+            padding: 20px;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
+            text-align: center;
         }
-        .provider-card:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-        .provider-card.selected {
-            border-color: #667eea;
-            background: #eef2ff;
-        }
+        .provider-card:hover { border-color: #667eea; transform: translateY(-2px); }
+        .provider-card.selected { border-color: #667eea; background: #eef2ff; }
         .provider-card.selected::after {
             content: '✓';
             position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 28px;
-            height: 28px;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
             background: #667eea;
             color: white;
             border-radius: 50%;
@@ -111,25 +84,12 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            font-size: 12px;
         }
-        .provider-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-        .provider-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 8px;
-        }
-        .provider-desc {
-            font-size: 13px;
-            color: #7a7a9d;
-            line-height: 1.5;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .provider-icon { font-size: 40px; margin-bottom: 10px; }
+        .provider-name { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+        .provider-desc { font-size: 11px; color: #7a7a9d; line-height: 1.4; }
+        .form-group { margin-bottom: 18px; }
         .form-label {
             display: block;
             font-size: 14px;
@@ -139,26 +99,15 @@
         }
         .form-input {
             width: 100%;
-            padding: 14px 18px;
+            padding: 12px 16px;
             border: 2px solid #e8eaf6;
             border-radius: 12px;
             font-size: 14px;
             transition: border-color 0.3s;
         }
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .form-hint {
-            font-size: 12px;
-            color: #7a7a9d;
-            margin-top: 6px;
-        }
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
+        .form-input:focus { outline: none; border-color: #667eea; }
+        .form-hint { font-size: 12px; color: #7a7a9d; margin-top: 6px; }
+        .btn-group { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
         .btn {
             padding: 14px 32px;
             border: none;
@@ -172,52 +121,26 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-        }
-        .btn-secondary {
-            background: #f0f4ff;
-            color: #667eea;
-        }
-        .btn-secondary:hover {
-            background: #eef2ff;
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #f0f4ff; color: #667eea; }
+        .btn-secondary:hover { background: #eef2ff; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .message {
             padding: 16px;
             border-radius: 12px;
             margin-bottom: 20px;
             display: none;
         }
-        .message.success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #a5d6a7;
-        }
-        .message.error {
-            background: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef9a9a;
-        }
-        .message.show {
-            display: block;
-        }
+        .message.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        .message.error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+        .message.show { display: block; }
         .preview-section {
             background: #f8f9ff;
             border-radius: 16px;
             padding: 24px;
             margin-top: 32px;
         }
-        .preview-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 16px;
-        }
+        .preview-title { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
         .test-conversation {
             display: flex;
             flex-direction: column;
@@ -230,21 +153,11 @@
             font-size: 14px;
             line-height: 1.5;
         }
-        .chat-bubble.user {
-            background: #667eea;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-        .chat-bubble.ai {
-            background: #f0f4ff;
-            color: #1a1a2e;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
+        .chat-bubble.user { background: #667eea; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-bubble.ai { background: #e8eaf6; color: #1a1a2e; align-self: flex-start; border-bottom-left-radius: 4px; }
         .feature-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 12px;
             margin: 20px 0;
         }
@@ -255,10 +168,17 @@
             font-size: 14px;
             color: #555;
         }
-        .feature-item .icon {
-            color: #11998e;
-            font-size: 18px;
+        .feature-item .icon { color: #11998e; font-size: 18px; }
+        .provider-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .provider-tag {
+            padding: 4px 10px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
         }
+        .provider-tag.local { background: #e8f5e9; color: #388e3c; }
     </style>
 </head>
 <body>
@@ -275,51 +195,18 @@
             <div class="section">
                 <div class="section-title">✨ 智能回复优势</div>
                 <div class="feature-list">
-                    <div class="feature-item">
-                        <span class="icon">✓</span>
-                        <span>自然口语化对话</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="icon">✓</span>
-                        <span>智能理解上下文</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="icon">✓</span>
-                        <span>记住历史对话</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="icon">✓</span>
-                        <span>主动推荐菜品</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="icon">✓</span>
-                        <span>专业应答FAQ</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="icon">✓</span>
-                        <span>友好带表情</span>
-                    </div>
+                    <div class="feature-item"><span class="icon">✓</span><span>自然口语化对话</span></div>
+                    <div class="feature-item"><span class="icon">✓</span><span>智能理解上下文</span></div>
+                    <div class="feature-item"><span class="icon">✓</span><span>记住历史对话</span></div>
+                    <div class="feature-item"><span class="icon">✓</span><span>主动推荐菜品</span></div>
+                    <div class="feature-item"><span class="icon">✓</span><span>专业应答FAQ</span></div>
+                    <div class="feature-item"><span class="icon">✓</span><span>友好带表情回复</span></div>
                 </div>
             </div>
 
             <div class="section">
                 <div class="section-title">选择大模型提供商</div>
-                <div class="provider-cards">
-                    <div class="provider-card" data-provider="qwen" onclick="selectProvider('qwen')">
-                        <div class="provider-icon">🟣</div>
-                        <div class="provider-name">通义千问</div>
-                        <div class="provider-desc">阿里云大模型<br>国内访问速度快<br>免费额度充足</div>
-                    </div>
-                    <div class="provider-card" data-provider="openai" onclick="selectProvider('openai')">
-                        <div class="provider-icon">🤖</div>
-                        <div class="provider-name">OpenAI GPT</div>
-                        <div class="provider-desc">ChatGPT同款模型<br>效果最好<br>需要科学上网</div>
-                    </div>
-                    <div class="provider-card" data-provider="wenxin" onclick="selectProvider('wenxin')">
-                        <div class="provider-icon">🟢</div>
-                        <div class="provider-name">百度文心一言</div>
-                        <div class="provider-desc">百度自研大模型<br>国内访问稳定<br>中文优化好</div>
-                    </div>
+                <div class="provider-cards" id="providerCards">
                 </div>
             </div>
 
@@ -327,20 +214,26 @@
                 <div class="section-title">填写配置信息</div>
                 
                 <div class="form-group">
-                    <label class="form-label">API密钥</label>
+                    <label class="form-label">API密钥 <span style="color: #c62828;">*</span></label>
                     <input type="password" id="apiKey" class="form-input" placeholder="请输入API密钥">
                     <div id="apiKeyHint" class="form-hint"></div>
                 </div>
 
                 <div class="form-group" id="secretKeyGroup" style="display: none;">
-                    <label class="form-label">Secret密钥</label>
+                    <label class="form-label">Secret密钥 <span style="color: #c62828;">*</span></label>
                     <input type="password" id="secretKey" class="form-input" placeholder="请输入Secret密钥">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">模型（可选）</label>
+                    <label class="form-label">模型名称</label>
                     <input type="text" id="modelName" class="form-input" placeholder="留空使用默认模型">
                     <div id="modelHint" class="form-hint"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">API地址（可选）</label>
+                    <input type="text" id="baseUrl" class="form-input" placeholder="留空使用默认地址">
+                    <div class="form-hint">自定义API端点，支持本地部署模型</div>
                 </div>
 
                 <div class="btn-group">
@@ -369,39 +262,88 @@
 
     <script>
         let selectedProvider = null;
+        const providerHints = {
+            openai: { apiKey: '前往 <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI平台</a> 获取API密钥', model: '默认：gpt-4o-mini' },
+            qwen: { apiKey: '前往 <a href="https://dashscope.console.aliyun.com/apiKey" target="_blank">阿里云百炼</a> 获取API密钥', model: '默认：qwen-turbo（免费额度充足）' },
+            wenxin: { apiKey: '前往 <a href="https://console.bce.baidu.com/wenxin/" target="_blank">百度智能云</a> 获取API密钥', model: '默认：ernie-4.0-turbo' },
+            deepseek: { apiKey: '前往 <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek平台</a> 获取API密钥', model: '默认：deepseek-chat（免费额度高）' },
+            moonshot: { apiKey: '前往 <a href="https://platform.moonshot.cn/console/api-keys" target="_blank">Moonshot平台</a> 获取API密钥', model: '默认：moonshot-v1-8k' },
+            zhipu: { apiKey: '前往 <a href="https://open.bigmodel.cn/usercenter/apikeys" target="_blank">智谱开放平台</a> 获取API密钥', model: '默认：glm-4' },
+            minimax: { apiKey: '前往 <a href="https://platform.minimax.chat/api-key" target="_blank">MiniMax平台</a> 获取API密钥', model: '默认：abab6-chat' },
+            volcengine: { apiKey: '前往 <a href="https://console.bytedance.net/ark" target="_blank">火山引擎方舟</a> 获取API密钥', model: '默认：Doubao-7B-Chat' },
+            youdao: { apiKey: '前往 <a href="https://ai.youdao.com/console/" target="_blank">有道AI开放平台</a> 获取API密钥', model: '默认：text-translation' },
+            qianfan: { apiKey: '前往 <a href="https://cloud.baidu.com/product/wenxinworkshop" target="_blank">百度千帆</a> 获取API密钥', model: '默认：ernie-4.0-turbo' },
+            ollama: { apiKey: '无需API密钥，在本地运行 <a href="https://ollama.com/" target="_blank">Ollama</a>', model: '默认：llama3' },
+            lmstudio: { apiKey: '无需API密钥，使用 <a href="https://lmstudio.ai/" target="_blank">LM Studio</a> 本地运行', model: '默认：gpt-4o-mini' },
+            stepfun: { apiKey: '前往 StepFun 官方平台获取API密钥', model: '默认：stepfun-chat' },
+            xiaomi: { apiKey: '前往小米AI开放平台获取API密钥', model: '默认：mi-ai-chat' },
+        };
 
-        function goBack() {
-            window.location.href = '/admin';
+        const providerIcons = {
+            openai: '🤖', qwen: '🟣', wenxin: '🟢', deepseek: '🌊',
+            moonshot: '🌙', zhipu: '🧠', minimax: '🔷', volcengine: '🔥',
+            youdao: '📖', qianfan: '🚢', ollama: '🐑', lmstudio: '🎬',
+            stepfun: '🚀', xiaomi: '📱'
+        };
+
+        const providerTags = {
+            openai: ['海外', 'GPT'], qwen: ['国内', '免费'], wenxin: ['国内', '百度'],
+            deepseek: ['国内', '免费'], moonshot: ['国内', 'Kimi'], zhipu: ['国内', 'GLM'],
+            minimax: ['国内'], volcengine: ['国内', '抖音'], youdao: ['国内', '网易'],
+            qianfan: ['国内', '百度'], ollama: ['本地', '免费'], lmstudio: ['本地', '免费'],
+            stepfun: ['国内'], xiaomi: ['国内']
+        };
+
+        function goBack() { window.location.href = '/admin'; }
+
+        async function loadProviders() {
+            try {
+                const response = await fetch('/api/v1/llm-config/providers');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const cards = document.getElementById('providerCards');
+                    result.providers.forEach(provider => {
+                        const card = document.createElement('div');
+                        card.className = 'provider-card';
+                        card.dataset.provider = provider.id;
+                        card.onclick = () => selectProvider(provider.id, provider.requiresSecret);
+                        
+                        const tags = providerTags[provider.id] || [];
+                        const tagHtml = tags.map(t => `<span class="provider-tag ${t === '本地' ? 'local' : ''}">${t}</span>`).join('');
+                        
+                        card.innerHTML = `
+                            <div class="provider-icon">${providerIcons[provider.id] || '🤖'}</div>
+                            <div class="provider-name">${provider.name}</div>
+                            <div class="provider-desc">${provider.requiresSecret ? '需要密钥对' : '单密钥'}</div>
+                            <div class="provider-tags">${tagHtml}</div>
+                        `;
+                        cards.appendChild(card);
+                    });
+                }
+            } catch (error) {
+                console.error('加载提供商列表失败:', error);
+            }
         }
 
-        function selectProvider(provider) {
-            selectedProvider = provider;
-            document.querySelectorAll('.provider-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            document.querySelector(`[data-provider="${provider}"]`).classList.add('selected');
+        function selectProvider(providerId, requiresSecret) {
+            selectedProvider = providerId;
+            document.querySelectorAll('.provider-card').forEach(card => card.classList.remove('selected'));
+            document.querySelector(`[data-provider="${providerId}"]`).classList.add('selected');
             
             document.getElementById('configForm').style.display = 'block';
+            document.getElementById('secretKeyGroup').style.display = requiresSecret ? 'block' : 'none';
             
-            const hints = {
-                qwen: {
-                    apiKey: '前往 <a href="https://dashscope.console.aliyun.com/apiKey" target="_blank">阿里云百炼</a> 获取API密钥',
-                    model: '默认：qwen-turbo（免费）'
-                },
-                openai: {
-                    apiKey: '前往 <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI平台</a> 获取API密钥',
-                    model: '默认：gpt-4o-mini（便宜快速）'
-                },
-                wenxin: {
-                    apiKey: '前往 <a href="https://console.bce.baidu.com/wenxin/" target="_blank">百度智能云</a> 获取API密钥',
-                    model: '默认：ernie-4.0-turbo'
-                }
-            };
-
-            document.getElementById('apiKeyHint').innerHTML = hints[provider].apiKey;
-            document.getElementById('modelHint').textContent = hints[provider].model;
-
-            document.getElementById('secretKeyGroup').style.display = provider === 'wenxin' ? 'block' : 'none';
+            const hints = providerHints[providerId] || {};
+            document.getElementById('apiKeyHint').innerHTML = hints.apiKey || '请输入API密钥';
+            document.getElementById('modelHint').textContent = hints.model || '留空使用默认模型';
+            
+            if (providerId === 'ollama' || providerId === 'lmstudio') {
+                document.getElementById('apiKey').value = providerId;
+                document.getElementById('apiKey').disabled = true;
+            } else {
+                document.getElementById('apiKey').disabled = false;
+            }
         }
 
         async function loadStatus() {
@@ -418,8 +360,8 @@
                         badge.textContent = '已启用';
                         document.getElementById('currentConfig').style.display = 'block';
                         document.getElementById('configInfo').innerHTML = `
-                            <p><strong>已启用：</strong>${status.provider}</p>
-                            <p><strong>模型：</strong>${status[status.provider]?.model || '默认'}</p>
+                            <p><strong>当前提供商：</strong>${status.provider}</p>
+                            <p><strong>模型：</strong>${status.providers[status.provider]?.model || '默认'}</p>
                         `;
                     } else {
                         badge.className = 'status-badge disabled';
@@ -432,8 +374,14 @@
         }
 
         async function testConnection() {
-            if (!selectedProvider || !document.getElementById('apiKey').value) {
-                showMessage('请选择提供商并填写API密钥', 'error');
+            if (!selectedProvider) {
+                showMessage('请先选择一个提供商', 'error');
+                return;
+            }
+
+            const apiKey = document.getElementById('apiKey').value;
+            if (!apiKey && selectedProvider !== 'ollama' && selectedProvider !== 'lmstudio') {
+                showMessage('请填写API密钥', 'error');
                 return;
             }
 
@@ -447,9 +395,10 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         provider: selectedProvider,
-                        apiKey: document.getElementById('apiKey').value,
+                        apiKey: apiKey || selectedProvider,
                         model: document.getElementById('modelName').value || null,
-                        secretKey: document.getElementById('secretKey').value || null
+                        secretKey: document.getElementById('secretKey').value || null,
+                        baseUrl: document.getElementById('baseUrl').value || null
                     })
                 });
 
@@ -469,8 +418,14 @@
         }
 
         async function saveConfig() {
-            if (!selectedProvider || !document.getElementById('apiKey').value) {
-                showMessage('请选择提供商并填写API密钥', 'error');
+            if (!selectedProvider) {
+                showMessage('请先选择一个提供商', 'error');
+                return;
+            }
+
+            const apiKey = document.getElementById('apiKey').value;
+            if (!apiKey && selectedProvider !== 'ollama' && selectedProvider !== 'lmstudio') {
+                showMessage('请填写API密钥', 'error');
                 return;
             }
 
@@ -484,9 +439,10 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         provider: selectedProvider,
-                        apiKey: document.getElementById('apiKey').value,
+                        apiKey: apiKey || selectedProvider,
                         model: document.getElementById('modelName').value || null,
-                        secretKey: document.getElementById('secretKey').value || null
+                        secretKey: document.getElementById('secretKey').value || null,
+                        baseUrl: document.getElementById('baseUrl').value || null
                     })
                 });
 
@@ -510,10 +466,7 @@
             if (!confirm('确定要关闭智能AI回复功能吗？')) return;
 
             try {
-                const response = await fetch('/api/v1/llm-config/disable', {
-                    method: 'POST'
-                });
-
+                const response = await fetch('/api/v1/llm-config/disable', { method: 'POST' });
                 const result = await response.json();
 
                 if (result.success) {
@@ -531,11 +484,10 @@
             const box = document.getElementById('messageBox');
             box.textContent = text;
             box.className = 'message ' + type + ' show';
-            setTimeout(() => {
-                box.classList.remove('show');
-            }, 5000);
+            setTimeout(() => box.classList.remove('show'), 5000);
         }
 
+        loadProviders();
         loadStatus();
     </script>
 </body>

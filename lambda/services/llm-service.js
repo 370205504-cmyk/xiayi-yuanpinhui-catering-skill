@@ -5,30 +5,139 @@ class LLMService {
   constructor() {
     this.providers = {
       openai: {
+        name: 'OpenAI GPT',
         baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
         apiKey: process.env.OPENAI_API_KEY,
         model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+        apiType: 'openai',
+        requiresSecret: false,
       },
       qwen: {
+        name: '通义千问',
         baseUrl: process.env.QWEN_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         apiKey: process.env.QWEN_API_KEY,
         model: process.env.QWEN_MODEL || 'qwen-turbo',
+        apiType: 'openai',
+        requiresSecret: false,
       },
       wenxin: {
+        name: '文心一言',
         baseUrl: process.env.WENXIN_BASE_URL || 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat',
         apiKey: process.env.WENXIN_API_KEY,
         secretKey: process.env.WENXIN_SECRET_KEY,
         model: process.env.WENXIN_MODEL || 'ernie-4.0-turbo',
+        apiType: 'wenxin',
+        requiresSecret: true,
+      },
+      deepseek: {
+        name: 'DeepSeek',
+        baseUrl: process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1',
+        apiKey: process.env.DEEPSEEK_API_KEY,
+        model: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+        apiType: 'openai',
+        requiresSecret: false,
+      },
+      moonshot: {
+        name: 'Moonshot Kimi',
+        baseUrl: process.env.MOONSHOT_BASE_URL || 'https://api.moonshot.cn/v1',
+        apiKey: process.env.MOONSHOT_API_KEY,
+        model: process.env.MOONSHOT_MODEL || 'moonshot-v1-8k',
+        apiType: 'openai',
+        requiresSecret: false,
+      },
+      zhipu: {
+        name: '智谱AI',
+        baseUrl: process.env.ZHIPU_BASE_URL || 'https://open.bigmodel.cn/api/paas/v4',
+        apiKey: process.env.ZHIPU_API_KEY,
+        model: process.env.ZHIPU_MODEL || 'glm-4',
+        apiType: 'openai',
+        requiresSecret: false,
+      },
+      minimax: {
+        name: 'MiniMax',
+        baseUrl: process.env.MINIMAX_BASE_URL || 'https://api.minimax.chat/v1',
+        apiKey: process.env.MINIMAX_API_KEY,
+        model: process.env.MINIMAX_MODEL || 'abab6-chat',
+        apiType: 'minimax',
+        requiresSecret: false,
+      },
+      volcengine: {
+        name: '火山引擎',
+        baseUrl: process.env.VOLCENGINE_BASE_URL || 'https://ark.cn-beijing.volces.com/api/text/v1',
+        apiKey: process.env.VOLCENGINE_API_KEY,
+        secretKey: process.env.VOLCENGINE_SECRET_KEY,
+        model: process.env.VOLCENGINE_MODEL || 'Doubao-7B-Chat',
+        apiType: 'volcengine',
+        requiresSecret: true,
+      },
+      youdao: {
+        name: '有道AI',
+        baseUrl: process.env.YOUDAO_BASE_URL || 'https://ai-api.youdao.com',
+        apiKey: process.env.YOUDAO_API_KEY,
+        secretKey: process.env.YOUDAO_SECRET_KEY,
+        model: process.env.YOUDAO_MODEL || 'text-translation',
+        apiType: 'youdao',
+        requiresSecret: true,
+      },
+      qianfan: {
+        name: '百度千帆',
+        baseUrl: process.env.QIANFAN_BASE_URL || 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat',
+        apiKey: process.env.QIANFAN_API_KEY,
+        secretKey: process.env.QIANFAN_SECRET_KEY,
+        model: process.env.QIANFAN_MODEL || 'ernie-4.0-turbo',
+        apiType: 'wenxin',
+        requiresSecret: true,
+      },
+      ollama: {
+        name: 'Ollama (本地)',
+        baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1',
+        apiKey: process.env.OLLAMA_API_KEY || 'ollama',
+        model: process.env.OLLAMA_MODEL || 'llama3',
+        apiType: 'openai',
+        requiresSecret: false,
+      },
+      lmstudio: {
+        name: 'LM Studio (本地)',
+        baseUrl: process.env.LMSTUDIO_BASE_URL || 'http://localhost:1234/v1',
+        apiKey: process.env.LMSTUDIO_API_KEY || 'lmstudio',
+        model: process.env.LMSTUDIO_MODEL || 'gpt-4o-mini',
+        apiType: 'openai',
+        requiresSecret: false,
+      },
+      stepfun: {
+        name: 'StepFun',
+        baseUrl: process.env.STEPFUN_BASE_URL || 'https://api.stepfun.com/v1',
+        apiKey: process.env.STEPFUN_API_KEY,
+        model: process.env.STEPFUN_MODEL || 'stepfun-chat',
+        apiType: 'openai',
+        requiresSecret: false,
+      },
+      xiaomi: {
+        name: '小米AI',
+        baseUrl: process.env.XIAOMI_BASE_URL || 'https://api.mi.com/v1/ai',
+        apiKey: process.env.XIAOMI_API_KEY,
+        model: process.env.XIAOMI_MODEL || 'mi-ai-chat',
+        apiType: 'xiaomi',
+        requiresSecret: false,
       },
     };
     this.enabledProvider = process.env.LLM_PROVIDER || null;
-    this.isEnabled = !!this.enabledProvider && this.providers[this.enabledProvider]?.apiKey;
+    this.isEnabled = !!this.enabledProvider && this.getProviderConfig(this.enabledProvider)?.apiKey;
     logger.info(`LLM Service initialized. Provider: ${this.enabledProvider || 'none'}`);
   }
 
-  /**
-   * 构建系统提示词
-   */
+  getProviderConfig(provider) {
+    return this.providers[provider] || null;
+  }
+
+  getAllProviders() {
+    return Object.keys(this.providers).map(key => ({
+      id: key,
+      name: this.providers[key].name,
+      requiresSecret: this.providers[key].requiresSecret,
+    }));
+  }
+
   buildSystemPrompt(storeInfo, dishes) {
     const menuText = dishes
       .map(d => `- ${d.name} (¥${d.price}${d.category ? `, ${d.category}` : ''})`)
@@ -66,9 +175,6 @@ ${menuText}
 - 可以适当使用表情符号增加亲和力`;
   }
 
-  /**
-   * 调用大模型生成回复
-   */
   async generateResponse(userMessage, conversationHistory = [], storeInfo, dishes) {
     if (!this.isEnabled) {
       logger.info('LLM not enabled, returning null');
@@ -76,6 +182,7 @@ ${menuText}
     }
 
     try {
+      const provider = this.providers[this.enabledProvider];
       const systemPrompt = this.buildSystemPrompt(storeInfo, dishes);
       const messages = [
         { role: 'system', content: systemPrompt },
@@ -87,18 +194,27 @@ ${menuText}
       ];
 
       let response;
-      switch (this.enabledProvider) {
+      switch (provider.apiType) {
         case 'openai':
-          response = await this.callOpenAI(messages);
-          break;
-        case 'qwen':
-          response = await this.callQwen(messages);
+          response = await this.callOpenAICompatible(provider, messages);
           break;
         case 'wenxin':
-          response = await this.callWenxin(messages);
+          response = await this.callWenxin(provider, messages);
+          break;
+        case 'minimax':
+          response = await this.callMiniMax(provider, messages);
+          break;
+        case 'volcengine':
+          response = await this.callVolcengine(provider, messages);
+          break;
+        case 'youdao':
+          response = await this.callYoudao(provider, messages);
+          break;
+        case 'xiaomi':
+          response = await this.callXiaomi(provider, messages);
           break;
         default:
-          return null;
+          response = await this.callOpenAICompatible(provider, messages);
       }
 
       return {
@@ -112,11 +228,7 @@ ${menuText}
     }
   }
 
-  /**
-   * 调用OpenAI API
-   */
-  async callOpenAI(messages) {
-    const provider = this.providers.openai;
+  async callOpenAICompatible(provider, messages) {
     const response = await axios.post(
       `${provider.baseUrl}/chat/completions`,
       {
@@ -130,41 +242,13 @@ ${menuText}
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${provider.apiKey}`,
         },
-        timeout: 10000,
+        timeout: 15000,
       }
     );
     return response.data.choices[0].message.content;
   }
 
-  /**
-   * 调用通义千问API
-   */
-  async callQwen(messages) {
-    const provider = this.providers.qwen;
-    const response = await axios.post(
-      `${provider.baseUrl}/chat/completions`,
-      {
-        model: provider.model,
-        messages,
-        temperature: 0.7,
-        max_tokens: 500,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${provider.apiKey}`,
-        },
-        timeout: 10000,
-      }
-    );
-    return response.data.choices[0].message.content;
-  }
-
-  /**
-   * 调用文心一言API
-   */
-  async callWenxin(messages) {
-    const provider = this.providers.wenxin;
+  async callWenxin(provider, messages) {
     const accessToken = await this.getWenxinAccessToken(provider);
     const response = await axios.post(
       `https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/${provider.model}?access_token=${accessToken}`,
@@ -177,27 +261,104 @@ ${menuText}
         headers: {
           'Content-Type': 'application/json',
         },
-        timeout: 10000,
+        timeout: 15000,
       }
     );
     return response.data.result;
   }
 
-  /**
-   * 获取文心一言的access token
-   */
+  async callMiniMax(provider, messages) {
+    const response = await axios.post(
+      `${provider.baseUrl}/chat/completions`,
+      {
+        model: provider.model,
+        messages,
+        temperature: 0.7,
+        max_tokens: 500,
+        stream: false,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${provider.apiKey}`,
+        },
+        timeout: 15000,
+      }
+    );
+    return response.data.choices[0].message.content;
+  }
+
+  async callVolcengine(provider, messages) {
+    const response = await axios.post(
+      `${provider.baseUrl}/chat/completions`,
+      {
+        model: provider.model,
+        messages,
+        temperature: 0.7,
+        max_tokens: 500,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${provider.apiKey}`,
+        },
+        timeout: 15000,
+      }
+    );
+    return response.data.choices[0].message.content;
+  }
+
+  async callYoudao(provider, messages) {
+    const userMessage = messages[messages.length - 1]?.content || '';
+    const response = await axios.post(
+      `${provider.baseUrl}/chat`,
+      {
+        model: provider.model,
+        input: userMessage,
+        history: messages.slice(0, -1).map(m => ({
+          role: m.role,
+          content: m.content,
+        })),
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${provider.apiKey}`,
+        },
+        timeout: 15000,
+      }
+    );
+    return response.data.result || response.data.content;
+  }
+
+  async callXiaomi(provider, messages) {
+    const userMessage = messages[messages.length - 1]?.content || '';
+    const response = await axios.post(
+      `${provider.baseUrl}/chat`,
+      {
+        model: provider.model,
+        query: userMessage,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${provider.apiKey}`,
+        },
+        timeout: 15000,
+      }
+    );
+    return response.data.result || response.data.answer;
+  }
+
   async getWenxinAccessToken(provider) {
     const response = await axios.post(
       `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${provider.apiKey}&client_secret=${provider.secretKey}`,
       {},
-      { timeout: 5000 }
+      { timeout: 10000 }
     );
     return response.data.access_token;
   }
 
-  /**
-   * 简单的意图检测（作为fallback）
-   */
   detectIntent(message) {
     const lowerMsg = message.toLowerCase();
     if (lowerMsg.includes('菜单') || lowerMsg.includes('有什么') || lowerMsg.includes('看看')) {

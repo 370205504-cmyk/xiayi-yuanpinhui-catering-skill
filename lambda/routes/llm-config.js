@@ -55,10 +55,32 @@ function updateEnvFile(newConfig) {
   return writeEnv(lines.join('\n'));
 }
 
+router.get('/providers', (req, res) => {
+  const llmService = require('../services/llm-service');
+  res.json({
+    success: true,
+    providers: llmService.getAllProviders()
+  });
+});
+
 router.get('/status', (req, res) => {
   try {
     const envContent = readEnv();
     const config = parseEnv(envContent);
+    const llmService = require('../services/llm-service');
+    
+    const providers = llmService.getAllProviders();
+    const providerStatus = {};
+    
+    providers.forEach(p => {
+      const prefix = p.id.toUpperCase();
+      providerStatus[p.id] = {
+        configured: !!(config[`${prefix}_API_KEY`]),
+        model: config[`${prefix}_MODEL`] || 'default',
+        requiresSecret: p.requiresSecret,
+        configuredSecret: p.requiresSecret ? !!(config[`${prefix}_SECRET_KEY`]) : true,
+      };
+    });
     
     const llmEnabled = !!(config.LLM_PROVIDER && config[`${config.LLM_PROVIDER.toUpperCase()}_API_KEY`]);
     
@@ -67,18 +89,7 @@ router.get('/status', (req, res) => {
       data: {
         enabled: llmEnabled,
         provider: config.LLM_PROVIDER || null,
-        openai: {
-          configured: !!(config.OPENAI_API_KEY),
-          model: config.OPENAI_MODEL || 'gpt-4o-mini',
-        },
-        qwen: {
-          configured: !!(config.QWEN_API_KEY),
-          model: config.QWEN_MODEL || 'qwen-turbo',
-        },
-        wenxin: {
-          configured: !!(config.WENXIN_API_KEY && config.WENXIN_SECRET_KEY),
-          model: config.WENXIN_MODEL || 'ernie-4.0-turbo',
-        }
+        providers: providerStatus
       }
     });
   } catch (error) {
@@ -92,7 +103,7 @@ router.get('/status', (req, res) => {
 
 router.post('/config', (req, res) => {
   try {
-    const { provider, apiKey, model } = req.body;
+    const { provider, apiKey, model, secretKey, baseUrl } = req.body;
     
     if (!provider || !apiKey) {
       return res.status(400).json({
@@ -101,32 +112,32 @@ router.post('/config', (req, res) => {
       });
     }
     
-    const providerMap = {
-      'openai': 'OPENAI',
-      'qwen': 'QWEN',
-      'wenxin': 'WENXIN'
-    };
+    const llmService = require('../services/llm-service');
+    const providerInfo = llmService.getProviderConfig(provider);
     
-    const providerUpper = providerMap[provider];
-    if (!providerUpper) {
+    if (!providerInfo) {
       return res.status(400).json({
         success: false,
         message: '不支持的大模型提供商'
       });
     }
     
+    const prefix = provider.toUpperCase();
     const newConfig = {
-      'LLM_PROVIDER': provider
+      'LLM_PROVIDER': provider,
+      [`${prefix}_API_KEY`]: apiKey,
     };
     
-    newConfig[`${providerUpper}_API_KEY`] = apiKey;
-    
     if (model) {
-      newConfig[`${providerUpper}_MODEL`] = model;
+      newConfig[`${prefix}_MODEL`] = model;
     }
     
-    if (provider === 'wenxin' && req.body.secretKey) {
-      newConfig['WENXIN_SECRET_KEY'] = req.body.secretKey;
+    if (secretKey && providerInfo.requiresSecret) {
+      newConfig[`${prefix}_SECRET_KEY`] = secretKey;
+    }
+    
+    if (baseUrl) {
+      newConfig[`${prefix}_BASE_URL`] = baseUrl;
     }
     
     const success = updateEnvFile(newConfig);
@@ -135,7 +146,7 @@ router.post('/config', (req, res) => {
       logger.info(`LLM configuration updated: provider=${provider}`);
       
       setTimeout(() => {
-        logger.info('请重启服务以使配置生效，或配置已自动加载');
+        logger.info('LLM config updated, service will use new config on next request');
       }, 100);
       
       res.json({
@@ -192,34 +203,25 @@ router.post('/disable', (req, res) => {
 
 router.post('/test', async (req, res) => {
   try {
-    const { provider, apiKey, model, secretKey } = req.body;
+    const { provider, apiKey, model, secretKey, baseUrl } = req.body;
     
     const llmService = require('../services/llm-service');
+    const providerInfo = llmService.getProviderConfig(provider);
     
-    const tempProvider = {
-      openai: {
-        baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
-        apiKey: apiKey,
-        model: model || 'gpt-4o-mini',
-      },
-      qwen: {
-        baseUrl: process.env.QWEN_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-        apiKey: apiKey,
-        model: model || 'qwen-turbo',
-      },
-      wenxin: {
-        apiKey: apiKey,
-        secretKey: secretKey || '',
-        model: model || 'ernie-4.0-turbo',
-      }
-    };
-    
-    if (!tempProvider[provider]) {
+    if (!providerInfo) {
       return res.status(400).json({
         success: false,
         message: '不支持的提供商'
       });
     }
+    
+    const tempProvider = {
+      ...providerInfo,
+      apiKey: apiKey,
+      model: model || providerInfo.model,
+      baseUrl: baseUrl || providerInfo.baseUrl,
+      secretKey: secretKey || providerInfo.secretKey,
+    };
     
     const mockStoreInfo = {
       name: '雨姗AI收银助手创味菜',
@@ -232,20 +234,43 @@ router.post('/test', async (req, res) => {
       { name: '黄焖大甲鱼', price: 238 },
     ];
     
-    const testResult = await llmService.generateResponse(
-      '你好，我想点餐',
-      [],
-      mockStoreInfo,
-      mockDishes
-    );
+    const systemPrompt = llmService.buildSystemPrompt(mockStoreInfo, mockDishes);
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: '你好，我想点餐' },
+    ];
     
-    if (testResult?.success) {
+    let response;
+    switch (tempProvider.apiType) {
+      case 'openai':
+        response = await llmService.callOpenAICompatible(tempProvider, messages);
+        break;
+      case 'wenxin':
+        response = await llmService.callWenxin(tempProvider, messages);
+        break;
+      case 'minimax':
+        response = await llmService.callMiniMax(tempProvider, messages);
+        break;
+      case 'volcengine':
+        response = await llmService.callVolcengine(tempProvider, messages);
+        break;
+      case 'youdao':
+        response = await llmService.callYoudao(tempProvider, messages);
+        break;
+      case 'xiaomi':
+        response = await llmService.callXiaomi(tempProvider, messages);
+        break;
+      default:
+        response = await llmService.callOpenAICompatible(tempProvider, messages);
+    }
+    
+    if (response) {
       res.json({
         success: true,
         message: '连接成功！AI回复测试通过',
         data: {
-          reply: testResult.content,
-          intent: testResult.intent
+          reply: response,
+          intent: llmService.detectIntent('你好，我想点餐')
         }
       });
     } else {
