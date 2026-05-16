@@ -264,6 +264,25 @@ yushan-ai-cashier-assistant/
 
 ---
 
+## 📚 功能扩展参考
+
+本项目整合了以下优秀开源项目的设计思路和功能规划：
+
+| 项目 | 功能 | 参考价值 |
+|------|------|----------|
+| [orderFood-wxCloud](https://github.com/yangxiaohan168/orderFood-wxCloud) | 微信点餐小程序 | ✅ 完整实现 |
+| [Foodix](https://github.com/StreetLamp05/foodix) | AI库存预测（99.5%准确率） | ⏳ 规划中 |
+| [OpenSkedge](https://github.com/OfficeStack/OpenSkedge) | 智能排班系统 | ⏳ 规划中 |
+| [Restaurant Social SaaS](https://github.com/LCHEROURI/restaurant-social-saas) | AI菜品营销（自动生成海报/文案） | ⏳ 规划中 |
+| [DPT-Agent](https://github.com/meituan-longcat/DPT-Agent) | 美团多智能体框架 | ⏳ 规划中 |
+| [Kitchen Display System](https://github.com/deeputkarsh/Kitchen-Display-System) | 厨房KDS显示系统 | ⏳ 规划中 |
+| [Recipe Costing](https://github.com/GarvitTech/Recipe-Costing-Application) | 菜品成本核算系统 | ⏳ 规划中 |
+| [fuintCatering](https://github.com/Avey777/fuintCatering) | 会员AI营销系统 | ⏳ 规划中 |
+
+详细整合规划见：[docs/功能扩展参考.md](docs/%E5%8A%9F%E8%83%BD%E6%89%A9%E5%B1%95%E5%8F%82%E8%80%83.md)
+
+---
+
 ## 🤝 致谢
 
 本项目整合了以下优秀开源项目：
