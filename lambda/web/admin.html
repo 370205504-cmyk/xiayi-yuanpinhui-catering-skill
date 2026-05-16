@@ -900,45 +900,34 @@
                     </div>
                     
                     <div class="card" style="grid-column: span 2;">
-                        <h3>🤖 AI智能助手配置</h3>
-                        <div id="llm-status" style="margin-bottom: 16px; padding: 12px; background: #f0f4ff; border-radius: 8px;">
-                            <span style="font-size: 14px; color: #666;">加载中...</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>🤖 AI智能助手配置</h3>
+                            <span id="llm-status-badge" style="padding: 6px 14px; background: #f0f4ff; border-radius: 16px; font-size: 13px; color: #667eea;">未开启</span>
                         </div>
-                        <div class="form-group">
-                            <label>AI提供商</label>
-                            <select id="llm-provider" onchange="updateLLMFields()" style="width: 100%; padding: 12px; border: 2px solid #e8eaf6; border-radius: 8px;">
-                                <option value="">不使用AI（规则回复）</option>
-                                <option value="qwen">🟣 通义千问</option>
-                                <option value="deepseek">🌊 DeepSeek</option>
-                                <option value="moonshot">🌙 Moonshot Kimi</option>
-                                <option value="zhipu">🧠 智谱AI</option>
-                                <option value="minimax">🔷 MiniMax</option>
-                                <option value="openai">🤖 OpenAI GPT</option>
-                                <option value="wenxin">🟢 文心一言</option>
-                                <option value="volcengine">🔥 火山引擎</option>
-                                <option value="ollama">🐑 Ollama (本地)</option>
-                                <option value="lmstudio">🎬 LM Studio (本地)</option>
-                            </select>
+                        
+                        <div style="display: flex; gap: 20px; min-height: 400px;">
+                            <div style="width: 240px; border-right: 1px solid #e8eaf6; padding-right: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                    <span style="font-size: 14px; font-weight: 600; color: #333;">模型提供商</span>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button style="padding: 4px 8px; font-size: 12px; background: #f0f4ff; border: none; border-radius: 4px; color: #667eea; cursor: pointer;">导入</button>
+                                        <button style="padding: 4px 8px; font-size: 12px; background: #f0f4ff; border: none; border-radius: 4px; color: #667eea; cursor: pointer;">导出</button>
+                                    </div>
+                                </div>
+                                <div id="llm-providers-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <div style="color: #999; font-size: 14px; text-align: center; padding: 20px;">加载中...</div>
+                                </div>
+                            </div>
+                            
+                            <div style="flex: 1;">
+                                <div id="llm-provider-settings">
+                                    <div style="text-align: center; padding: 60px 20px; color: #999;">
+                                        <div style="font-size: 48px; margin-bottom: 16px;">🤖</div>
+                                        <p>请从左侧选择一个AI提供商</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>API密钥</label>
-                            <input type="password" id="llm-api-key" placeholder="请输入API密钥" style="width: 100%; padding: 12px; border: 2px solid #e8eaf6; border-radius: 8px;">
-                        </div>
-                        <div class="form-group" id="llm-secret-group" style="display: none;">
-                            <label>Secret密钥</label>
-                            <input type="password" id="llm-secret-key" placeholder="请输入Secret密钥" style="width: 100%; padding: 12px; border: 2px solid #e8eaf6; border-radius: 8px;">
-                        </div>
-                        <div class="form-group">
-                            <label>模型名称（可选）</label>
-                            <input type="text" id="llm-model" placeholder="留空使用默认模型" style="width: 100%; padding: 12px; border: 2px solid #e8eaf6; border-radius: 8px;">
-                        </div>
-                        <div class="form-group">
-                            <label>API地址（可选）</label>
-                            <input type="text" id="llm-base-url" placeholder="留空使用默认地址" style="width: 100%; padding: 12px; border: 2px solid #e8eaf6; border-radius: 8px;">
-                            <div style="font-size: 12px; color: #7a7a9d; margin-top: 4px;">本地部署时可填写</div>
-                        </div>
-                        <button class="btn btn-primary" onclick="saveLLMSettings()">💾 保存AI配置</button>
-                        <button class="btn btn-secondary" onclick="testLLMConnection()" style="margin-left: 12px;">🧪 测试连接</button>
                     </div>
                 </div>
             </div>
@@ -1374,72 +1363,277 @@
             loadLLMSettings();
         }
         
+        const providerIcons = {
+            openai: '🤖', qwen: '🟣', wenxin: '🟢', deepseek: '🌊',
+            moonshot: '🌙', zhipu: '🧠', minimax: '🔷', volcengine: '🔥',
+            youdao: '📖', qianfan: '🚢', ollama: '🐑', lmstudio: '🎬'
+        };
+        
+        const providerInfo = {
+            openai: { name: 'OpenAI GPT', defaultModel: 'gpt-4o-mini', defaultUrl: 'https://api.openai.com/v1' },
+            qwen: { name: 'Qwen', defaultModel: 'qwen-turbo', defaultUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
+            wenxin: { name: '文心一言', defaultModel: 'ernie-4.0-turbo', defaultUrl: 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat' },
+            deepseek: { name: 'DeepSeek', defaultModel: 'deepseek-chat', defaultUrl: 'https://api.deepseek.com/v1' },
+            moonshot: { name: 'Moonshot', defaultModel: 'moonshot-v1-8k', defaultUrl: 'https://api.moonshot.cn/v1' },
+            zhipu: { name: 'Zhipu', defaultModel: 'glm-4', defaultUrl: 'https://open.bigmodel.cn/api/paas/v4' },
+            minimax: { name: 'MiniMax', defaultModel: 'abab6-chat', defaultUrl: 'https://api.minimax.chat/v1' },
+            volcengine: { name: 'Volcengine', defaultModel: 'Doubao-7B-Chat', defaultUrl: 'https://ark.cn-beijing.volces.com/api/text/v1' },
+            youdao: { name: 'Youdao', defaultModel: 'text-translation', defaultUrl: 'https://ai-api.youdao.com' },
+            qianfan: { name: 'Qianfan', defaultModel: 'ernie-4.0-turbo', defaultUrl: 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat' },
+            ollama: { name: 'Ollama', defaultModel: 'llama3', defaultUrl: 'http://localhost:11434/v1' },
+            lmstudio: { name: 'LM Studio', defaultModel: 'gpt-4o-mini', defaultUrl: 'http://localhost:1234/v1' }
+        };
+        
+        let currentProvider = null;
+        
         async function loadLLMSettings() {
+            try {
+                const response = await fetch('/api/v1/llm-config/providers');
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderProvidersList(result.providers);
+                    loadStatus();
+                }
+            } catch (error) {
+                console.error('加载LLM配置失败:', error);
+            }
+        }
+        
+        async function loadStatus() {
             try {
                 const response = await fetch('/api/v1/llm-config/status');
                 const result = await response.json();
                 
-                const statusEl = document.getElementById('llm-status');
-                const providerSelect = document.getElementById('llm-provider');
-                
                 if (result.success && result.data) {
-                    const data = result.data;
-                    
-                    if (data.enabled) {
-                        statusEl.innerHTML = `<strong style="color: #11998e;">✅ 已启用：${data.provider}</strong> - 商家端已开启智能AI回复功能`;
-                        providerSelect.value = data.provider;
+                    const badge = document.getElementById('llm-status-badge');
+                    if (result.data.enabled) {
+                        badge.textContent = '已开启';
+                        badge.style.background = '#e8f5e9';
+                        badge.style.color = '#2e7d32';
                     } else {
-                        statusEl.innerHTML = `<span style="color: #999;">❌ 未启用 - 使用规则回复</span>`;
-                        providerSelect.value = '';
+                        badge.textContent = '未开启';
+                        badge.style.background = '#f0f4ff';
+                        badge.style.color = '#667eea';
                     }
-                    
-                    updateLLMFields();
                 }
             } catch (error) {
-                console.error('加载LLM配置失败:', error);
-                document.getElementById('llm-status').innerHTML = `<span style="color: #c62828;">加载失败</span>`;
+                console.error('加载状态失败:', error);
             }
         }
         
-        function updateLLMFields() {
-            const provider = document.getElementById('llm-provider').value;
-            const secretGroup = document.getElementById('llm-secret-group');
+        function renderProvidersList(providers) {
+            const listEl = document.getElementById('llm-providers-list');
+            listEl.innerHTML = '';
             
-            const providersWithSecret = ['wenxin', 'volcengine', 'youdao', 'qianfan'];
+            providers.forEach(provider => {
+                const item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+                item.style.padding = '12px';
+                item.style.border = '2px solid transparent';
+                item.style.borderRadius = '8px';
+                item.style.cursor = 'pointer';
+                item.style.transition = 'all 0.2s';
+                
+                item.onmouseenter = () => {
+                    item.style.background = '#f8f9ff';
+                };
+                item.onmouseleave = () => {
+                    if (currentProvider !== provider.id) {
+                        item.style.background = 'transparent';
+                    }
+                };
+                
+                item.onclick = () => selectProvider(provider.id);
+                
+                item.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">${providerIcons[provider.id] || '🤖'}</span>
+                        <span style="font-size: 14px; color: #333;">${provider.name}</span>
+                    </span>
+                    <div class="llm-toggle" data-provider="${provider.id}" style="width: 40px; height: 22px; background: #e0e0e0; border-radius: 11px; position: relative; cursor: pointer;">
+                        <div style="position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: left 0.2s;"></div>
+                    </div>
+                `;
+                
+                listEl.appendChild(item);
+            });
+        }
+        
+        function selectProvider(providerId) {
+            currentProvider = providerId;
             
-            if (providersWithSecret.includes(provider)) {
-                secretGroup.style.display = 'block';
-            } else {
-                secretGroup.style.display = 'none';
+            document.querySelectorAll('#llm-providers-list > div').forEach(item => {
+                item.style.borderColor = 'transparent';
+                item.style.background = 'transparent';
+            });
+            
+            const selectedItem = document.querySelector(`#llm-providers-list > div:has(.llm-toggle[data-provider="${providerId}"])`);
+            if (selectedItem) {
+                selectedItem.style.borderColor = '#667eea';
+                selectedItem.style.background = '#eef2ff';
             }
             
-            const providerHints = {
-                qwen: '默认模型：qwen-turbo',
-                deepseek: '默认模型：deepseek-chat',
-                moonshot: '默认模型：moonshot-v1-8k',
-                zhipu: '默认模型：glm-4',
-                minimax: '默认模型：abab6-chat',
-                openai: '默认模型：gpt-4o-mini',
-                wenxin: '默认模型：ernie-4.0-turbo',
-                volcengine: '默认模型：Doubao-7B-Chat',
-                ollama: '默认模型：llama3',
-                lmstudio: '默认模型：gpt-4o-mini'
+            document.querySelectorAll('.llm-toggle').forEach(toggle => {
+                const toggleBtn = toggle.querySelector('div');
+                if (toggle.dataset.provider === providerId) {
+                    toggle.style.background = '#667eea';
+                    toggleBtn.style.left = '20px';
+                } else {
+                    toggle.style.background = '#e0e0e0';
+                    toggleBtn.style.left = '2px';
+                }
+            });
+            
+            renderProviderSettings(providerId);
+        }
+        
+        function renderProviderSettings(providerId) {
+            const info = providerInfo[providerId];
+            const settingsEl = document.getElementById('llm-provider-settings');
+            
+            settingsEl.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h4 style="font-size: 16px; font-weight: 600; color: #1a1a2e;">${info.name} 提供商设置</h4>
+                    <span style="padding: 4px 12px; background: #ffebee; color: #c62828; border-radius: 12px; font-size: 12px;">${currentProvider ? '已开启' : '未开启'}</span>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API Key *</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="password" id="llm-api-key-${providerId}" placeholder="输入您的 API Key" style="flex: 1; padding: 10px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
+                            <a href="${getApiKeyUrl(providerId)}" target="_blank" style="padding: 10px 16px; background: #667eea; color: white; border-radius: 8px; font-size: 13px; text-decoration: none; white-space: nowrap;">获取 API Key →</a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API Base URL</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="llm-url-${providerId}" value="${info.defaultUrl}" style="flex: 1; padding: 10px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
+                            <button onclick="clearUrl('${providerId}')" style="padding: 10px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer; font-size: 14px;">✕</button>
+                        </div>
+                    </div>
+                    
+                    <div style="padding: 12px; background: #fff8e1; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 13px; color: #e65100;">Coding Plan (Beta)</span>
+                            <label class="toggle-switch" style="width: 40px; height: 22px; background: #e0e0e0; border-radius: 11px; position: relative; cursor: pointer; display: inline-block;">
+                                <input type="checkbox" style="display: none;">
+                                <div style="position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: left 0.2s;"></div>
+                            </label>
+                        </div>
+                        <p style="font-size: 12px; color: #999; margin-top: 4px;">启用后使用专属API端点</p>
+                    </div>
+                    
+                    <button onclick="testProviderConnection('${providerId}')" style="padding: 12px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <span>🔌</span> 测试连接
+                    </button>
+                    
+                    <div style="border-top: 1px solid #e8eaf6; padding-top: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span style="font-size: 14px; font-weight: 600; color: #333;">可用模型列表</span>
+                            <button style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer;">+ 添加模型</button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9ff; border-radius: 8px;">
+                                <span>${info.defaultModel}</span>
+                                <span style="padding: 4px 10px; background: #e8f5e9; color: #388e3c; border-radius: 6px; font-size: 11px;">默认</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e8eaf6;">
+                    <button onclick="cancelProviderSettings()" style="padding: 12px 24px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; font-size: 14px; cursor: pointer;">取消</button>
+                    <button onclick="saveProviderSettings('${providerId}')" style="padding: 12px 24px; background: #667eea; border: none; border-radius: 8px; color: white; font-size: 14px; cursor: pointer;">保存</button>
+                </div>
+            `;
+        }
+        
+        function getApiKeyUrl(providerId) {
+            const urls = {
+                openai: 'https://platform.openai.com/api-keys',
+                qwen: 'https://dashscope.console.aliyun.com/apiKey',
+                wenxin: 'https://console.bce.baidu.com/wenxin/',
+                deepseek: 'https://platform.deepseek.com/api_keys',
+                moonshot: 'https://platform.moonshot.cn/console/api-keys',
+                zhipu: 'https://open.bigmodel.cn/usercenter/apikeys',
+                minimax: 'https://platform.minimax.chat/api-key',
+                volcengine: 'https://console.bytedance.net/ark',
+                youdao: 'https://ai.youdao.com/console/',
+                qianfan: 'https://cloud.baidu.com/product/wenxinworkshop',
+                ollama: 'https://ollama.com/',
+                lmstudio: 'https://lmstudio.ai/'
             };
+            return urls[providerId] || '#';
+        }
+        
+        function clearUrl(providerId) {
+            document.getElementById(`llm-url-${providerId}`).value = '';
+        }
+        
+        async function testProviderConnection(providerId) {
+            const apiKey = document.getElementById(`llm-api-key-${providerId}`)?.value;
+            const url = document.getElementById(`llm-url-${providerId}`)?.value;
             
-            if (providerHints[provider]) {
-                document.getElementById('llm-model').placeholder = providerHints[provider];
+            if (!apiKey) {
+                showToast('请输入API Key', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/v1/llm-config/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        provider: providerId,
+                        apiKey,
+                        baseUrl: url || null
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('✅ 连接成功！', 'success');
+                } else {
+                    showToast('❌ ' + (result.message || '连接失败'), 'error');
+                }
+            } catch (error) {
+                showToast('❌ 测试失败：' + error.message, 'error');
             }
         }
         
-        async function saveLLMSettings() {
-            const provider = document.getElementById('llm-provider').value;
-            const apiKey = document.getElementById('llm-api-key').value;
-            const secretKey = document.getElementById('llm-secret-key').value;
-            const model = document.getElementById('llm-model').value;
-            const baseUrl = document.getElementById('llm-base-url').value;
+        function cancelProviderSettings() {
+            currentProvider = null;
+            document.querySelectorAll('.llm-toggle').forEach(toggle => {
+                toggle.style.background = '#e0e0e0';
+                const btn = toggle.querySelector('div');
+                btn.style.left = '2px';
+            });
             
-            if (provider && !apiKey) {
-                showToast('请输入API密钥', 'error');
+            document.querySelectorAll('#llm-providers-list > div').forEach(item => {
+                item.style.borderColor = 'transparent';
+                item.style.background = 'transparent';
+            });
+            
+            document.getElementById('llm-provider-settings').innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; color: #999;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🤖</div>
+                    <p>请从左侧选择一个AI提供商</p>
+                </div>
+            `;
+        }
+        
+        async function saveProviderSettings(providerId) {
+            const apiKey = document.getElementById(`llm-api-key-${providerId}`)?.value;
+            const url = document.getElementById(`llm-url-${providerId}`)?.value;
+            
+            if (!apiKey) {
+                showToast('请输入API Key', 'error');
                 return;
             }
             
@@ -1448,70 +1642,22 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        provider,
-                        apiKey: apiKey || provider,
-                        secretKey: secretKey || null,
-                        model: model || null,
-                        baseUrl: baseUrl || null
+                        provider: providerId,
+                        apiKey,
+                        baseUrl: url || null
                     })
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
-                    showToast('✅ AI配置已保存！商家端已启用智能回复功能', 'success');
-                    loadLLMSettings();
+                    showToast('✅ AI配置已保存！', 'success');
+                    loadStatus();
                 } else {
                     showToast('❌ ' + (result.message || '保存失败'), 'error');
                 }
             } catch (error) {
                 showToast('❌ 保存失败：' + error.message, 'error');
-            }
-        }
-        
-        async function testLLMConnection() {
-            const provider = document.getElementById('llm-provider').value;
-            const apiKey = document.getElementById('llm-api-key').value;
-            
-            if (!provider) {
-                showToast('请先选择一个AI提供商', 'error');
-                return;
-            }
-            
-            if (!apiKey && provider !== 'ollama' && provider !== 'lmstudio') {
-                showToast('请输入API密钥', 'error');
-                return;
-            }
-            
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '测试中...';
-            
-            try {
-                const response = await fetch('/api/v1/llm-config/test', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        provider,
-                        apiKey: apiKey || provider,
-                        model: document.getElementById('llm-model').value || null,
-                        secretKey: document.getElementById('llm-secret-key').value || null,
-                        baseUrl: document.getElementById('llm-base-url').value || null
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast('✅ 连接成功！AI回复：' + result.data.reply.substring(0, 50) + '...', 'success');
-                } else {
-                    showToast('❌ ' + (result.message || '连接失败'), 'error');
-                }
-            } catch (error) {
-                showToast('❌ 测试失败：' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🧪 测试连接';
             }
         }
         
