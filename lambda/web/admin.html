@@ -1539,11 +1539,31 @@
             renderProviderSettings(providerId);
         }
         
+        function getApiKeyUrl(providerId) {
+            const urls = {
+                openai: 'https://platform.openai.com/api-keys',
+                qwen: 'https://dashscope.console.aliyun.com/apiKey',
+                deepseek: 'https://platform.deepseek.com/api_keys',
+                moonshot: 'https://platform.moonshot.cn/console/api-keys',
+                zhipu: 'https://open.bigmodel.cn/usercenter/apikeys',
+                minimax: 'https://platform.minimax.chat/api-key',
+                volcengine: 'https://console.volcengine.com/ark',
+                youdao: 'https://ai.youdao.com/console/',
+                qianfan: 'https://console.bce.baidu.com/qianfan/',
+                wenxin: 'https://console.bce.baidu.com/qianfan/',
+                anthropic: 'https://console.anthropic.com/settings/keys',
+                ollama: 'https://ollama.com/',
+                lmstudio: 'https://lmstudio.ai/'
+            };
+            return urls[providerId] || '#';
+        }
+        
         function renderProviderSettings(providerId) {
             const info = providerInfo[providerId];
             const settingsEl = document.getElementById('llm-provider-settings');
             const compatibleTypes = providerCompatibleTypes[providerId] || ['openai'];
             const models = providerModelLists[providerId] || [];
+            const apiKeyUrl = getApiKeyUrl(providerId);
 
             settingsEl.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -1556,8 +1576,8 @@
                         <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API Key *</label>
                         <div style="display: flex; gap: 10px;">
                             <input type="password" id="llm-api-key-${providerId}" placeholder="输入您的 API Key" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
-                            <a href="${providerApiUrls[providerId]}" target="_blank" style="padding: 12px 18px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 8px; font-size: 13px; text-decoration: none; white-space: nowrap; display: flex; align-items: center;">获取 API Key →</a>
-                            <button onclick="togglePassword('llm-api-key-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer;">👁️</button>
+                            <a href="${apiKeyUrl}" target="_blank"><button type="button" style="padding: 12px 18px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap;">获取 API Key →</button></a>
+                            <button type="button" onclick="togglePassword('llm-api-key-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer;">👁️</button>
                         </div>
                     </div>
                     

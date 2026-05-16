@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI模型配置 - 测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 50px; background: #f5f5f5; }
+        .test-section { background: white; padding: 30px; border-radius: 10px; margin: 20px 0; }
+        button { padding: 15px 25px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        button:hover { opacity: 0.9; }
+        a { text-decoration: none; }
+        .info { background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔗 测试"获取API Key"链接</h1>
+    
+    <div class="test-section">
+        <h3>测试1：直接点击链接（DeepSeek）</h3>
+        <p class="info">链接地址：https://platform.deepseek.com/api_keys</p>
+        <a href="https://platform.deepseek.com/api_keys" target="_blank">
+            <button>获取 API Key →</button>
+        </a>
+    </div>
+    
+    <div class="test-section">
+        <h3>测试2：通过JavaScript打开链接</h3>
+        <button onclick="openDeepSeekLink()">点击这里打开DeepSeek API页面</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>测试3：模拟admin.html中的按钮样式</h3>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="password" placeholder="输入API Key" style="flex: 1; padding: 12px; border: 2px solid #e8eaf6; border-radius: 8px;">
+            <a href="https://platform.deepseek.com/api_keys" target="_blank">
+                <button style="padding: 12px 18px;">获取 API Key →</button>
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        function openDeepSeekLink() {
+            window.open('https://platform.deepseek.com/api_keys', '_blank');
+        }
+    </script>
+</body>
+</html>
