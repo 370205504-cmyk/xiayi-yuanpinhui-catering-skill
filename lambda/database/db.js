@@ -18,7 +18,6 @@ const SQL_INJECTION_PATTERNS = [
   /(['"])\s*OR\s*\1.*--/gi,
   /(['"])\s*AND\s*\1.*--/gi,
   /UNION\s+SELECT/gi,
-  /SELECT.*FROM/gi,
   /INSERT\s+INTO/gi,
   /UPDATE.*SET/gi,
   /DELETE\s+FROM/gi,
@@ -32,8 +31,7 @@ const SQL_INJECTION_PATTERNS = [
   /\b(OR|AND)\b\s*'[^']*'\s*=\s*'[^']*'/gi,
   /--.*$/gm,
   /\/\*.*\*\//g,
-  /;.*--/g,
-  /\b(UNION|SELECT|INSERT|UPDATE|DELETE|DROP|TRUNCATE|EXEC)\b/i
+  /;.*--/g
 ];
 
 const ALLOWED_SQL_COMMANDS = [

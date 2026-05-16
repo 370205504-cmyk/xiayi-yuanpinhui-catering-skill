@@ -108,7 +108,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(csrfProtection);
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/v1/agent') || req.path.startsWith('/mobile') || req.path.startsWith('/api/v1/menu')) {
+    return next();
+  }
+  csrfProtection(req, res, next);
+});
 
 app.use(express.static(path.join(__dirname, 'web'), {
   maxAge: '1d',
@@ -138,8 +143,8 @@ app.use('/api/v1/queue', queueRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/store', storeRoutes);
 app.use('/api/v1/payment-config', paymentConfigRoutes);
+app.use('/api/v1/agent', agentRoutes);
 app.use('/api/v1', apiLimiter, apiRoutes);
-app.use('/agent', agentRoutes);
 app.use('/admin', adminRoutes);
 app.use('/monitor', monitorRoutes);
 app.use('/api/v1/export', exportRoutes);
