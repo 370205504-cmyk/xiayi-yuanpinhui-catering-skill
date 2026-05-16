@@ -47,6 +47,7 @@ const socialMarketingRoutes = require('./routes/social-marketing');
 const dptAgentRoutes = require('./routes/dpt-agent');
 const accountingRoutes = require('./routes/accounting');
 const printRoutes = require('./routes/print');
+const llmConfigRoutes = require('./routes/llm-config');
 
 const { apiLimiter, helmetConfig, corsConfig, inputSanitize, xssProtection, ipProtection, csrfProtection } = require('./middleware/security');
 const session = require('express-session');
@@ -157,6 +158,7 @@ app.use('/api/v1/social-marketing', socialMarketingRoutes);
 app.use('/api/v1/dpt-agent', dptAgentRoutes);
 app.use('/api/v1/accounting', accountingRoutes);
 app.use('/api/v1/print', printRoutes);
+app.use('/api/v1/llm-config', llmConfigRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'web', 'index.html'));
