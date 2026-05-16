@@ -684,8 +684,7 @@
                 <button class="tab-btn" onclick="showTab('queue')">排队管理</button>
                 <button class="tab-btn" onclick="showTab('members')">会员管理</button>
                 <button class="tab-btn" onclick="showTab('payments')">支付记录</button>
-                              <button class="tab-btn" onclick="showTab('settings')">系统设置</button>
-                <button class="tab-btn" onclick="window.open('/llm-config.html', '_blank')">🤖 AI助手</button>
+                <button class="tab-btn" onclick="showTab('settings')">系统设置</button>
             </div>
             
             <div id="tab-orders" class="tab-content active">
@@ -1372,6 +1371,148 @@
         }
         
         async function loadSettings() {
+            loadLLMSettings();
+        }
+        
+        async function loadLLMSettings() {
+            try {
+                const response = await fetch('/api/v1/llm-config/status');
+                const result = await response.json();
+                
+                const statusEl = document.getElementById('llm-status');
+                const providerSelect = document.getElementById('llm-provider');
+                
+                if (result.success && result.data) {
+                    const data = result.data;
+                    
+                    if (data.enabled) {
+                        statusEl.innerHTML = `<strong style="color: #11998e;">✅ 已启用：${data.provider}</strong> - 商家端已开启智能AI回复功能`;
+                        providerSelect.value = data.provider;
+                    } else {
+                        statusEl.innerHTML = `<span style="color: #999;">❌ 未启用 - 使用规则回复</span>`;
+                        providerSelect.value = '';
+                    }
+                    
+                    updateLLMFields();
+                }
+            } catch (error) {
+                console.error('加载LLM配置失败:', error);
+                document.getElementById('llm-status').innerHTML = `<span style="color: #c62828;">加载失败</span>`;
+            }
+        }
+        
+        function updateLLMFields() {
+            const provider = document.getElementById('llm-provider').value;
+            const secretGroup = document.getElementById('llm-secret-group');
+            
+            const providersWithSecret = ['wenxin', 'volcengine', 'youdao', 'qianfan'];
+            
+            if (providersWithSecret.includes(provider)) {
+                secretGroup.style.display = 'block';
+            } else {
+                secretGroup.style.display = 'none';
+            }
+            
+            const providerHints = {
+                qwen: '默认模型：qwen-turbo',
+                deepseek: '默认模型：deepseek-chat',
+                moonshot: '默认模型：moonshot-v1-8k',
+                zhipu: '默认模型：glm-4',
+                minimax: '默认模型：abab6-chat',
+                openai: '默认模型：gpt-4o-mini',
+                wenxin: '默认模型：ernie-4.0-turbo',
+                volcengine: '默认模型：Doubao-7B-Chat',
+                ollama: '默认模型：llama3',
+                lmstudio: '默认模型：gpt-4o-mini'
+            };
+            
+            if (providerHints[provider]) {
+                document.getElementById('llm-model').placeholder = providerHints[provider];
+            }
+        }
+        
+        async function saveLLMSettings() {
+            const provider = document.getElementById('llm-provider').value;
+            const apiKey = document.getElementById('llm-api-key').value;
+            const secretKey = document.getElementById('llm-secret-key').value;
+            const model = document.getElementById('llm-model').value;
+            const baseUrl = document.getElementById('llm-base-url').value;
+            
+            if (provider && !apiKey) {
+                showToast('请输入API密钥', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/v1/llm-config/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        provider,
+                        apiKey: apiKey || provider,
+                        secretKey: secretKey || null,
+                        model: model || null,
+                        baseUrl: baseUrl || null
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('✅ AI配置已保存！商家端已启用智能回复功能', 'success');
+                    loadLLMSettings();
+                } else {
+                    showToast('❌ ' + (result.message || '保存失败'), 'error');
+                }
+            } catch (error) {
+                showToast('❌ 保存失败：' + error.message, 'error');
+            }
+        }
+        
+        async function testLLMConnection() {
+            const provider = document.getElementById('llm-provider').value;
+            const apiKey = document.getElementById('llm-api-key').value;
+            
+            if (!provider) {
+                showToast('请先选择一个AI提供商', 'error');
+                return;
+            }
+            
+            if (!apiKey && provider !== 'ollama' && provider !== 'lmstudio') {
+                showToast('请输入API密钥', 'error');
+                return;
+            }
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '测试中...';
+            
+            try {
+                const response = await fetch('/api/v1/llm-config/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        provider,
+                        apiKey: apiKey || provider,
+                        model: document.getElementById('llm-model').value || null,
+                        secretKey: document.getElementById('llm-secret-key').value || null,
+                        baseUrl: document.getElementById('llm-base-url').value || null
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('✅ 连接成功！AI回复：' + result.data.reply.substring(0, 50) + '...', 'success');
+                } else {
+                    showToast('❌ ' + (result.message || '连接失败'), 'error');
+                }
+            } catch (error) {
+                showToast('❌ 测试失败：' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🧪 测试连接';
+            }
         }
         
         async function saveStoreSettings() {
