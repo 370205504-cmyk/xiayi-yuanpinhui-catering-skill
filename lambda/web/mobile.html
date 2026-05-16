@@ -623,15 +623,47 @@
             bottom: 0;
             right: 0;
             left: 0;
-            top: 0;
+            height: 65vh;
             background: white;
             z-index: 500;
             display: none;
             flex-direction: column;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
         }
         
         .chat-window.active {
             display: flex;
+            transform: translateY(0);
+        }
+        
+        .chat-handle {
+            width: 40px;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin: 10px auto 0;
+        }
+        
+        .chat-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 499;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        
+        .chat-overlay.active {
+            display: block;
+            opacity: 1;
         }
         
         .chat-header {
@@ -927,8 +959,12 @@
         <span class="chat-badge" id="chat-badge">1</span>
     </div>
     
+    <!-- AI Chat Overlay -->
+    <div class="chat-overlay" id="chat-overlay" onclick="closeChat()"></div>
+    
     <!-- AI Chat Window -->
     <div class="chat-window" id="chat-window">
+        <div class="chat-handle"></div>
         <div class="chat-header">
             <div class="chat-header-left">
                 <div class="chat-avatar">🤖</div>
@@ -1194,6 +1230,7 @@
         }
         
         function openChat() {
+            document.getElementById('chat-overlay').classList.add('active');
             document.getElementById('chat-window').classList.add('active');
             renderChatMessages();
             setTimeout(() => {
@@ -1203,6 +1240,7 @@
         }
         
         function closeChat() {
+            document.getElementById('chat-overlay').classList.remove('active');
             document.getElementById('chat-window').classList.remove('active');
         }
         
