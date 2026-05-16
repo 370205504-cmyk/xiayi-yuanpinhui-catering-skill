@@ -1596,21 +1596,9 @@
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;">API Key *</label>
                         <div style="display: flex; gap: 10px;">
-                            ${isConfigured ? `
-                                <div id="api-key-display-${providerId}" style="flex: 1; padding: 12px 14px; background: #f5f5f5; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px; color: #666; display: flex; align-items: center; gap: 8px;">
-                                    <span style="color: #2e7d32; font-weight: 600;">✓</span>
-                                    <span>已配置 (如需修改请重新输入)</span>
-                                </div>
-                                <input type="password" id="llm-api-key-${providerId}" placeholder="请输入新的 API Key" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px; display: none;">
-                            ` : `
-                                <input type="password" id="llm-api-key-${providerId}" placeholder="输入您的 API Key" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
-                            `}
+                            <input type="password" id="llm-api-key-${providerId}" placeholder="${isConfigured ? '已配置，如需修改请重新输入' : '请输入您的 API Key'}" style="flex: 1; padding: 12px 14px; border: 2px solid #e8eaf6; border-radius: 8px; font-size: 14px;">
                             <a href="${apiKeyUrl}" target="_blank"><button type="button" style="padding: 12px 18px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap;">获取 API Key →</button></a>
-                            ${isConfigured ? `
-                                <button type="button" id="toggle-api-key-btn-${providerId}" onclick="toggleApiKeyEdit('${providerId}')" style="padding: 12px 14px; background: #fff3e0; border: none; border-radius: 8px; color: #e65100; cursor: pointer;">✏️</button>
-                            ` : `
-                                <button type="button" onclick="togglePassword('llm-api-key-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer;">👁️</button>
-                            `}
+                            <button type="button" onclick="togglePassword('llm-api-key-${providerId}')" style="padding: 12px 14px; background: #f0f4ff; border: none; border-radius: 8px; color: #667eea; cursor: pointer;">👁️</button>
                         </div>
                     </div>
                     
@@ -1685,28 +1673,6 @@
             `;
         }
         
-        function toggleApiKeyEdit(providerId) {
-            const displayEl = document.getElementById(`api-key-display-${providerId}`);
-            const inputEl = document.getElementById(`llm-api-key-${providerId}`);
-            const toggleBtn = document.getElementById(`toggle-api-key-btn-${providerId}`);
-            
-            if (displayEl && inputEl && toggleBtn) {
-                if (inputEl.style.display === 'none') {
-                    inputEl.style.display = 'block';
-                    displayEl.style.display = 'none';
-                    toggleBtn.textContent = '👁️';
-                    toggleBtn.style.background = '#f0f4ff';
-                    toggleBtn.style.color = '#667eea';
-                } else {
-                    inputEl.style.display = 'none';
-                    displayEl.style.display = 'flex';
-                    toggleBtn.textContent = '✏️';
-                    toggleBtn.style.background = '#fff3e0';
-                    toggleBtn.style.color = '#e65100';
-                    inputEl.value = '';
-                }
-            }
-        }
         
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
