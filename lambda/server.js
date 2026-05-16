@@ -5,7 +5,7 @@ const fs = require('fs');
 const cron = require('node-cron');
 const compression = require('compression');
 const db = require('./database/db');
-const backupService = require('./database/backup');
+const backupService = require('./services/backup');
 const logger = require('./utils/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 

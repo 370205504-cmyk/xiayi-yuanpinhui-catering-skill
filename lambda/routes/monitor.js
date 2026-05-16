@@ -215,7 +215,7 @@ router.post('/backup',
   requireAdmin,
   async (req, res) => {
     try {
-      const backupService = require('../database/backup');
+      const backupService = require('../services/backup');
       const result = await backupService.backupDatabase();
 
       logger.info('管理员手动备份', { adminId: req.userId });

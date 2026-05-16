@@ -3,7 +3,7 @@ const router = express.Router();
 const dishesService = require('../services/dishesService');
 const cartService = require('../services/cartService');
 const orderService = require('../services/orderServiceV2');
-const storeService = require('../utils/storeService');
+const storeService = require('../services/storeService');
 const wifiService = require('../utils/wifiService');
 const logger = require('../utils/logger');
 
