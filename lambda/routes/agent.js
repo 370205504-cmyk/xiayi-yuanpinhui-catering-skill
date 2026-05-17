@@ -93,34 +93,28 @@ async function processAgentQuery(query, userId, sessionId, context) {
   context = context || {};
   context.lastQuery = query;
 
-  // 只保留最核心的规则处理：下单、购物车、取消、帮助
-  if (lowerQuery.includes('下单') || lowerQuery.includes('确认') || lowerQuery.includes('结账') || lowerQuery.includes('买单')) {
-    return await handleCheckoutQuery(query, userId, context);
-  }
-
-  if (lowerQuery.includes('购物车') || lowerQuery.includes('看看我点的') || lowerQuery.includes('我点的')) {
-    return await handleCartQuery(userId, context);
-  }
-
-  if (lowerQuery.includes('取消') || lowerQuery.includes('不要了') || lowerQuery.includes('退')) {
-    return await handleCancelQuery(query, userId, context);
-  }
-
-  if (lowerQuery.includes('帮助') || lowerQuery.includes('怎么用') || lowerQuery.includes('help')) {
-    return await handleHelpQuery(context);
-  }
-
-  // 其他所有问题都直接交给大模型处理
+  // 所有问题都直接交给大模型处理，完全不用规则！
   return await handleLLMQuery(query, userId, context);
 }
 
 async function handleLLMQuery(query, userId, context) {
   const dishes = await dishesService.getAllDishes();
+  const cart = await cartService.getCart(userId);
   const fullDishList = dishes.map(d =>
     `${d.name} ¥${d.price} ${d.category || ''} ${d.description || ''}`
   ).join('\n');
+  
+  let cartInfo = '';
+  if (cart.items && cart.items.length > 0) {
+    const cartItems = cart.items.map(item =>
+      `${item.name} x${item.quantity} ¥${item.price * item.quantity}${item.remarks ? ` (${item.remarks})` : ''}`
+    ).join('\n');
+    cartInfo = `当前购物车内容：\n${cartItems}\n合计：¥${cart.total}`;
+  } else {
+    cartInfo = '当前购物车：空';
+  }
 
-  const systemPrompt = `你是一个餐饮收银系统的AI助手，名叫"雨姗AI收银助手"。你的任务是帮助顾客点餐、回答关于菜品和门店的问题。
+  const systemPrompt = `你是一个餐饮收银系统的AI助手，名叫"雨姗AI收银助手"。你是一个像豆包、千问、元宝那样的智能AI助手，可以自由对话、回答各种问题，同时也能帮助顾客点餐。
 
 门店信息：
 - 名称：雨姗AI收银助手创味菜
@@ -132,13 +126,17 @@ async function handleLLMQuery(query, userId, context) {
 完整菜单：
 ${fullDishList}
 
+${cartInfo}
+
 回复要求：
-1. 用中文回复，语气热情友好
-2. 如果顾客说"来一份XX"、"点XX"、"要XX"等明确想点餐的表述，先正常回复，然后我会自动帮顾客添加到购物车
+1. 用中文回复，语气热情友好、自然流畅，像真人一样对话
+2. 可以回答各种问题，包括日常聊天、天气、时间等，不要局限于点餐相关
 3. 如果顾客问菜品相关问题，根据菜单信息回答
 4. 如果顾客问门店信息，根据门店信息回答
-5. 回复简洁明了，不要过长
-6. 可以适当使用emoji让回复更生动`;
+5. 如果顾客想点餐（比如"来一份XX"、"点XX"、"要XX"等），自然回复确认，系统会自动帮顾客添加到购物车
+6. 如果顾客问购物车或已点菜品，根据上面提供的购物车信息回答
+7. 可以适当使用emoji让回复更生动
+8. 回复要自然，不要太机械，像朋友一样聊天`;
 
   const result = await llmService.chat({
     messages: [{ role: 'user', content: query }],
@@ -148,25 +146,70 @@ ${fullDishList}
   if (result.success) {
     // 检查用户是否想点餐，如果想点，同时调用添加购物车
     const lowerQuery = query.toLowerCase();
-    const orderKeywords = ['点', '要', '来一份', '加', '一份'];
+    const orderKeywords = ['点', '要', '来一份', '加', '一份', '来个', '整个'];
     const hasOrderIntent = orderKeywords.some(k => lowerQuery.includes(k)) && 
                           !lowerQuery.includes('几点') && 
                           !lowerQuery.includes('有点') && 
-                          !lowerQuery.includes('一点');
+                          !lowerQuery.includes('一点') &&
+                          !lowerQuery.includes('今天') &&
+                          !lowerQuery.includes('明天');
+    
+    // 检查是否是查看购物车
+    const hasCartIntent = lowerQuery.includes('购物车') || lowerQuery.includes('看看我点的') || lowerQuery.includes('我点的') || lowerQuery.includes('我的菜');
+    
+    // 检查是否是下单结账
+    const hasCheckoutIntent = lowerQuery.includes('下单') || lowerQuery.includes('确认') || lowerQuery.includes('结账') || lowerQuery.includes('买单') || lowerQuery.includes('结算');
+    
+    let actions = [];
+    let data = {};
+    
+    if (hasCartIntent) {
+      // 显示购物车
+      actions.push({ type: 'show_cart', data: cart });
+      data = { cart };
+    }
     
     if (hasOrderIntent) {
       // 先让大模型回复，同时后台调用添加购物车
       try {
-        await handleOrderQuery(query, userId, context);
+        const orderResult = await handleOrderQuery(query, userId, context);
+        if (orderResult.actions && orderResult.actions.length > 0) {
+          actions = actions.concat(orderResult.actions);
+        }
+        if (orderResult.data) {
+          data = { ...data, ...orderResult.data };
+        }
       } catch (e) {
         console.log('添加购物车失败', e);
+      }
+    }
+    
+    if (hasCheckoutIntent && cart.items && cart.items.length > 0) {
+      // 下单结账
+      try {
+        const checkoutResult = await handleCheckoutQuery(query, userId, context);
+        if (checkoutResult.actions && checkoutResult.actions.length > 0) {
+          actions = actions.concat(checkoutResult.actions);
+        }
+        if (checkoutResult.data) {
+          data = { ...data, ...checkoutResult.data };
+        }
+        // 更新回复为下单成功的消息
+        return {
+          response: checkoutResult.response,
+          actions: checkoutResult.actions,
+          data: checkoutResult.data,
+          context: { ...context, lastIntent: 'checkout' }
+        };
+      } catch (e) {
+        console.log('下单失败', e);
       }
     }
 
     return {
       response: result.reply,
-      actions: [],
-      data: {},
+      actions: actions,
+      data: data,
       context: { ...context, lastIntent: 'llm' }
     };
   }
