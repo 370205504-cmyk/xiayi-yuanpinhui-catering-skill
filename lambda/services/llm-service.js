@@ -44,7 +44,7 @@ const providers = [
     requiresSecret: false,
     defaultUrl: 'https://api.deepseek.com/v1',
     defaultModel: 'deepseek-chat',
-    models: ['DeepSeek-V4-Pro', 'DeepSeek-V4-Flash', 'deepseek-chat', 'deepseek-r1-chat']
+    models: ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-chat', 'deepseek-r1-chat']
   },
   {
     id: 'moonshot',
