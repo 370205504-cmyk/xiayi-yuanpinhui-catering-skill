@@ -196,7 +196,7 @@ const sanitizeObject = (obj, path = '') => {
     if (typeof value === 'string') {
       const maxLength = getMaxLengthForField(key);
       const skipEscape = shouldSkipEscape(key);
-      sanitized[key] = sanitizeString(value, { maxLength, escapeHtml: !skipEscape });
+      sanitized[key] = sanitizeString(value, { maxLength, stripHtml: !skipEscape, escapeHtml: !skipEscape });
     } else if (Array.isArray(value)) {
       sanitized[key] = value.map((item, index) => 
         typeof item === 'string' ? sanitizeString(item) : item

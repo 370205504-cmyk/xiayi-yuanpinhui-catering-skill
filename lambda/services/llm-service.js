@@ -1,5 +1,16 @@
 const axios = require('axios');
+const { HttpsProxyAgent } = require('https-proxy-agent');
 const logger = require('../utils/logger');
+
+function getAxiosConfig(timeout = 10000) {
+  const config = { timeout };
+  const proxyUrl = process.env.http_proxy || process.env.HTTP_PROXY;
+  if (proxyUrl) {
+    config.httpsAgent = new HttpsProxyAgent(proxyUrl);
+    config.proxy = false;
+  }
+  return config;
+}
 
 const providers = [
   {
@@ -157,7 +168,7 @@ async function testConnection({ provider, apiKey, baseUrl, apiType = 'openai', m
             'Content-Type': 'application/json',
             'x-api-key': apiKey
           },
-          timeout: 10000
+          ...getAxiosConfig()
         }
       );
       
@@ -174,7 +185,7 @@ async function testConnection({ provider, apiKey, baseUrl, apiType = 'openai', m
         },
         {
           headers: { 'Content-Type': 'application/json' },
-          timeout: 10000
+          ...getAxiosConfig()
         }
       );
       
@@ -196,7 +207,7 @@ async function testConnection({ provider, apiKey, baseUrl, apiType = 'openai', m
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`
           },
-          timeout: 10000
+          ...getAxiosConfig()
         }
       );
       
