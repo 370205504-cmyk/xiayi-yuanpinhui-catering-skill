@@ -1289,7 +1289,6 @@
             
             if (!text || isTyping) return;
             
-            // Add user message
             const userMsg = {
                 id: Date.now(),
                 type: 'user',
@@ -1306,10 +1305,12 @@
             const container = document.getElementById('chat-messages');
             container.scrollTop = container.scrollHeight;
             
-            // Show typing indicator
             showTypingIndicator();
             
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+                
                 const response = await fetch('/agent', {
                     method: 'POST',
                     headers: {
@@ -1318,8 +1319,11 @@
                     body: JSON.stringify({
                         query: text,
                         session_id: chatSessionId
-                    })
+                    }),
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
                 
                 const result = await response.json();
                 
@@ -1354,10 +1358,15 @@
             } catch (error) {
                 removeTypingIndicator();
                 
+                let errorMessage = '抱歉，网络连接失败，请检查网络后重试。';
+                if (error.name === 'AbortError') {
+                    errorMessage = '抱歉，AI回复超时了，请稍后再试。';
+                }
+                
                 const errorMsg = {
                     id: Date.now(),
                     type: 'assistant',
-                    content: '抱歉，网络连接失败，请检查网络后重试。',
+                    content: errorMessage,
                     time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
                 };
                 chatMessages.push(errorMsg);
