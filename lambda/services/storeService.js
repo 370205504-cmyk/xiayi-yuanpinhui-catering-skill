@@ -21,8 +21,8 @@ class StoreService {
       const stores = await db.query('SELECT * FROM stores WHERE status = ? ORDER BY sort_order ASC', ['active']);
       return { success: true, stores };
     } catch (error) {
-      logger.error('获取门店列表失败:', error);
-      throw error;
+      logger.error('获取门店列表失败:', error.message);
+      return { success: false, message: '门店数据不可用' };
     }
   }
 
@@ -38,8 +38,8 @@ class StoreService {
       }
       return { success: true, store: stores[0] };
     } catch (error) {
-      logger.error('获取默认门店失败:', error);
-      throw error;
+      logger.error('获取默认门店失败:', error.message);
+      return { success: false, message: '门店数据不可用' };
     }
   }
 
@@ -63,8 +63,8 @@ class StoreService {
         settings: settings.success ? settings.settings : {}
       };
     } catch (error) {
-      logger.error('获取门店信息失败:', error);
-      throw error;
+      logger.error('获取门店信息失败:', error.message);
+      return { success: false, message: '门店数据不可用' };
     }
   }
 
@@ -78,8 +78,8 @@ class StoreService {
         store_name: result.store.name
       };
     } catch (error) {
-      logger.error('获取营业时间失败:', error);
-      throw error;
+      logger.error('获取营业时间失败:', error.message);
+      return { success: false, message: '营业时间数据不可用' };
     }
   }
 
@@ -95,8 +95,8 @@ class StoreService {
         store_name: result.store.name
       };
     } catch (error) {
-      logger.error('获取WiFi信息失败:', error);
-      throw error;
+      logger.error('获取WiFi信息失败:', error.message);
+      return { success: false, message: 'WiFi数据不可用' };
     }
   }
 
@@ -111,8 +111,8 @@ class StoreService {
         store_name: result.store.name
       };
     } catch (error) {
-      logger.error('获取停车信息失败:', error);
-      throw error;
+      logger.error('获取停车信息失败:', error.message);
+      return { success: false, message: '停车信息不可用' };
     }
   }
 
@@ -131,8 +131,8 @@ class StoreService {
         }
       };
     } catch (error) {
-      logger.error('获取联系信息失败:', error);
-      throw error;
+      logger.error('获取联系信息失败:', error.message);
+      return { success: false, message: '联系信息不可用' };
     }
   }
 
@@ -146,8 +146,8 @@ class StoreService {
         store_name: result.store_name
       };
     } catch (error) {
-      logger.error('获取地址失败:', error);
-      throw error;
+      logger.error('获取地址失败:', error.message);
+      return { success: false, message: '地址信息不可用' };
     }
   }
 
@@ -161,8 +161,8 @@ class StoreService {
         store_name: result.store_name
       };
     } catch (error) {
-      logger.error('获取电话失败:', error);
-      throw error;
+      logger.error('获取电话失败:', error.message);
+      return { success: false, message: '电话信息不可用' };
     }
   }
 
@@ -190,8 +190,8 @@ class StoreService {
         features: result.store.features
       };
     } catch (error) {
-      logger.error('获取门店服务失败:', error);
-      throw error;
+      logger.error('获取门店服务失败:', error.message);
+      return { success: false, message: '门店服务数据不可用' };
     }
   }
 
@@ -212,8 +212,8 @@ class StoreService {
       const announcements = await db.query(query, params);
       return { success: true, announcements };
     } catch (error) {
-      logger.error('获取公告失败:', error);
-      throw error;
+      logger.error('获取公告失败:', error.message);
+      return { success: false, message: '公告数据不可用' };
     }
   }
 
@@ -230,8 +230,8 @@ class StoreService {
         minimum_order: parseFloat(result.settings.minimum_order || 0)
       };
     } catch (error) {
-      logger.error('获取预订信息失败:', error);
-      throw error;
+      logger.error('获取预订信息失败:', error.message);
+      return { success: false, message: '预订信息不可用' };
     }
   }
 

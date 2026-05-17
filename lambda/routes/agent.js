@@ -5,6 +5,7 @@ const orderService = require('../services/orderServiceV2');
 const inputValidator = require('../services/inputValidator');
 const logger = require('../utils/logger');
 const storeService = require('../services/storeService');
+const llmService = require('../services/llm-service');
 
 const PROMPT_INJECTION_PATTERNS = [
   /ignore\s+(previous|all|your)/i,
@@ -100,7 +101,7 @@ async function processAgentQuery(query, userId, sessionId, context) {
     return await handleRecommendQuery(query, userId, context);
   }
 
-  if (lowerQuery.includes('点') || lowerQuery.includes('要') || lowerQuery.includes('来一份') || lowerQuery.includes('加') || lowerQuery.includes('一份')) {
+  if ((lowerQuery.includes('点') && !lowerQuery.includes('几点') && !lowerQuery.includes('有点') && !lowerQuery.includes('一点')) || lowerQuery.includes('要') || lowerQuery.includes('来一份') || lowerQuery.includes('加') || lowerQuery.includes('一份')) {
     return await handleOrderQuery(query, userId, context);
   }
 
@@ -138,6 +139,49 @@ async function processAgentQuery(query, userId, sessionId, context) {
 
   if (lowerQuery.includes('帮助') || lowerQuery.includes('怎么用') || lowerQuery.includes('help')) {
     return await handleHelpQuery(context);
+  }
+
+  return await handleLLMQuery(query, context);
+}
+
+async function handleLLMQuery(query, context) {
+  const dishes = await dishesService.getAllDishes();
+  const dishList = dishes.slice(0, 10).map(d =>
+    `${d.name} ¥${d.price}`
+  ).join('\n');
+
+  const systemPrompt = `你是一个餐饮收银系统的AI助手，名叫"雨姗AI收银助手"。你的任务是帮助顾客点餐、回答关于菜品和门店的问题。
+
+门店信息：
+- 名称：雨姗AI收银助手创味菜
+- 地址：河南省商丘市县府前路188号
+- 电话：0370-628-9999
+- 营业时间：09:00-22:00
+- WiFi密码：88888888
+
+当前菜单（部分）：
+${dishList}
+
+回复要求：
+1. 用中文回复，语气热情友好
+2. 如果顾客想点餐，引导他们说出菜品名称
+3. 如果顾客问菜品相关问题，根据菜单信息回答
+4. 如果顾客问门店信息，根据门店信息回答
+5. 回复简洁明了，不要过长
+6. 可以适当使用emoji让回复更生动`;
+
+  const result = await llmService.chat({
+    messages: [{ role: 'user', content: query }],
+    systemPrompt
+  });
+
+  if (result.success) {
+    return {
+      response: result.reply,
+      actions: [],
+      data: {},
+      context: { ...context, lastIntent: 'llm' }
+    };
   }
 
   return {
@@ -692,6 +736,13 @@ async function handleHelpQuery(context) {
     actions: [{ type: 'show_help', data: {} }],
     data: {},
     context: context
+  };
+}
+
+function extractDishInfo(query) {
+  return {
+    name: extractDishName(query),
+    quantity: extractQuantity(query)
   };
 }
 

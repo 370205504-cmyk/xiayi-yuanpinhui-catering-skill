@@ -1,6 +1,29 @@
 const axios = require('axios');
 const { HttpsProxyAgent } = require('https-proxy-agent');
+const path = require('path');
+const fs = require('fs');
 const logger = require('../utils/logger');
+
+const ENV_PATH = path.join(__dirname, '../../.env');
+
+function readEnvConfig() {
+  try {
+    if (fs.existsSync(ENV_PATH)) {
+      const content = fs.readFileSync(ENV_PATH, 'utf8');
+      const config = {};
+      content.split('\n').forEach(line => {
+        const match = line.match(/^(\w+)=(.*)$/);
+        if (match) {
+          config[match[1]] = match[2];
+        }
+      });
+      return config;
+    }
+  } catch (e) {
+    logger.error('读取.env配置失败:', e.message);
+  }
+  return {};
+}
 
 function getAxiosConfig(timeout = 10000) {
   const config = { timeout };
@@ -226,8 +249,93 @@ async function testConnection({ provider, apiKey, baseUrl, apiType = 'openai', m
   }
 }
 
+async function chat({ messages, systemPrompt }) {
+  try {
+    const envConfig = readEnvConfig();
+    const provider = envConfig.LLM_PROVIDER;
+    if (!provider) {
+      return { success: false, message: '未配置大模型' };
+    }
+
+    const prefix = provider.toUpperCase();
+    const apiKey = envConfig[`${prefix}_API_KEY`];
+    if (!apiKey) {
+      return { success: false, message: '未配置API Key' };
+    }
+
+    const providerConfig = getProviderConfig(provider);
+    if (!providerConfig) {
+      return { success: false, message: '不支持的提供商' };
+    }
+
+    const baseUrl = envConfig[`${prefix}_BASE_URL`] || providerConfig.defaultUrl;
+    const model = envConfig[`${prefix}_MODEL`] || providerConfig.defaultModel;
+    const apiType = envConfig[`${prefix}_API_TYPE`] || providerConfig.apiType || 'openai';
+
+    const fullMessages = [];
+    if (systemPrompt) {
+      fullMessages.push({ role: 'system', content: systemPrompt });
+    }
+    if (messages && messages.length > 0) {
+      fullMessages.push(...messages);
+    } else {
+      fullMessages.push({ role: 'user', content: '你好' });
+    }
+
+    if (apiType === 'anthropic') {
+      const response = await axios.post(
+        `${baseUrl}/messages`,
+        {
+          model,
+          max_tokens: 1024,
+          messages: fullMessages
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey
+          },
+          ...getAxiosConfig(30000)
+        }
+      );
+      return {
+        success: true,
+        reply: response.data.content?.[0]?.text || response.data.content?.toString() || ''
+      };
+    } else {
+      const response = await axios.post(
+        `${baseUrl}/chat/completions`,
+        {
+          model,
+          messages: fullMessages,
+          max_tokens: 1024,
+          temperature: 0.7
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          ...getAxiosConfig(30000)
+        }
+      );
+      return {
+        success: true,
+        reply: response.data.choices?.[0]?.message?.content || ''
+      };
+    }
+  } catch (error) {
+    logger.error('LLM chat error:', error.message);
+    return {
+      success: false,
+      message: error.response?.data?.error?.message || error.message
+    };
+  }
+}
+
 module.exports = {
   getAllProviders,
   getProviderConfig,
-  testConnection
+  testConnection,
+  chat
 };
