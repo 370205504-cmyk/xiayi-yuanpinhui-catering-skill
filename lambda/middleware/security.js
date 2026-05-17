@@ -88,7 +88,7 @@ const corsConfig = cors({
   origin: isProduction
     ? (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',')
     : '*',
-  methods: ['GET', 'HEAD', 'OPTIONS'],
+  methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Request-ID'],
   credentials: true,
   maxAge: 86400
@@ -195,7 +195,8 @@ const sanitizeObject = (obj, path = '') => {
     
     if (typeof value === 'string') {
       const maxLength = getMaxLengthForField(key);
-      sanitized[key] = sanitizeString(value, { maxLength });
+      const skipEscape = shouldSkipEscape(key);
+      sanitized[key] = sanitizeString(value, { maxLength, escapeHtml: !skipEscape });
     } else if (Array.isArray(value)) {
       sanitized[key] = value.map((item, index) => 
         typeof item === 'string' ? sanitizeString(item) : item
@@ -224,6 +225,11 @@ const getMaxLengthForField = (fieldName) => {
     message: 3000
   };
   return fieldLimits[fieldName.toLowerCase()] || 500;
+};
+
+const shouldSkipEscape = (fieldName) => {
+  const skipFields = ['apikey', 'secretkey', 'api_key', 'secret_key', 'password', 'token'];
+  return skipFields.includes(fieldName.toLowerCase());
 };
 
 const inputSanitize = (req, res, next) => {
