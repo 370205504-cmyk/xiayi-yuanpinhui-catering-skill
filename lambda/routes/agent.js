@@ -93,61 +93,31 @@ async function processAgentQuery(query, userId, sessionId, context) {
   context = context || {};
   context.lastQuery = query;
 
-  if (lowerQuery.includes('菜单') || lowerQuery.includes('有什么菜') || lowerQuery.includes('看看菜')) {
-    return await handleMenuQuery(query, userId, context);
-  }
-
-  if (lowerQuery.includes('推荐') || lowerQuery.includes('好吃') || lowerQuery.includes('特色')) {
-    return await handleRecommendQuery(query, userId, context);
-  }
-
-  if ((lowerQuery.includes('点') && !lowerQuery.includes('几点') && !lowerQuery.includes('有点') && !lowerQuery.includes('一点')) || lowerQuery.includes('要') || lowerQuery.includes('来一份') || lowerQuery.includes('加') || lowerQuery.includes('一份')) {
-    return await handleOrderQuery(query, userId, context);
+  // 只保留最核心的规则处理：下单、购物车、取消、帮助
+  if (lowerQuery.includes('下单') || lowerQuery.includes('确认') || lowerQuery.includes('结账') || lowerQuery.includes('买单')) {
+    return await handleCheckoutQuery(query, userId, context);
   }
 
   if (lowerQuery.includes('购物车') || lowerQuery.includes('看看我点的') || lowerQuery.includes('我点的')) {
     return await handleCartQuery(userId, context);
   }
 
-  if (lowerQuery.includes('下单') || lowerQuery.includes('确认') || lowerQuery.includes('结账') || lowerQuery.includes('买单')) {
-    return await handleCheckoutQuery(query, userId, context);
-  }
-
   if (lowerQuery.includes('取消') || lowerQuery.includes('不要了') || lowerQuery.includes('退')) {
     return await handleCancelQuery(query, userId, context);
-  }
-
-  if (lowerQuery.includes('门店') || lowerQuery.includes('地址') || lowerQuery.includes('在哪') || lowerQuery.includes('怎么去')) {
-    return await handleStoreQuery(query, context);
-  }
-
-  if (lowerQuery.includes('wifi') || lowerQuery.includes('无线') || lowerQuery.includes('密码') || lowerQuery.includes('网络')) {
-    return await handleWifiQuery(context);
-  }
-
-  if (lowerQuery.includes('价格') || lowerQuery.includes('多少钱') || lowerQuery.includes('多少')) {
-    return await handlePriceQuery(query, context);
-  }
-
-  if (lowerQuery.includes('排队') || lowerQuery.includes('取号') || lowerQuery.includes('排号')) {
-    return await handleQueueQuery(query, userId, context);
-  }
-
-  if (lowerQuery.includes('电话') || lowerQuery.includes('联系') || lowerQuery.includes('营业')) {
-    return await handleContactQuery(query, context);
   }
 
   if (lowerQuery.includes('帮助') || lowerQuery.includes('怎么用') || lowerQuery.includes('help')) {
     return await handleHelpQuery(context);
   }
 
-  return await handleLLMQuery(query, context);
+  // 其他所有问题都直接交给大模型处理
+  return await handleLLMQuery(query, userId, context);
 }
 
-async function handleLLMQuery(query, context) {
+async function handleLLMQuery(query, userId, context) {
   const dishes = await dishesService.getAllDishes();
-  const dishList = dishes.slice(0, 10).map(d =>
-    `${d.name} ¥${d.price}`
+  const fullDishList = dishes.map(d =>
+    `${d.name} ¥${d.price} ${d.category || ''} ${d.description || ''}`
   ).join('\n');
 
   const systemPrompt = `你是一个餐饮收银系统的AI助手，名叫"雨姗AI收银助手"。你的任务是帮助顾客点餐、回答关于菜品和门店的问题。
@@ -159,12 +129,12 @@ async function handleLLMQuery(query, context) {
 - 营业时间：09:00-22:00
 - WiFi密码：88888888
 
-当前菜单（部分）：
-${dishList}
+完整菜单：
+${fullDishList}
 
 回复要求：
 1. 用中文回复，语气热情友好
-2. 如果顾客想点餐，引导他们说出菜品名称
+2. 如果顾客说"来一份XX"、"点XX"、"要XX"等明确想点餐的表述，先正常回复，然后我会自动帮顾客添加到购物车
 3. 如果顾客问菜品相关问题，根据菜单信息回答
 4. 如果顾客问门店信息，根据门店信息回答
 5. 回复简洁明了，不要过长
@@ -176,6 +146,23 @@ ${dishList}
   });
 
   if (result.success) {
+    // 检查用户是否想点餐，如果想点，同时调用添加购物车
+    const lowerQuery = query.toLowerCase();
+    const orderKeywords = ['点', '要', '来一份', '加', '一份'];
+    const hasOrderIntent = orderKeywords.some(k => lowerQuery.includes(k)) && 
+                          !lowerQuery.includes('几点') && 
+                          !lowerQuery.includes('有点') && 
+                          !lowerQuery.includes('一点');
+    
+    if (hasOrderIntent) {
+      // 先让大模型回复，同时后台调用添加购物车
+      try {
+        await handleOrderQuery(query, userId, context);
+      } catch (e) {
+        console.log('添加购物车失败', e);
+      }
+    }
+
     return {
       response: result.reply,
       actions: [],
