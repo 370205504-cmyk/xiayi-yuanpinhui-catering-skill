@@ -1074,12 +1074,12 @@
         let currentMemberId = null;
         
         const LLM_PROVIDERS = {
-            deepseek: { name: 'DeepSeek', models: ['DeepSeek-V4-Pro', 'DeepSeek-V4-Flash', 'deepseek-chat', 'deepseek-coder'], url: 'https://platform.deepseek.com/' },
-            moonshot: { name: 'Moonshot (Kimi)', models: ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k', 'moonshot-v1-256k'], url: 'https://platform.moonshot.cn/' },
-            qwen: { name: '通义千问 (Qwen)', models: ['qwen-turbo', 'qwen-plus', 'qwen-max', 'qwen-max-longcontext'], url: 'https://bailian.console.aliyun.com/' },
-            zhipu: { name: '智谱AI (GLM)', models: ['glm-4', 'glm-4-flash', 'glm-3-turbo', 'glm-4-air'], url: 'https://open.bigmodel.cn/' },
-            anthropic: { name: 'Anthropic (Claude)', models: ['claude-3-5-sonnet', 'claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku'], url: 'https://console.anthropic.com/' },
-            openai: { name: 'OpenAI (GPT)', models: ['gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'], url: 'https://platform.openai.com/' }
+            deepseek: { name: 'DeepSeek', models: ['DeepSeek-V4-Pro', 'DeepSeek-V4-Flash', 'deepseek-chat', 'deepseek-coder'], url: 'https://platform.deepseek.com/', apiType: 'openai', baseUrl: 'https://api.deepseek.com/v1' },
+            moonshot: { name: 'Moonshot (Kimi)', models: ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k', 'moonshot-v1-256k'], url: 'https://platform.moonshot.cn/', apiType: 'openai', baseUrl: 'https://api.moonshot.cn/v1' },
+            qwen: { name: '通义千问 (Qwen)', models: ['qwen-turbo', 'qwen-plus', 'qwen-max', 'qwen-max-longcontext'], url: 'https://bailian.console.aliyun.com/', apiType: 'openai', baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
+            zhipu: { name: '智谱AI (GLM)', models: ['glm-4', 'glm-4-flash', 'glm-3-turbo', 'glm-4-air'], url: 'https://open.bigmodel.cn/', apiType: 'openai', baseUrl: 'https://open.bigmodel.cn/api/paas/v4' },
+            anthropic: { name: 'Anthropic (Claude)', models: ['claude-3-5-sonnet', 'claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku'], url: 'https://console.anthropic.com/', apiType: 'anthropic', baseUrl: 'https://api.anthropic.com/v1' },
+            openai: { name: 'OpenAI (GPT)', models: ['gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'], url: 'https://platform.openai.com/', apiType: 'openai', baseUrl: 'https://api.openai.com/v1' }
         };
         
         async function loadLLMSettings() {
@@ -1117,12 +1117,22 @@
         function onProviderChange(provider) {
             const providerSelect = document.getElementById('llm-provider');
             const modelSelect = document.getElementById('llm-model');
+            const apiTypeSelect = document.getElementById('llm-api-type');
+            const baseUrlInput = document.getElementById('llm-base-url');
             provider = provider || providerSelect.value;
             
             if (provider && LLM_PROVIDERS[provider]) {
                 const models = LLM_PROVIDERS[provider].models;
                 modelSelect.innerHTML = models.map(m => `<option value="${m}">${m}</option>`).join('');
                 modelSelect.disabled = false;
+                // 自动设置API协议类型
+                if (LLM_PROVIDERS[provider].apiType) {
+                    apiTypeSelect.value = LLM_PROVIDERS[provider].apiType;
+                }
+                // 自动设置默认Base URL
+                if (LLM_PROVIDERS[provider].baseUrl) {
+                    baseUrlInput.value = LLM_PROVIDERS[provider].baseUrl;
+                }
             } else {
                 modelSelect.innerHTML = '<option value="">请先选择提供商</option>';
                 modelSelect.disabled = true;

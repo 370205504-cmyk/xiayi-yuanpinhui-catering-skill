@@ -10,7 +10,7 @@ const providers = [
     requiresSecret: false,
     defaultUrl: 'https://api.deepseek.com/v1',
     defaultModel: 'deepseek-chat',
-    models: ['deepseek-chat', 'deepseek-r1-chat']
+    models: ['DeepSeek-V4-Pro', 'DeepSeek-V4-Flash', 'deepseek-chat', 'deepseek-r1-chat']
   },
   {
     id: 'moonshot',
