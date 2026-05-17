@@ -140,7 +140,7 @@ app.use('/api/v1/user', userDataRoutes);
 app.use('/api/v1/llm-config', llmConfigRoutes);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'web', 'index.html'));
+  res.redirect('/mobile');
 });
 
 app.get('/admin', (req, res) => {
